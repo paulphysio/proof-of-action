@@ -100,11 +100,20 @@ export async function createEmergencyRequest(
 }
 
 export async function getNearbyRequests(geohash) {
+  const prefixes = Array.isArray(geohash) ? geohash : [geohash];
+  const cleaned = prefixes
+    .filter((p) => typeof p === 'string' && p.trim().length > 0)
+    .map((p) => p.trim());
+
+  if (cleaned.length === 0) return [];
+
+  const orClause = cleaned.map((p) => `geohash.like.${p}%`).join(',');
+
   const { data, error } = await supabase
     .from('emergency_requests')
     .select('*')
     .eq('status', 'open')
-    .or(`geohash.like.${geohash}%`);
+    .or(orClause);
   
   if (error) {
     logSupabaseError('Error fetching requests', error);

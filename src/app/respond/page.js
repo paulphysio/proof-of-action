@@ -7,6 +7,33 @@ import { generateGeohash } from '@/lib/ai-verification';
 import { notifyActionConfirmed, notifyNearbyEmergency } from '@/lib/notifications';
 import Link from 'next/link';
 
+function buildNearbyGeohashPrefixes(lat, lon, prefixLength) {
+  // Option 1: “same neighborhood/city” (wide match)
+  // Create a small set of prefixes from the user location + surrounding offsets
+  // to avoid missing requests across geohash cell borders.
+  const delta = 0.2; // ~20km latitude; lon varies with latitude. Good demo “city” default.
+
+  const points = [
+    [lat, lon],
+    [lat + delta, lon],
+    [lat - delta, lon],
+    [lat, lon + delta],
+    [lat, lon - delta],
+    [lat + delta, lon + delta],
+    [lat + delta, lon - delta],
+    [lat - delta, lon + delta],
+    [lat - delta, lon - delta]
+  ];
+
+  const prefixes = new Set();
+  for (const [pLat, pLon] of points) {
+    const gh = generateGeohash(pLat, pLon, 6);
+    prefixes.add(gh.slice(0, prefixLength));
+  }
+
+  return Array.from(prefixes);
+}
+
 export default function RespondPage() {
   const { isSignedIn, accountId, signIn } = useWallet();
   const [requests, setRequests] = useState([]);
@@ -14,7 +41,11 @@ export default function RespondPage() {
   const [responding, setResponding] = useState(null);
   const [success, setSuccess] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
-  const [currentGeohash, setCurrentGeohash] = useState(null);
+  const [nearbyPrefixes, setNearbyPrefixes] = useState(null);
+
+  // Smaller prefix => larger “nearby” area.
+  // Option 1 (“same neighborhood/city”): use a short prefix to avoid border misses.
+  const GEOFENCE_PREFIX_LENGTH = 3;
 
   useEffect(() => {
     if (isSignedIn) {
@@ -26,7 +57,7 @@ export default function RespondPage() {
 
   // Realtime: when app is open, listen for new emergency requests and surface ones that match your area
   useEffect(() => {
-    if (!isSignedIn || !currentGeohash) return;
+    if (!isSignedIn || !Array.isArray(nearbyPrefixes) || nearbyPrefixes.length === 0) return;
     if (!supabase?.channel) return;
 
     const channel = supabase
@@ -46,7 +77,8 @@ export default function RespondPage() {
 
           // Geohash proximity: prefix match
           if (typeof newRequest.geohash !== 'string') return;
-          if (!newRequest.geohash.startsWith(currentGeohash)) return;
+          const matches = nearbyPrefixes.some((p) => newRequest.geohash.startsWith(p));
+          if (!matches) return;
 
           setRequests((prev) => {
             if (prev.some((r) => r.id === newRequest.id)) return prev;
@@ -62,7 +94,7 @@ export default function RespondPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isSignedIn, currentGeohash, accountId]);
+  }, [isSignedIn, nearbyPrefixes, accountId]);
 
   const loadNearbyRequests = async () => {
     setLoading(true);
@@ -76,9 +108,9 @@ export default function RespondPage() {
             setUserLocation({ lat, lon });
             
             // Generate geohash and get nearby requests
-            const geohash = generateGeohash(lat, lon, 6);
-            setCurrentGeohash(geohash);
-            const nearby = await getNearbyRequests(geohash);
+            const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+            setNearbyPrefixes(prefixes);
+            const nearby = await getNearbyRequests(prefixes);
             
             // Filter out user's own requests
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
@@ -86,17 +118,21 @@ export default function RespondPage() {
           },
           async () => {
             // Fallback: use default geohash
-            const geohash = generateGeohash(40.7128, -74.0060, 4);
-            setCurrentGeohash(geohash);
-            const nearby = await getNearbyRequests(geohash);
+            const lat = 40.7128;
+            const lon = -74.0060;
+            const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+            setNearbyPrefixes(prefixes);
+            const nearby = await getNearbyRequests(prefixes);
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
           }
         );
       } else {
-        const geohash = generateGeohash(40.7128, -74.0060, 4);
-        setCurrentGeohash(geohash);
-        const nearby = await getNearbyRequests(geohash);
+        const lat = 40.7128;
+        const lon = -74.0060;
+        const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+        setNearbyPrefixes(prefixes);
+        const nearby = await getNearbyRequests(prefixes);
         const filtered = nearby.filter(r => r.requester_wallet !== accountId);
         setRequests(filtered);
       }
