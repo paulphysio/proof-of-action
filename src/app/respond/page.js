@@ -2,9 +2,9 @@
 
 import { useWallet } from '@/lib/near-wallet';
 import { useState, useEffect } from 'react';
-import { getNearbyRequests, createResponse, getOrCreateUser } from '@/lib/supabase';
+import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/lib/supabase';
 import { generateGeohash } from '@/lib/ai-verification';
-import { notifyActionConfirmed } from '@/lib/notifications';
+import { notifyActionConfirmed, notifyNearbyEmergency } from '@/lib/notifications';
 import Link from 'next/link';
 
 export default function RespondPage() {
@@ -14,6 +14,7 @@ export default function RespondPage() {
   const [responding, setResponding] = useState(null);
   const [success, setSuccess] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
+  const [currentGeohash, setCurrentGeohash] = useState(null);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -22,6 +23,46 @@ export default function RespondPage() {
       setLoading(false);
     }
   }, [isSignedIn]);
+
+  // Realtime: when app is open, listen for new emergency requests and surface ones that match your area
+  useEffect(() => {
+    if (!isSignedIn || !currentGeohash) return;
+    if (!supabase?.channel) return;
+
+    const channel = supabase
+      .channel('nearby-emergency-requests')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'emergency_requests' },
+        (payload) => {
+          const newRequest = payload?.new;
+          if (!newRequest) return;
+
+          // Only show open requests
+          if (newRequest.status !== 'open') return;
+
+          // Don't show your own requests
+          if (newRequest.requester_wallet === accountId) return;
+
+          // Geohash proximity: prefix match
+          if (typeof newRequest.geohash !== 'string') return;
+          if (!newRequest.geohash.startsWith(currentGeohash)) return;
+
+          setRequests((prev) => {
+            if (prev.some((r) => r.id === newRequest.id)) return prev;
+            return [newRequest, ...prev];
+          });
+
+          // Notify locally on this device (works while the app is open)
+          notifyNearbyEmergency(newRequest);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isSignedIn, currentGeohash, accountId]);
 
   const loadNearbyRequests = async () => {
     setLoading(true);
@@ -36,6 +77,7 @@ export default function RespondPage() {
             
             // Generate geohash and get nearby requests
             const geohash = generateGeohash(lat, lon, 6);
+            setCurrentGeohash(geohash);
             const nearby = await getNearbyRequests(geohash);
             
             // Filter out user's own requests
@@ -45,6 +87,7 @@ export default function RespondPage() {
           async () => {
             // Fallback: use default geohash
             const geohash = generateGeohash(40.7128, -74.0060, 4);
+            setCurrentGeohash(geohash);
             const nearby = await getNearbyRequests(geohash);
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
@@ -52,6 +95,7 @@ export default function RespondPage() {
         );
       } else {
         const geohash = generateGeohash(40.7128, -74.0060, 4);
+        setCurrentGeohash(geohash);
         const nearby = await getNearbyRequests(geohash);
         const filtered = nearby.filter(r => r.requester_wallet !== accountId);
         setRequests(filtered);
