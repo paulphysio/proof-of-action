@@ -6,13 +6,27 @@ import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/
 import { generateGeohash } from '@/lib/ai-verification';
 import { notifyActionConfirmed, notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
+import { 
+  Shield,
+  Wallet,
+  HandHelping,
+  MapPin,
+  Clock,
+  RefreshCw,
+  Loader2,
+  Check,
+  ArrowRight,
+  ChevronLeft,
+  AlertCircle,
+  User,
+  Award,
+  Plus,
+  Sparkles,
+  Navigation
+} from 'lucide-react';
 
 function buildNearbyGeohashPrefixes(lat, lon, prefixLength) {
-  // Option 1: “same neighborhood/city” (wide match)
-  // Create a small set of prefixes from the user location + surrounding offsets
-  // to avoid missing requests across geohash cell borders.
-  const delta = 0.2; // ~20km latitude; lon varies with latitude. Good demo “city” default.
-
+  const delta = 0.2;
   const points = [
     [lat, lon],
     [lat + delta, lon],
@@ -43,8 +57,6 @@ export default function RespondPage() {
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyPrefixes, setNearbyPrefixes] = useState(null);
 
-  // Smaller prefix => larger “nearby” area.
-  // Option 1 (“same neighborhood/city”): use a short prefix to avoid border misses.
   const GEOFENCE_PREFIX_LENGTH = 3;
 
   useEffect(() => {
@@ -55,7 +67,6 @@ export default function RespondPage() {
     }
   }, [isSignedIn]);
 
-  // Realtime: when app is open, listen for new emergency requests and surface ones that match your area
   useEffect(() => {
     if (!isSignedIn || !Array.isArray(nearbyPrefixes) || nearbyPrefixes.length === 0) return;
     if (!supabase?.channel) return;
@@ -68,14 +79,8 @@ export default function RespondPage() {
         (payload) => {
           const newRequest = payload?.new;
           if (!newRequest) return;
-
-          // Only show open requests
           if (newRequest.status !== 'open') return;
-
-          // Don't show your own requests
           if (newRequest.requester_wallet === accountId) return;
-
-          // Geohash proximity: prefix match
           if (typeof newRequest.geohash !== 'string') return;
           const matches = nearbyPrefixes.some((p) => newRequest.geohash.startsWith(p));
           if (!matches) return;
@@ -85,7 +90,6 @@ export default function RespondPage() {
             return [newRequest, ...prev];
           });
 
-          // Notify locally on this device (works while the app is open)
           notifyNearbyEmergency(newRequest);
         }
       )
@@ -96,13 +100,11 @@ export default function RespondPage() {
     };
   }, [isSignedIn, nearbyPrefixes, accountId]);
 
-  // Background device alerts: store this device's push subscription with your nearby prefixes
   useEffect(() => {
     if (!isSignedIn || !accountId) return;
     if (!Array.isArray(nearbyPrefixes) || nearbyPrefixes.length === 0) return;
     if (typeof window === 'undefined') return;
     if (!('Notification' in window)) return;
-
     if (Notification.permission !== 'granted') return;
 
     let cancelled = false;
@@ -122,25 +124,19 @@ export default function RespondPage() {
   const loadNearbyRequests = async () => {
     setLoading(true);
     try {
-      // Get user location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             setUserLocation({ lat, lon });
-            
-            // Generate geohash and get nearby requests
             const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
             setNearbyPrefixes(prefixes);
             const nearby = await getNearbyRequests(prefixes);
-            
-            // Filter out user's own requests
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
           },
           async () => {
-            // Fallback: use default geohash
             const lat = 40.7128;
             const lon = -74.0060;
             const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
@@ -175,8 +171,6 @@ export default function RespondPage() {
       if (response) {
         setSuccess(request);
         notifyActionConfirmed(response);
-
-        // Notify requester on their devices (push)
         if (request?.requester_wallet) {
           fetch('/api/push/notify-requester', {
             method: 'POST',
@@ -184,8 +178,6 @@ export default function RespondPage() {
             body: JSON.stringify({ requesterWallet: request.requester_wallet, requestId: request.id })
           }).catch(() => {});
         }
-        
-        // Refresh list
         setRequests(requests.filter(r => r.id !== request.id));
       }
     } catch (error) {
@@ -198,23 +190,36 @@ export default function RespondPage() {
 
   if (!isSignedIn) {
     return (
-      <div className="min-vh-100 bg-light d-flex align-items-center">
-        <div className="container">
+      <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
+        <div className="aurora-bg" />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div className="row justify-content-center">
             <div className="col-md-6 text-center">
-              <div className="card shadow">
-                <div className="card-body p-5">
-                  <div className="display-1 mb-4">🔌</div>
-                  <h2 className="mb-3">Connect Your Wallet</h2>
-                  <p className="text-muted mb-4">
-                    Create or import your Solana wallet to help others in your community.
-                  </p>
-                  <button onClick={signIn} className="btn btn-primary btn-lg">
-                    Import Wallet
-                  </button>
-                  <div className="mt-3">
-                    <Link href="/" className="btn btn-link">← Back to Home</Link>
-                  </div>
+              <div className="glass-card p-5">
+                <div style={{ 
+                  width: '80px', 
+                  height: '80px', 
+                  borderRadius: '20px',
+                  background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}>
+                  <Wallet size={36} color="#06B6D4" />
+                </div>
+                <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '1rem' }}>Connect Your Wallet</h2>
+                <p style={{ color: 'var(--slate-400)', marginBottom: '2rem' }}>
+                  Create or import your Solana wallet to help others in your community.
+                </p>
+                <button onClick={signIn} className="btn btn-gradient btn-lg">
+                  Import Wallet
+                  <ArrowRight size={18} className="ms-2" />
+                </button>
+                <div className="mt-4">
+                  <Link href="/" style={{ color: 'var(--cyan-400)', textDecoration: 'none', fontSize: '0.875rem' }}>
+                    Back to Home
+                  </Link>
                 </div>
               </div>
             </div>
@@ -226,29 +231,40 @@ export default function RespondPage() {
 
   if (success) {
     return (
-      <div className="min-vh-100 bg-light d-flex align-items-center">
-        <div className="container">
+      <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
+        <div className="aurora-bg" />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div className="row justify-content-center">
             <div className="col-md-6 text-center">
-              <div className="card shadow border-success">
-                <div className="card-body p-5">
-                  <div className="display-1 mb-4">🤝</div>
-                  <h2 className="text-success mb-3">Response Sent!</h2>
-                  <p className="text-muted mb-4">
-                    You've offered to help with <strong>{success.request_type}</strong>.
-                    The requester will be notified. Once confirmed, you'll earn rewards!
-                  </p>
-                  <div className="d-flex gap-3 justify-content-center">
-                    <Link href="/dashboard" className="btn btn-primary">
-                      View Dashboard
-                    </Link>
-                    <button 
-                      onClick={() => { setSuccess(null); loadNearbyRequests(); }}
-                      className="btn btn-outline-success"
-                    >
-                      Help Someone Else
-                    </button>
-                  </div>
+              <div className="glass-card p-5" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+                <div style={{ 
+                  width: '100px', 
+                  height: '100px', 
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}>
+                  <HandHelping size={48} color="#10B981" />
+                </div>
+                <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '1rem' }}>Response Sent!</h2>
+                <p style={{ color: 'var(--slate-400)', marginBottom: '2rem' }}>
+                  You've offered to help with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>.
+                  The requester will be notified. Once confirmed, you'll earn rewards!
+                </p>
+                <div className="d-flex gap-3 justify-content-center">
+                  <Link href="/dashboard" className="btn btn-gradient">
+                    View Dashboard
+                  </Link>
+                  <button 
+                    onClick={() => { setSuccess(null); loadNearbyRequests(); }}
+                    className="btn btn-outline-glass"
+                  >
+                    Help Someone Else
+                  </button>
                 </div>
               </div>
             </div>
@@ -259,112 +275,227 @@ export default function RespondPage() {
   }
 
   return (
-    <div className="min-vh-100 bg-light">
-      {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-success">
-        <div className="container">
-          <Link href="/" className="navbar-brand fw-bold">
-            🛡️ Proof-of-Action
-          </Link>
-          <div className="d-flex align-items-center gap-3">
-            <span className="text-light small d-none d-sm-inline">
-              {accountId?.slice(0, 16)}...
-            </span>
-            <Link href="/dashboard" className="btn btn-light btn-sm">
-              Dashboard
+    <div className="min-vh-100" style={{ background: 'var(--navy-950)', position: 'relative', overflow: 'hidden' }}>
+      <div className="aurora-bg" />
+      
+      {/* Floating Elements */}
+      <div 
+        className="animate-float-slow"
+        style={{
+          position: 'fixed',
+          width: '250px',
+          height: '250px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)',
+          top: '15%',
+          left: '-80px',
+          zIndex: 0,
+          pointerEvents: 'none'
+        }}
+      />
+      
+      {/* Premium Navbar - Mobile Optimized */}
+      <nav className="nav-premium" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+        <div className="container px-3 px-md-4">
+          <div className="d-flex align-items-center justify-content-between py-3">
+            <Link href="/" className="d-flex align-items-center gap-2 text-decoration-none">
+              <div 
+                className="animate-pulse-glow"
+                style={{ 
+                  background: 'var(--gradient-accent)', 
+                  padding: '10px', 
+                  borderRadius: '12px',
+                  display: 'flex'
+                }}
+              >
+                <Shield size={24} color="white" />
+              </div>
+              <div className="d-none d-sm-block">
+                <span style={{ 
+                  color: 'white', 
+                  fontWeight: 700, 
+                  fontSize: '1.25rem',
+                  letterSpacing: '-0.02em'
+                }}>
+                  Proof-of-Action
+                </span>
+              </div>
+              <div className="d-sm-none">
+                <span style={{ 
+                  color: 'white', 
+                  fontWeight: 700, 
+                  fontSize: '1.1rem',
+                  letterSpacing: '-0.02em'
+                }}>
+                  PoA
+                </span>
+              </div>
             </Link>
+            
+            <div className="d-flex align-items-center gap-2 gap-md-3">
+              <div className="wallet-chip d-none d-md-flex animate-reveal-scale">
+                <Wallet size={14} />
+                <span>{accountId?.slice(0, 8)}...</span>
+              </div>
+              <Link href="/dashboard" className="btn btn-outline-glass d-none d-sm-flex" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+                <ChevronLeft size={16} className="me-2" />
+                Dashboard
+              </Link>
+              <Link href="/dashboard" className="btn btn-outline-glass d-sm-none" style={{ padding: '0.5rem', fontSize: '0.875rem' }}>
+                <ChevronLeft size={18} />
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="container py-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="container py-4 py-md-5 px-3 px-md-4" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Header - Mobile Optimized */}
+        <div className="d-flex flex-wrap justify-content-between align-items-start mb-4 mb-md-5 gap-3 animate-reveal-down">
           <div>
-            <h2 className="mb-1">🤝 Emergency Requests Nearby</h2>
-            <p className="text-muted mb-0">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <div 
+                className="animate-bounce-subtle flex-shrink-0"
+                style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <HandHelping size={20} color="#10B981" />
+              </div>
+              <h2 className="m-0" style={{ color: 'white', fontWeight: 700, fontSize: '1.25rem' }}>Requests Nearby</h2>
+            </div>
+            <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
               Help your community. Earn on-chain rewards.
             </p>
           </div>
           <button 
             onClick={loadNearbyRequests}
-            className="btn btn-outline-success"
+            className="btn btn-outline-glass d-flex align-items-center gap-2 flex-shrink-0"
             disabled={loading}
+            style={{ padding: '0.5rem 1rem' }}
           >
             {loading ? (
-              <span className="spinner-border spinner-border-sm" />
+              <Loader2 size={16} className="animate-spin" />
             ) : (
-              '🔄 Refresh'
+              <RefreshCw size={16} />
             )}
+            <span className="d-none d-sm-inline">Refresh</span>
           </button>
         </div>
 
         {loading ? (
-          <div className="text-center py-5">
-            <div className="spinner-border text-success" role="status">
+          <div className="text-center py-5 animate-reveal-up">
+            <div className="spinner-border" role="status" style={{ color: 'var(--cyan-400)', width: '2.5rem', height: '2.5rem' }}>
               <span className="visually-hidden">Loading...</span>
             </div>
-            <p className="mt-3 text-muted">Finding nearby requests...</p>
+            <p className="mt-3" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>Finding nearby requests...</p>
           </div>
         ) : requests.length === 0 ? (
-          <div className="card shadow-sm">
-            <div className="card-body text-center py-5">
-              <div className="display-1 mb-4">🌟</div>
-              <h4>No Emergency Requests Nearby</h4>
-              <p className="text-muted mb-4">
-                Great news! There are no open emergency requests in your area right now.
-              </p>
-              <div className="d-flex gap-3 justify-content-center">
-                <button 
-                  onClick={loadNearbyRequests}
-                  className="btn btn-success"
-                >
-                  Check Again
-                </button>
-                <Link href="/request" className="btn btn-outline-danger">
-                  Post a Request
-                </Link>
-              </div>
+          <div className="glass-card p-4 p-md-5 text-center animate-reveal-scale">
+            <div 
+              className="animate-float mx-auto"
+              style={{ 
+                width: '80px', 
+                height: '80px', 
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05))',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1.5rem'
+              }}
+            >
+              <Sparkles size={36} color="#F59E0B" />
+            </div>
+            <h4 style={{ color: 'white', fontWeight: 600, marginBottom: '1rem', fontSize: '1.125rem' }}>No Requests Nearby</h4>
+            <p className="mb-4" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
+              Great news! There are no open emergency requests in your area right now.
+            </p>
+            <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+              <button 
+                onClick={loadNearbyRequests}
+                className="btn btn-gradient"
+              >
+                <RefreshCw size={16} className="me-2" />
+                Check Again
+              </button>
+              <Link href="/request" className="btn btn-gold">
+                <Plus size={16} className="me-2" />
+                Post Request
+              </Link>
             </div>
           </div>
         ) : (
-          <div className="row g-4">
-            {requests.map((request) => (
-              <div key={request.id} className="col-md-6 col-lg-4">
-                <div className="card h-100 shadow-sm border-warning">
-                  <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                    <span className="fw-bold">🚨 {request.request_type}</span>
-                    <span className="badge bg-light text-dark">
+          <div className="card-grid stagger-children">
+            {requests.map((request, index) => (
+              <div 
+                key={request.id} 
+                className="animate-reveal-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="glass-card h-100" style={{ borderColor: 'rgba(244, 63, 94, 0.2)' }}>
+                  <div 
+                    className="p-3 d-flex justify-content-between align-items-center"
+                    style={{ 
+                      background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(244, 63, 94, 0.05))',
+                      borderBottom: '1px solid rgba(244, 63, 94, 0.2)'
+                    }}
+                  >
+                    <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }} className="d-flex align-items-center gap-2">
+                      <AlertCircle size={16} color="#F43F5E" />
+                      {request.request_type}
+                    </span>
+                    <span style={{ 
+                      background: 'rgba(15, 23, 42, 0.5)',
+                      color: 'var(--slate-300)',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.6875rem'
+                    }}>
                       {new Date(request.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="card-body">
-                    <p className="card-text">
+                  <div className="p-3 p-md-4">
+                    <p style={{ color: 'var(--slate-300)', marginBottom: '1rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
                       {request.description || 'No additional details provided.'}
                     </p>
-                    <div className="mt-3">
-                      <small className="text-muted">
-                        📍 Location: {request.geohash.slice(0, 4)}...
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      <MapPin size={12} color="var(--slate-500)" />
+                      <small style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                        Location: {request.geohash.slice(0, 4)}...
                       </small>
                     </div>
-                    <div className="mt-2">
-                      <small className="text-muted">
-                        👤 Requester: {request.requester_wallet.slice(0, 12)}...
+                    <div className="d-flex align-items-center gap-2">
+                      <User size={12} color="var(--slate-500)" />
+                      <small style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                        Requester: {request.requester_wallet.slice(0, 10)}...
                       </small>
                     </div>
                   </div>
-                  <div className="card-footer bg-white">
+                  <div className="p-3 p-md-4 pt-0">
                     <button
                       onClick={() => handleRespond(request)}
                       disabled={responding === request.id}
-                      className="btn btn-success w-100"
+                      className="btn btn-gradient w-100 d-flex align-items-center justify-content-center gap-2"
                     >
                       {responding === request.id ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" />
-                          Responding...
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Responding...</span>
                         </>
                       ) : (
-                        '🤝 I Can Help'
+                        <>
+                          <HandHelping size={16} />
+                          <span>I Can Help</span>
+                        </>
                       )}
                     </button>
                   </div>
@@ -374,23 +505,48 @@ export default function RespondPage() {
           </div>
         )}
 
-        {/* Info Card */}
-        <div className="card mt-4 bg-primary text-white">
-          <div className="card-body">
-            <h5 className="card-title">💡 How Helping Works</h5>
-            <div className="row mt-3">
-              <div className="col-md-4">
-                <p className="mb-1"><strong>1. Click "I Can Help"</strong></p>
-                <small>Respond to an emergency request near you</small>
-              </div>
-              <div className="col-md-4">
-                <p className="mb-1"><strong>2. Meet & Help</strong></p>
-                <small>Coordinate with the requester and provide assistance</small>
-              </div>
-              <div className="col-md-4">
-                <p className="mb-1"><strong>3. Get Verified</strong></p>
-                <small>AI verifies the action and you earn rewards!</small>
-              </div>
+        {/* Info Card - Mobile Optimized */}
+        <div 
+          className="glass-card mt-4 mt-md-5 animate-reveal-up"
+          style={{ background: 'rgba(6, 182, 212, 0.05)', animationDelay: '200ms' }}
+        >
+          <div className="p-3 p-md-4">
+            <div className="d-flex align-items-center gap-2 mb-3">
+              <Award size={18} color="var(--cyan-400)" />
+              <h5 className="m-0" style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>How Helping Works</h5>
+            </div>
+            <div className="row g-3 g-md-4 mt-1">
+              {[
+                { num: '1', title: 'Click "I Can Help"', desc: 'Respond to an emergency near you', icon: HandHelping },
+                { num: '2', title: 'Meet & Help', desc: 'Coordinate and provide assistance', icon: MapPin },
+                { num: '3', title: 'Get Verified', desc: 'AI verifies and you earn rewards!', icon: Award }
+              ].map((step, i) => (
+                <div key={i} className="col-12 col-md-4">
+                  <div className="d-flex gap-3 animate-reveal-left" style={{ animationDelay: `${i * 100}ms` }}>
+                    <div 
+                      className="animate-pulse-glow flex-shrink-0"
+                      style={{ 
+                        width: '32px', 
+                        height: '32px', 
+                        borderRadius: '50%',
+                        background: i === 2 ? 'var(--gradient-gold)' : 'var(--gradient-accent)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                        color: i === 2 ? 'var(--navy-950)' : 'white'
+                      }}
+                    >
+                      {step.num}
+                    </div>
+                    <div>
+                      <p className="mb-1" style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }}>{step.title}</p>
+                      <small style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>{step.desc}</small>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
