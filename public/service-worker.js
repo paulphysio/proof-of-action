@@ -49,7 +49,8 @@ self.addEventListener('push', (event) => {
     badge: '/icons/icon-192x192.png',
     tag: data.tag,
     requireInteraction: true,
-    actions: data.actions || []
+    actions: data.actions || [],
+    data: { url: data.url }
   };
   
   event.waitUntil(
@@ -62,9 +63,14 @@ self.addEventListener('notificationclick', (event) => {
   
   const action = event.action;
   const notification = event.notification;
+  const url = notification?.data?.url;
   
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then((clientList) => {
+      if (url && typeof url === 'string') {
+        return clients.openWindow(url);
+      }
+
       if (action === 'respond') {
         return clients.openWindow('/respond');
       } else if (action === 'view') {

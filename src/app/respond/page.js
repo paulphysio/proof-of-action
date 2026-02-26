@@ -4,7 +4,7 @@ import { useWallet } from '@/lib/near-wallet';
 import { useState, useEffect } from 'react';
 import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/lib/supabase';
 import { generateGeohash } from '@/lib/ai-verification';
-import { notifyActionConfirmed, notifyNearbyEmergency } from '@/lib/notifications';
+import { notifyActionConfirmed, notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
 
 function buildNearbyGeohashPrefixes(lat, lon, prefixLength) {
@@ -96,6 +96,29 @@ export default function RespondPage() {
     };
   }, [isSignedIn, nearbyPrefixes, accountId]);
 
+  // Background device alerts: store this device's push subscription with your nearby prefixes
+  useEffect(() => {
+    if (!isSignedIn || !accountId) return;
+    if (!Array.isArray(nearbyPrefixes) || nearbyPrefixes.length === 0) return;
+    if (typeof window === 'undefined') return;
+    if (!('Notification' in window)) return;
+
+    if (Notification.permission !== 'granted') return;
+
+    let cancelled = false;
+    (async () => {
+      const sub = await subscribeToPushNotifications();
+      if (cancelled) return;
+      if (sub) {
+        await savePushSubscription(sub, accountId, nearbyPrefixes);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, accountId, nearbyPrefixes]);
+
   const loadNearbyRequests = async () => {
     setLoading(true);
     try {
@@ -152,6 +175,15 @@ export default function RespondPage() {
       if (response) {
         setSuccess(request);
         notifyActionConfirmed(response);
+
+        // Notify requester on their devices (push)
+        if (request?.requester_wallet) {
+          fetch('/api/push/notify-requester', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requesterWallet: request.requester_wallet, requestId: request.id })
+          }).catch(() => {});
+        }
         
         // Refresh list
         setRequests(requests.filter(r => r.id !== request.id));

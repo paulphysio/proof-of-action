@@ -1,7 +1,7 @@
 'use client';
 
 import { useWallet } from '@/lib/near-wallet';
-import { requestNotificationPermission } from '@/lib/notifications';
+import { requestNotificationPermission, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
@@ -47,6 +47,10 @@ export default function Home() {
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
     if (granted) {
+      const sub = await subscribeToPushNotifications();
+      if (sub) {
+        await savePushSubscription(sub, accountId, []);
+      }
       alert('Notifications enabled! You\'ll receive alerts for nearby emergencies.');
     }
   };

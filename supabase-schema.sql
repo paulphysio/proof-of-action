@@ -115,6 +115,23 @@ CREATE INDEX IF NOT EXISTS idx_reports_reported ON reports(reported_wallet);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 
 -- ============================================
+-- PUSH SUBSCRIPTIONS TABLE
+-- Stores Web Push subscriptions for device alerts
+-- ============================================
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  wallet_address TEXT REFERENCES users(wallet_address),
+  endpoint TEXT UNIQUE NOT NULL,
+  subscription JSONB NOT NULL,
+  geohash_prefixes TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_wallet ON push_subscriptions(wallet_address);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_geohash_prefixes ON push_subscriptions USING GIN (geohash_prefixes);
+
+-- ============================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- Enable privacy and security
 -- ============================================
@@ -126,6 +143,7 @@ ALTER TABLE responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE action_verifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies so this script can be re-run safely
 DROP POLICY IF EXISTS "Users can read all profiles" ON users;
@@ -157,6 +175,10 @@ DROP POLICY IF EXISTS "Rewards can be created" ON rewards;
 
 DROP POLICY IF EXISTS "Reports are readable" ON reports;
 DROP POLICY IF EXISTS "Reports can be created" ON reports;
+
+DROP POLICY IF EXISTS "Push subscriptions are readable" ON push_subscriptions;
+DROP POLICY IF EXISTS "Push subscriptions can be created" ON push_subscriptions;
+DROP POLICY IF EXISTS "Push subscriptions can be updated" ON push_subscriptions;
 
 -- Demo mode policies
 
@@ -204,6 +226,15 @@ CREATE POLICY "Reports are readable"
 
 CREATE POLICY "Reports can be created"
   ON reports FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Push subscriptions are readable"
+  ON push_subscriptions FOR SELECT USING (true);
+
+CREATE POLICY "Push subscriptions can be created"
+  ON push_subscriptions FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Push subscriptions can be updated"
+  ON push_subscriptions FOR UPDATE USING (true);
 
 -- ============================================
 -- FUNCTIONS & TRIGGERS

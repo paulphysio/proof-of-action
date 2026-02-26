@@ -72,6 +72,16 @@ export default function RequestPage() {
         // Send notification (demo purposes)
         notifyNearbyEmergency(request);
 
+        // Background device alerts (Web Push): notify nearby helpers
+        const prefix = typeof request.geohash === 'string' ? request.geohash.slice(0, 3) : null;
+        if (prefix) {
+          fetch('/api/push/notify-nearby', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ request, geohashPrefixes: [prefix] })
+          }).catch(() => {});
+        }
+
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           router.push('/dashboard');

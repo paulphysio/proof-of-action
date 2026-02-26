@@ -32,20 +32,55 @@ export async function requestNotificationPermission() {
 export async function subscribeToPushNotifications() {
   try {
     const registration = await navigator.serviceWorker.ready;
-    
-    // In production, you would get this from your server
-    // For demo, we'll simulate the subscription
+
+    const existing = await registration.pushManager.getSubscription();
+    if (existing) return existing;
+
+    const res = await fetch('/api/push/public-key');
+    if (!res.ok) {
+      throw new Error('Failed to fetch VAPID public key');
+    }
+
+    const { publicKey } = await res.json();
+    if (!publicKey || typeof publicKey !== 'string') {
+      throw new Error('Invalid VAPID public key');
+    }
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        'BEl62iTMgUfis1J0L9ZlJ-1rPqF0z5P6g6z6Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9'
-      )
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
     });
     
     console.log('Push subscription:', subscription);
     return subscription;
   } catch (error) {
     console.error('Push subscription failed:', error);
+    return null;
+  }
+}
+
+export async function savePushSubscription(subscription, walletAddress, geohashPrefixes = []) {
+  try {
+    if (!subscription) return null;
+
+    const res = await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subscription,
+        walletAddress: walletAddress || null,
+        geohashPrefixes: Array.isArray(geohashPrefixes) ? geohashPrefixes : []
+      })
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json?.error || 'Failed to save push subscription');
+    }
+
+    return json;
+  } catch (error) {
+    console.error('Saving push subscription failed:', error);
     return null;
   }
 }
