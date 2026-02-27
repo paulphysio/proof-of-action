@@ -37,6 +37,7 @@ export default function Home() {
   const [walletError, setWalletError] = useState('');
   const [copied, setCopied] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [showSeedPhrase, setShowSeedPhrase] = useState(false);
 
   const shortAddress = useMemo(() => {
     if (!accountId) return '';
@@ -55,7 +56,7 @@ export default function Home() {
     try {
       const { mnemonic } = await createWallet();
       setCreatedMnemonic(mnemonic);
-      setShowOnboarding(true);
+      setShowSeedPhrase(true);
     } catch (e) {
       console.error(e);
       setWalletError('Could not create wallet. Please try again.');
@@ -67,6 +68,7 @@ export default function Home() {
     try {
       await importWallet(importPhrase);
       setShowOnboarding(false);
+      setShowSeedPhrase(false);
       setCreatedMnemonic('');
       setImportPhrase('');
     } catch (e) {
@@ -407,7 +409,7 @@ export default function Home() {
       </section>
 
       {/* Wallet Onboarding Modal */}
-      {!isSignedIn && showOnboarding && (
+      {(showOnboarding || showSeedPhrase) && (
         <div style={{ 
           position: 'fixed', 
           top: 0, 
@@ -427,10 +429,15 @@ export default function Home() {
               <div className="d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center gap-2">
                   <Wallet size={20} color="var(--cyan-400)" />
-                  <h5 className="m-0" style={{ color: 'white', fontWeight: 600 }}>Solana Wallet</h5>
+                  <h5 className="m-0" style={{ color: 'white', fontWeight: 600 }}>
+                    {showSeedPhrase ? 'Save Your Recovery Phrase' : 'Solana Wallet'}
+                  </h5>
                 </div>
                 <button 
-                  onClick={() => setShowOnboarding(false)}
+                  onClick={() => {
+                    setShowOnboarding(false);
+                    setShowSeedPhrase(false);
+                  }}
                   className="btn btn-link p-0"
                   style={{ color: 'var(--slate-400)' }}
                 >
@@ -531,7 +538,10 @@ export default function Home() {
                           <button
                             className="btn btn-gradient flex-fill"
                             disabled={!confirmedBackup}
-                            onClick={() => setShowOnboarding(false)}
+                            onClick={() => {
+                              setShowSeedPhrase(false);
+                              setShowOnboarding(false);
+                            }}
                           >
                             Continue
                           </button>
@@ -550,7 +560,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-md-6" style={{ display: showSeedPhrase ? 'none' : 'block' }}>
                   <div className="glass-card p-4 h-100">
                     <div className="d-flex align-items-center gap-2 mb-3">
                       <div style={{ 
