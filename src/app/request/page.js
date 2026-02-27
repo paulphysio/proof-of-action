@@ -33,7 +33,8 @@ const REQUEST_TYPES = [
     value: 'medication', 
     icon: Pill,
     label: 'Medication', 
-    desc: 'Insulin, inhalers, epipens, etc.',
+    labelMobile: 'Medication',
+    desc: 'Insulin, inhalers, epipens',
     color: '#F43F5E',
     bg: 'rgba(244, 63, 94, 0.1)'
   },
@@ -41,7 +42,8 @@ const REQUEST_TYPES = [
     value: 'medical_supplies', 
     icon: Stethoscope,
     label: 'Medical Supplies', 
-    desc: 'Bandages, first aid, etc.',
+    labelMobile: 'Med Supplies',
+    desc: 'Bandages, first aid items',
     color: '#06B6D4',
     bg: 'rgba(6, 182, 212, 0.1)'
   },
@@ -49,6 +51,7 @@ const REQUEST_TYPES = [
     value: 'food', 
     icon: Utensils,
     label: 'Food/Water', 
+    labelMobile: 'Food/Water',
     desc: 'Emergency food supplies',
     color: '#10B981',
     bg: 'rgba(16, 185, 129, 0.1)'
@@ -57,6 +60,7 @@ const REQUEST_TYPES = [
     value: 'shelter', 
     icon: Home,
     label: 'Temporary Shelter', 
+    labelMobile: 'Shelter',
     desc: 'Emergency accommodation',
     color: '#8B5CF6',
     bg: 'rgba(139, 92, 246, 0.1)'
@@ -65,6 +69,7 @@ const REQUEST_TYPES = [
     value: 'transport', 
     icon: Car,
     label: 'Emergency Transport', 
+    labelMobile: 'Transport',
     desc: 'Ride to medical facility',
     color: '#F59E0B',
     bg: 'rgba(245, 158, 11, 0.1)'
@@ -73,6 +78,7 @@ const REQUEST_TYPES = [
     value: 'other', 
     icon: AlertTriangle,
     label: 'Other Emergency', 
+    labelMobile: 'Other',
     desc: 'Other urgent needs',
     color: '#64748B',
     bg: 'rgba(100, 116, 139, 0.1)'
@@ -384,11 +390,11 @@ export default function RequestPage() {
                       </label>
                     </div>
                     
-                    <div className="row g-2 g-md-3">
+                    <div className="row g-2">
                       {REQUEST_TYPES.map((type) => (
-                        <div key={type.value} className="col-6 col-md-6">
+                        <div key={type.value} className="col-12 col-sm-6">
                           <div 
-                            className="glass-card p-2 p-md-3 animate-reveal-scale"
+                            className="glass-card p-2 p-sm-3 animate-reveal-scale"
                             onClick={() => setRequestType(type.value)}
                             style={{ 
                               cursor: 'pointer',
@@ -398,16 +404,19 @@ export default function RequestPage() {
                               background: requestType === type.value 
                                 ? type.bg 
                                 : 'var(--glass-bg)',
-                              animationDelay: `${REQUEST_TYPES.indexOf(type) * 50}ms`
+                              animationDelay: `${REQUEST_TYPES.indexOf(type) * 50}ms`,
+                              minHeight: '68px',
+                              display: 'flex',
+                              alignItems: 'center'
                             }}
                           >
-                            <div className="d-flex align-items-start gap-2 gap-md-3">
+                            <div className="d-flex align-items-center gap-2 gap-sm-3 w-100">
                               <div 
                                 className="animate-float flex-shrink-0"
                                 style={{ 
-                                  width: '36px', 
-                                  height: '36px', 
-                                  borderRadius: '8px',
+                                  width: '40px', 
+                                  height: '40px', 
+                                  borderRadius: '10px',
                                   background: type.bg,
                                   border: `1px solid ${type.color}40`,
                                   display: 'flex',
@@ -415,7 +424,7 @@ export default function RequestPage() {
                                   justifyContent: 'center'
                                 }}
                               >
-                                <type.icon size={18} color={type.color} />
+                                <type.icon size={20} color={type.color} />
                               </div>
                               <div className="flex-grow-1 min-width-0">
                                 <div className="d-flex align-items-center gap-2">
@@ -424,17 +433,30 @@ export default function RequestPage() {
                                     name="requestType"
                                     checked={requestType === type.value}
                                     onChange={() => setRequestType(type.value)}
+                                    className="flex-shrink-0"
                                     style={{ 
                                       accentColor: type.color,
-                                      width: '16px',
-                                      height: '16px'
+                                      width: '18px',
+                                      height: '18px',
+                                      margin: 0
                                     }}
                                   />
-                                  <span style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
-                                    {type.label}
+                                  <span 
+                                    style={{ 
+                                      color: 'white', 
+                                      fontWeight: 600, 
+                                      fontSize: '0.875rem',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis'
+                                    }}
+                                  >
+                                    {/* Show mobile label on xs, full label on sm+ */}
+                                    <span className="d-inline d-sm-none">{type.labelMobile}</span>
+                                    <span className="d-none d-sm-inline">{type.label}</span>
                                   </span>
                                 </div>
-                                <p className="m-0 mt-1 d-none d-sm-block" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+                                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.6875rem', lineHeight: 1.3 }}>
                                   {type.desc}
                                 </p>
                               </div>

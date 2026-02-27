@@ -488,60 +488,155 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recent Rewards - Mobile Optimized */}
+          {/* Recent Rewards - Styled as Premium Cards */}
           <div className="col-12 animate-reveal-up" style={{ animationDelay: '300ms' }}>
             <div className="glass-card">
               <div className="p-3 p-md-4" style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-2">
-                    <Star size={18} color="var(--amber-400)" />
-                    <h5 className="m-0" style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>Recent Rewards</h5>
+                    <div 
+                      className="animate-pulse-glow"
+                      style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1))',
+                        border: '1px solid rgba(245, 158, 11, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Star size={18} color="#F59E0B" />
+                    </div>
+                    <div>
+                      <h5 className="m-0" style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>Recent Rewards</h5>
+                      <small style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>Proof Points earned</small>
+                    </div>
                   </div>
-                  <div className="token-badge animate-pulse-glow">
-                    <TrendingUp size={12} />
-                    <span>{totalRewards} Total</span>
+                  <div 
+                    className="d-flex align-items-center gap-2 px-3 py-2"
+                    style={{ 
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05))',
+                      borderRadius: '20px',
+                      border: '1px solid rgba(245, 158, 11, 0.2)'
+                    }}
+                  >
+                    <TrendingUp size={14} color="#F59E0B" />
+                    <span style={{ color: '#F59E0B', fontWeight: 700, fontSize: '0.875rem' }}>
+                      {totalRewards} Total
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="p-3 p-md-4">
                 {rewards.length === 0 ? (
-                  <div className="text-center py-4">
-                    <div className="animate-float" style={{ color: 'var(--slate-500)', marginBottom: '1rem' }}>
-                      <Award size={40} opacity={0.3} />
+                  <div className="text-center py-5">
+                    <div 
+                      className="animate-float mx-auto mb-3"
+                      style={{ 
+                        width: '64px', 
+                        height: '64px', 
+                        borderRadius: '16px',
+                        background: 'rgba(100, 116, 139, 0.1)',
+                        border: '1px solid rgba(100, 116, 139, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Award size={28} color="var(--slate-500)" />
                     </div>
-                    <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
-                      No rewards yet. Complete verified actions to earn!
+                    <p style={{ color: 'var(--slate-400)', fontSize: '0.9375rem', marginBottom: '0.5rem' }}>
+                      No rewards yet
+                    </p>
+                    <p style={{ color: 'var(--slate-500)', fontSize: '0.75rem', margin: 0 }}>
+                      Complete verified help actions to earn Proof Points
                     </p>
                   </div>
                 ) : (
-                  <div className="table-responsive">
-                    <table className="table" style={{ color: 'var(--slate-300)', fontSize: '0.875rem' }}>
-                      <thead>
-                        <tr style={{ borderColor: 'var(--glass-border)' }}>
-                          <th style={{ color: 'var(--slate-400)', fontWeight: 600, border: 'none', fontSize: '0.75rem' }}>Amount</th>
-                          <th style={{ color: 'var(--slate-400)', fontWeight: 600, border: 'none', fontSize: '0.75rem' }}>Reason</th>
-                          <th style={{ color: 'var(--slate-400)', fontWeight: 600, border: 'none', fontSize: '0.75rem' }} className="d-none d-sm-table-cell">Date</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rewards.slice(0, 10).map((reward) => (
-                          <tr key={reward.id} style={{ borderColor: 'var(--glass-border)' }}>
-                            <td style={{ border: 'none', padding: '0.75rem' }}>
-                              <span className="token-badge" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                                <Plus size={10} />
-                                {reward.amount}
+                  <div className="row g-3">
+                    {rewards.slice(0, 6).map((reward, index) => (
+                      <div key={reward.id} className="col-12 col-md-6 col-lg-4">
+                        <div 
+                          className="animate-reveal-scale"
+                          style={{ 
+                            animationDelay: `${index * 50}ms`,
+                            background: 'rgba(15, 23, 42, 0.5)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: 'var(--radius-lg)',
+                            padding: '1rem',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(6, 182, 212, 0.08)';
+                            e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(15, 23, 42, 0.5)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                          }}
+                        >
+                          <div className="d-flex align-items-start gap-3">
+                            {/* Points Badge */}
+                            <div 
+                              className="flex-shrink-0 animate-pulse-glow"
+                              style={{ 
+                                width: '44px', 
+                                height: '44px', 
+                                borderRadius: '12px',
+                                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1))',
+                                border: '1px solid rgba(245, 158, 11, 0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexDirection: 'column'
+                              }}
+                            >
+                              <span style={{ color: '#F59E0B', fontWeight: 700, fontSize: '0.875rem', lineHeight: 1 }}>
+                                +{reward.amount}
                               </span>
-                            </td>
-                            <td style={{ color: 'var(--slate-200)', border: 'none', padding: '0.75rem', fontSize: '0.8125rem' }}>
-                              {reward.reason}
-                            </td>
-                            <td style={{ color: 'var(--slate-500)', fontSize: '0.75rem', border: 'none', padding: '0.75rem' }} className="d-none d-sm-table-cell">
-                              {new Date(reward.created_at).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                              <span style={{ color: 'var(--slate-500)', fontSize: '0.5rem' }}>PTS</span>
+                            </div>
+                            
+                            <div className="flex-grow-1 min-width-0">
+                              <p 
+                                style={{ 
+                                  color: 'white', 
+                                  fontWeight: 600, 
+                                  fontSize: '0.875rem',
+                                  marginBottom: '0.25rem',
+                                  lineHeight: 1.4
+                                }}
+                              >
+                                {reward.reason}
+                              </p>
+                              <div className="d-flex align-items-center gap-2">
+                                <Clock size={12} color="var(--slate-500)" />
+                                <span style={{ color: 'var(--slate-500)', fontSize: '0.6875rem' }}>
+                                  {new Date(reward.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Status indicator */}
+                            <div 
+                              className="flex-shrink-0"
+                              style={{ 
+                                width: '8px', 
+                                height: '8px', 
+                                borderRadius: '50%',
+                                background: '#10B981'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

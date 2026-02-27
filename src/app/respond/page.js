@@ -7,6 +7,7 @@ import { generateGeohash } from '@/lib/ai-verification';
 import { notifyActionConfirmed, notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
 import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
+import RequesterStaticMap from '@/components/maps/RequesterStaticMap';
 import { 
   Shield,
   Wallet,
@@ -336,145 +337,191 @@ export default function RespondPage() {
 
   if (success && trackingStatus !== 'completed') {
     return (
-      <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
+      <div className="min-vh-100" style={{ background: 'var(--navy-950)', position: 'relative', overflow: 'hidden' }}>
         <div className="aurora-bg" />
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="container py-4 py-md-5 px-3 px-md-4" style={{ position: 'relative', zIndex: 1 }}>
           <div className="row justify-content-center">
-            <div className="col-md-6">
-              <div className="glass-card p-4 p-md-5" style={{ borderColor: 'rgba(6, 182, 212, 0.3)' }}>
-                {/* Tracking Header */}
-                <div className="text-center mb-4">
-                  <div 
-                    className="animate-pulse-glow mx-auto"
-                    style={{ 
-                      width: '80px', 
-                      height: '80px', 
-                      borderRadius: '50%',
-                      background: trackingStatus === 'active' 
-                        ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1))'
-                        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))',
-                      border: `2px solid ${trackingStatus === 'active' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '1rem'
-                    }}
-                  >
-                    {trackingStatus === 'active' ? (
-                      <Radio size={36} color="#06B6D4" className="animate-pulse" />
-                    ) : (
-                      <Check size={36} color="#10B981" />
-                    )}
+            <div className="col-lg-8">
+              <div className="glass-card overflow-hidden" style={{ borderColor: 'rgba(6, 182, 212, 0.3)' }}>
+                {/* Header */}
+                <div 
+                  className="p-3 p-md-4"
+                  style={{ 
+                    background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05))',
+                    borderBottom: '1px solid rgba(6, 182, 212, 0.2)'
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center gap-3">
+                      <div 
+                        className="animate-pulse-glow"
+                        style={{ 
+                          width: '56px', 
+                          height: '56px', 
+                          borderRadius: '14px',
+                          background: trackingStatus === 'active' 
+                            ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1))'
+                            : 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))',
+                          border: `2px solid ${trackingStatus === 'active' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {trackingStatus === 'active' ? (
+                          <Radio size={28} color="#06B6D4" className="animate-pulse" />
+                        ) : (
+                          <Check size={28} color="#10B981" />
+                        )}
+                      </div>
+                      <div>
+                        <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.25rem' }}>
+                          {trackingStatus === 'active' ? 'Help in Progress' : 'Tracking Complete'}
+                        </h4>
+                        <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
+                          You're helping with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '0.5rem' }}>
-                    {trackingStatus === 'active' ? 'Movement Tracking Active' : 'Help in Progress'}
-                  </h2>
-                  <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
-                    You're helping with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>
-                  </p>
                 </div>
 
-                {/* Tracking Status Card */}
-                {trackingStatus === 'active' && (
-                  <div className="glass-card mb-4" style={{ background: 'rgba(6, 182, 212, 0.05)', borderColor: 'rgba(6, 182, 212, 0.2)' }}>
-                    <div className="p-3 p-md-4">
-                      <div className="d-flex align-items-center gap-2 mb-3">
-                        <Navigation2 size={18} color="#06B6D4" />
-                        <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }}>Live Movement Tracking</span>
-                      </div>
-                      
-                      {movementAnalysis ? (
-                        <div>
-                          <div className="d-flex justify-content-between align-items-center mb-2">
-                            <span style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>Movement Confidence</span>
-                            <span style={{ 
-                              color: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
-                              fontWeight: 700,
-                              fontSize: '0.9375rem'
-                            }}>
-                              {Math.round(movementAnalysis.confidence * 100)}%
-                            </span>
-                          </div>
-                          <div style={{ 
-                            height: '6px', 
-                            background: 'rgba(255,255,255,0.1)', 
-                            borderRadius: '3px',
-                            overflow: 'hidden',
-                            marginBottom: '1rem'
-                          }}>
-                            <div 
-                              style={{ 
-                                height: '100%', 
-                                width: `${movementAnalysis.confidence * 100}%`,
-                                background: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
-                                borderRadius: '3px',
-                                transition: 'width 0.5s ease'
-                              }}
-                            />
+                <div className="p-3 p-md-4">
+                  <div className="row g-4">
+                    {/* Left Column - Map */}
+                    <div className="col-md-6">
+                      <RequesterStaticMap 
+                        requesterLocation={userLocation ? {
+                          lat: parseFloat(userLocation.lat) + 0.002, // Offset to show relative position
+                          lon: parseFloat(userLocation.lon) + 0.002
+                        } : { lat: 40.7128, lon: -74.0060 }}
+                        requesterGeohash={success.geohash}
+                        requestType={success.request_type}
+                        requestTime={success.created_at}
+                      />
+                    </div>
+
+                    {/* Right Column - Tracking Status */}
+                    <div className="col-md-6">
+                      <div className="glass-card h-100" style={{ background: 'rgba(6, 182, 212, 0.05)', borderColor: 'rgba(6, 182, 212, 0.2)' }}>
+                        <div className="p-3 p-md-4">
+                          <div className="d-flex align-items-center gap-2 mb-4">
+                            <Navigation2 size={18} color="#06B6D4" />
+                            <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }}>Movement Tracking</span>
                           </div>
                           
-                          <div className="row g-2">
-                            <div className="col-6">
-                              <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '0.75rem', borderRadius: '8px' }}>
-                                <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem', display: 'block' }}>Distance</small>
-                                <span style={{ color: 'white', fontWeight: 600, fontSize: '0.8125rem' }}>
-                                  {movementAnalysis.endDistance?.toFixed(2)} km
-                                </span>
+                          {movementAnalysis ? (
+                            <div>
+                              {/* Confidence Score */}
+                              <div className="mb-4">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <span style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>Movement Confidence</span>
+                                  <span style={{ 
+                                    color: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
+                                    fontWeight: 700,
+                                    fontSize: '1rem'
+                                  }}>
+                                    {Math.round(movementAnalysis.confidence * 100)}%
+                                  </span>
+                                </div>
+                                <div style={{ 
+                                  height: '8px', 
+                                  background: 'rgba(255,255,255,0.1)', 
+                                  borderRadius: '4px',
+                                  overflow: 'hidden'
+                                }}>
+                                  <div 
+                                    style={{ 
+                                      height: '100%', 
+                                      width: `${movementAnalysis.confidence * 100}%`,
+                                      background: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
+                                      borderRadius: '4px',
+                                      transition: 'width 0.5s ease'
+                                    }}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                            <div className="col-6">
-                              <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '0.75rem', borderRadius: '8px' }}>
-                                <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem', display: 'block' }}>Speed</small>
-                                <span style={{ color: 'white', fontWeight: 600, fontSize: '0.8125rem' }}>
-                                  {movementAnalysis.avgSpeed?.toFixed(1)} km/h
-                                </span>
+
+                              {/* Stats Grid */}
+                              <div className="row g-2 mb-3">
+                                <div className="col-6">
+                                  <div className="p-2 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)' }}>
+                                    <small style={{ color: 'var(--slate-500)', fontSize: '0.625rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Distance</small>
+                                    <span style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
+                                      {movementAnalysis.endDistance?.toFixed(2)} km
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="col-6">
+                                  <div className="p-2 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)' }}>
+                                    <small style={{ color: 'var(--slate-500)', fontSize: '0.625rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Speed</small>
+                                    <span style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
+                                      {movementAnalysis.avgSpeed?.toFixed(1)} km/h
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="col-6">
+                                  <div className="p-2 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)' }}>
+                                    <small style={{ color: 'var(--slate-500)', fontSize: '0.625rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Updates</small>
+                                    <span style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
+                                      {tracker?.locations?.length || 0}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="col-6">
+                                  <div className="p-2 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)' }}>
+                                    <small style={{ color: 'var(--slate-500)', fontSize: '0.625rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pattern</small>
+                                    <span style={{ 
+                                      color: movementAnalysis.movedCloser ? '#10B981' : '#F59E0B', 
+                                      fontWeight: 600, 
+                                      fontSize: '0.75rem',
+                                      textTransform: 'capitalize'
+                                    }}>
+                                      {movementAnalysis.movementPattern?.replace('_', ' ')}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
+                              
+                              {movementAnalysis.movedCloser && (
+                                <div className="d-flex align-items-center gap-2 p-2 rounded" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                                  <Check size={16} color="#10B981" />
+                                  <span style={{ color: '#10B981', fontSize: '0.8125rem', fontWeight: 500 }}>Moving toward requester</span>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                          
-                          {movementAnalysis.movedCloser && (
-                            <div className="mt-3 d-flex align-items-center gap-2" style={{ color: '#10B981', fontSize: '0.8125rem' }}>
-                              <Check size={16} />
-                              <span>Moving toward requester</span>
+                          ) : (
+                            <div className="text-center py-4">
+                              <Loader2 size={32} color="#06B6D4" className="animate-spin mb-3" />
+                              <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', margin: 0 }}>
+                                Analyzing your movement pattern...
+                              </p>
                             </div>
                           )}
                         </div>
-                      ) : (
-                        <div className="text-center py-3">
-                          <Loader2 size={24} color="#06B6D4" className="animate-spin mb-2" />
-                          <p style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', margin: 0 }}>
-                            Analyzing movement pattern...
-                          </p>
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
-                )}
 
-                {/* Privacy Notice */}
-                <div className="mb-4 p-3 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
-                  <div className="d-flex align-items-start gap-2">
-                    <Shield size={16} color="#06B6D4" className="flex-shrink-0 mt-0.5" />
-                    <small style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.5 }}>
-                      Your location is tracked only during this help session. We store only approximate geohash locations, not exact GPS coordinates. Data is deleted after verification.
-                    </small>
+                  {/* Privacy Notice */}
+                  <div className="mt-4 p-3 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+                    <div className="d-flex align-items-start gap-2">
+                      <Shield size={16} color="#06B6D4" className="flex-shrink-0 mt-0.5" />
+                      <small style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.5 }}>
+                        Your location is tracked only during this help session. We store only approximate geohash locations, not exact GPS coordinates. Data is deleted after verification.
+                      </small>
+                    </div>
                   </div>
-                </div>
 
-                {/* Complete Button */}
-                <button 
-                  onClick={completeHelp}
-                  className="btn btn-gradient w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
-                  style={{ padding: '1rem' }}
-                >
-                  <Check size={20} />
-                  <span>Mark Help as Complete</span>
-                </button>
-
-                <div className="d-flex gap-3 justify-content-center">
-                  <Link href="/dashboard" className="btn btn-outline-glass">
-                    View Dashboard
-                  </Link>
+                  {/* Complete Button */}
+                  <button 
+                    onClick={completeHelp}
+                    className="btn btn-gradient w-100 mt-4 d-flex align-items-center justify-content-center gap-2"
+                    style={{ padding: '1rem' }}
+                  >
+                    <Check size={20} />
+                    <span>Mark Help as Complete</span>
+                  </button>
                 </div>
               </div>
             </div>
