@@ -8,7 +8,6 @@ import { notifyNearbyEmergency } from '@/lib/notifications';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
-  Shield,
   Wallet,
   Pill,
   Stethoscope,
@@ -272,10 +271,12 @@ export default function RequestPage() {
                   background: 'var(--gradient-accent)', 
                   padding: '10px', 
                   borderRadius: '12px',
-                  display: 'flex'
+                  display: 'flex',
+                  width: '44px',
+                  height: '44px'
                 }}
               >
-                <Shield size={24} color="white" />
+                <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div className="d-none d-sm-block">
                 <span style={{ 

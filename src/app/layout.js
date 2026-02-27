@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
         <meta name="description" content="Proof-of-Action: A privacy-first Web3 emergency network where real-world helpful actions are verified by AI and rewarded with blockchain tokens" />
         <meta name="color-scheme" content="dark" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/ICON.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />

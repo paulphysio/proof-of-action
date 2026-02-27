@@ -5,7 +5,6 @@ import { requestNotificationPermission, savePushSubscription, subscribeToPushNot
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { 
-  Shield, 
   Wallet, 
   Bell, 
   Users, 
@@ -142,10 +141,12 @@ export default function Home() {
                   background: 'var(--gradient-accent)', 
                   padding: '10px', 
                   borderRadius: '12px',
-                  display: 'flex'
+                  display: 'flex',
+                  width: '44px',
+                  height: '44px'
                 }}
               >
-                <Shield size={24} color="white" />
+                <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div className="d-none d-sm-block">
                 <span style={{ 
@@ -957,7 +958,7 @@ export default function Home() {
         <div className="container px-3 px-md-4">
           <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
             <div className="d-flex align-items-center gap-2">
-              <Shield size={20} color="var(--cyan-400)" />
+              <img src="/ICON.png" alt="PoA Logo" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
               <span style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
                 Proof-of-Action • Web3 Emergency Network
               </span>

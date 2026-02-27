@@ -7,7 +7,6 @@ import { quickVerify, verifyAction } from '@/lib/ai-verification';
 import { notifyRewardReceived } from '@/lib/notifications';
 import Link from 'next/link';
 import { 
-  Shield,
   Wallet,
   Brain,
   Check,
@@ -212,9 +211,11 @@ export default function VerifyPage() {
                   background: 'var(--gradient-accent)', 
                   padding: '8px', 
                   borderRadius: '10px',
-                  display: 'flex'
+                  display: 'flex',
+                  width: '40px',
+                  height: '40px'
                 }}>
-                  <Shield size={24} color="white" />
+                  <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
                 <span style={{ color: 'white', fontWeight: 700, fontSize: '1.25rem' }}>
                   Proof-of-Action
@@ -427,10 +428,12 @@ export default function VerifyPage() {
                   background: 'var(--gradient-accent)', 
                   padding: '10px', 
                   borderRadius: '12px',
-                  display: 'flex'
+                  display: 'flex',
+                  width: '44px',
+                  height: '44px'
                 }}
               >
-                <Shield size={24} color="white" />
+                <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div className="d-none d-sm-block">
                 <span style={{ 
