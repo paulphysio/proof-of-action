@@ -132,6 +132,81 @@ CREATE INDEX IF NOT EXISTS idx_push_subscriptions_wallet ON push_subscriptions(w
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_geohash_prefixes ON push_subscriptions USING GIN (geohash_prefixes);
 
 -- ============================================
+-- MOVEMENT TRACKING TABLE
+-- Privacy-first location tracking for verification
+-- Only stores geohashes, not exact coordinates
+-- ============================================
+CREATE TABLE IF NOT EXISTS movement_tracking (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  response_id UUID NOT NULL REFERENCES responses(id) ON DELETE CASCADE,
+  responder_wallet TEXT NOT NULL REFERENCES users(wallet_address),
+  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITH TIME ZONE,
+  location_geohashes TEXT[] DEFAULT '{}',
+  movement_confidence NUMERIC(3, 2) CHECK (movement_confidence >= 0 AND movement_confidence <= 1),
+  movement_pattern TEXT CHECK (movement_pattern IN ('toward_requester', 'away_from_requester', 'stationary', 'unclear', 'unknown')),
+  distance_delta NUMERIC(10, 3),
+  verification_data JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Add indexes
+CREATE INDEX IF NOT EXISTS idx_movement_tracking_response ON movement_tracking(response_id);
+CREATE INDEX IF NOT EXISTS idx_movement_tracking_responder ON movement_tracking(responder_wallet);
+CREATE INDEX IF NOT EXISTS idx_movement_tracking_confidence ON movement_tracking(movement_confidence);
+
+-- ============================================
+-- HELP COMPLETED NOTIFICATIONS TABLE
+-- Tracks neighbor notifications about completed help
+-- ============================================
+CREATE TABLE IF NOT EXISTS help_completed_notifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  request_id UUID NOT NULL REFERENCES emergency_requests(id) ON DELETE CASCADE,
+  responder_wallet TEXT NOT NULL REFERENCES users(wallet_address),
+  neighbor_wallet TEXT NOT NULL REFERENCES users(wallet_address),
+  notification_sent BOOLEAN DEFAULT FALSE,
+  notification_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Add indexes
+CREATE INDEX IF NOT EXISTS idx_help_completed_notifications_request ON help_completed_notifications(request_id);
+CREATE INDEX IF NOT EXISTS idx_help_completed_notifications_neighbor ON help_completed_notifications(neighbor_wallet);
+
+-- ============================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- Enable privacy and security
+-- ============================================
+
+-- Enable RLS on new tables
+ALTER TABLE movement_tracking ENABLE ROW LEVEL SECURITY;
+ALTER TABLE help_completed_notifications ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies for new tables
+DROP POLICY IF EXISTS "Movement tracking is readable" ON movement_tracking;
+DROP POLICY IF EXISTS "Movement tracking can be created" ON movement_tracking;
+DROP POLICY IF EXISTS "Help completed notifications are readable" ON help_completed_notifications;
+DROP POLICY IF EXISTS "Help completed notifications can be created" ON help_completed_notifications;
+
+-- Demo mode policies for new tables
+CREATE POLICY "Movement tracking is readable"
+  ON movement_tracking FOR SELECT USING (true);
+
+CREATE POLICY "Movement tracking can be created"
+  ON movement_tracking FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Help completed notifications are readable"
+  ON help_completed_notifications FOR SELECT USING (true);
+
+CREATE POLICY "Help completed notifications can be created"
+  ON help_completed_notifications FOR INSERT WITH CHECK (true);
+
+-- Add triggers for updated_at on responses table
+DROP TRIGGER IF EXISTS update_responses_updated_at ON responses;
+CREATE TRIGGER update_responses_updated_at BEFORE UPDATE ON responses
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- Enable privacy and security
 -- ============================================

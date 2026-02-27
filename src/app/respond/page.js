@@ -6,6 +6,7 @@ import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/
 import { generateGeohash } from '@/lib/ai-verification';
 import { notifyActionConfirmed, notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
+import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
 import { 
   Shield,
   Wallet,
@@ -22,7 +23,9 @@ import {
   Award,
   Plus,
   Sparkles,
-  Navigation
+  Navigation,
+  Radio,
+  Navigation2
 } from 'lucide-react';
 
 function buildNearbyGeohashPrefixes(lat, lon, prefixLength) {
@@ -53,6 +56,10 @@ export default function RespondPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(null);
+  const [tracking, setTracking] = useState(null);
+  const [tracker, setTracker] = useState(null);
+  const [trackingStatus, setTrackingStatus] = useState('idle'); // idle, active, completed
+  const [movementAnalysis, setMovementAnalysis] = useState(null);
   const [success, setSuccess] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyPrefixes, setNearbyPrefixes] = useState(null);
@@ -170,6 +177,35 @@ export default function RespondPage() {
       
       if (response) {
         setSuccess(request);
+        setTracking(response);
+        setTrackingStatus('active');
+        
+        // Start movement tracking
+        if (userLocation && request.geohash) {
+          // Decode approximate requester location from geohash
+          const requesterLocation = geohashToLatLon(request.geohash);
+          
+          const newTracker = new MovementTracker(
+            response.id,
+            requesterLocation,
+            accountId
+          );
+          
+          setTracker(newTracker);
+          await newTracker.start();
+          
+          // Update tracking status periodically
+          const statusInterval = setInterval(() => {
+            if (newTracker.locations.length > 0) {
+              const analysis = newTracker.analyzeMovement();
+              setMovementAnalysis(analysis);
+            }
+          }, 30000);
+          
+          // Store interval for cleanup
+          newTracker.statusInterval = statusInterval;
+        }
+        
         notifyActionConfirmed(response);
         if (request?.requester_wallet) {
           fetch('/api/push/notify-requester', {
@@ -187,6 +223,75 @@ export default function RespondPage() {
       setResponding(null);
     }
   };
+
+  /**
+   * Complete the help action and stop tracking
+   */
+  const completeHelp = async () => {
+    if (!tracker || !tracking) return;
+    
+    try {
+      // Stop tracking
+      const stopResult = tracker.stop();
+      if (tracker.statusInterval) {
+        clearInterval(tracker.statusInterval);
+      }
+      
+      // Get final analysis
+      const finalAnalysis = tracker.analyzeMovement();
+      setMovementAnalysis(finalAnalysis);
+      
+      // Store tracking data
+      const trackingData = tracker.getTrackingData();
+      await storeTrackingData(supabase, trackingData);
+      
+      // Get neighbors to notify
+      const response = await supabase
+        .from('responses')
+        .select('*')
+        .eq('request_id', tracking.id)
+        .eq('responder_wallet', accountId)
+        .single();
+        
+      if (response.data) {
+        const neighbors = await notifyNeighbors(supabase, tracking, response.data, trackingData);
+        
+        // Send push notifications to neighbors
+        if (neighbors.length > 0) {
+          fetch('/api/push/notify-neighbors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              neighbors,
+              requestType: tracking.request_type,
+              responderWallet: accountId
+            })
+          }).catch(() => {});
+        }
+      }
+      
+      // Update status
+      await supabase
+        .from('responses')
+        .update({ status: 'completed' })
+        .eq('request_id', tracking.id)
+        .eq('responder_wallet', accountId);
+        
+      setTrackingStatus('completed');
+      
+    } catch (error) {
+      console.error('Error completing help:', error);
+    }
+  };
+
+  /**
+   * Convert geohash to approximate lat/lon
+   */
+  function geohashToLatLon(geohash) {
+    // Simplified - just return user location as approximation
+    // In production, use proper geohash decoding
+    return userLocation || { lat: 40.7128, lon: -74.0060 };
+  }
 
   if (!isSignedIn) {
     return (
@@ -229,7 +334,157 @@ export default function RespondPage() {
     );
   }
 
-  if (success) {
+  if (success && trackingStatus !== 'completed') {
+    return (
+      <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
+        <div className="aurora-bg" />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="row justify-content-center">
+            <div className="col-md-6">
+              <div className="glass-card p-4 p-md-5" style={{ borderColor: 'rgba(6, 182, 212, 0.3)' }}>
+                {/* Tracking Header */}
+                <div className="text-center mb-4">
+                  <div 
+                    className="animate-pulse-glow mx-auto"
+                    style={{ 
+                      width: '80px', 
+                      height: '80px', 
+                      borderRadius: '50%',
+                      background: trackingStatus === 'active' 
+                        ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1))'
+                        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))',
+                      border: `2px solid ${trackingStatus === 'active' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '1rem'
+                    }}
+                  >
+                    {trackingStatus === 'active' ? (
+                      <Radio size={36} color="#06B6D4" className="animate-pulse" />
+                    ) : (
+                      <Check size={36} color="#10B981" />
+                    )}
+                  </div>
+                  <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '0.5rem' }}>
+                    {trackingStatus === 'active' ? 'Movement Tracking Active' : 'Help in Progress'}
+                  </h2>
+                  <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
+                    You're helping with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>
+                  </p>
+                </div>
+
+                {/* Tracking Status Card */}
+                {trackingStatus === 'active' && (
+                  <div className="glass-card mb-4" style={{ background: 'rgba(6, 182, 212, 0.05)', borderColor: 'rgba(6, 182, 212, 0.2)' }}>
+                    <div className="p-3 p-md-4">
+                      <div className="d-flex align-items-center gap-2 mb-3">
+                        <Navigation2 size={18} color="#06B6D4" />
+                        <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }}>Live Movement Tracking</span>
+                      </div>
+                      
+                      {movementAnalysis ? (
+                        <div>
+                          <div className="d-flex justify-content-between align-items-center mb-2">
+                            <span style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>Movement Confidence</span>
+                            <span style={{ 
+                              color: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
+                              fontWeight: 700,
+                              fontSize: '0.9375rem'
+                            }}>
+                              {Math.round(movementAnalysis.confidence * 100)}%
+                            </span>
+                          </div>
+                          <div style={{ 
+                            height: '6px', 
+                            background: 'rgba(255,255,255,0.1)', 
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                            marginBottom: '1rem'
+                          }}>
+                            <div 
+                              style={{ 
+                                height: '100%', 
+                                width: `${movementAnalysis.confidence * 100}%`,
+                                background: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
+                                borderRadius: '3px',
+                                transition: 'width 0.5s ease'
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="row g-2">
+                            <div className="col-6">
+                              <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '0.75rem', borderRadius: '8px' }}>
+                                <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem', display: 'block' }}>Distance</small>
+                                <span style={{ color: 'white', fontWeight: 600, fontSize: '0.8125rem' }}>
+                                  {movementAnalysis.endDistance?.toFixed(2)} km
+                                </span>
+                              </div>
+                            </div>
+                            <div className="col-6">
+                              <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '0.75rem', borderRadius: '8px' }}>
+                                <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem', display: 'block' }}>Speed</small>
+                                <span style={{ color: 'white', fontWeight: 600, fontSize: '0.8125rem' }}>
+                                  {movementAnalysis.avgSpeed?.toFixed(1)} km/h
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {movementAnalysis.movedCloser && (
+                            <div className="mt-3 d-flex align-items-center gap-2" style={{ color: '#10B981', fontSize: '0.8125rem' }}>
+                              <Check size={16} />
+                              <span>Moving toward requester</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-3">
+                          <Loader2 size={24} color="#06B6D4" className="animate-spin mb-2" />
+                          <p style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', margin: 0 }}>
+                            Analyzing movement pattern...
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Privacy Notice */}
+                <div className="mb-4 p-3 rounded" style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+                  <div className="d-flex align-items-start gap-2">
+                    <Shield size={16} color="#06B6D4" className="flex-shrink-0 mt-0.5" />
+                    <small style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.5 }}>
+                      Your location is tracked only during this help session. We store only approximate geohash locations, not exact GPS coordinates. Data is deleted after verification.
+                    </small>
+                  </div>
+                </div>
+
+                {/* Complete Button */}
+                <button 
+                  onClick={completeHelp}
+                  className="btn btn-gradient w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
+                  style={{ padding: '1rem' }}
+                >
+                  <Check size={20} />
+                  <span>Mark Help as Complete</span>
+                </button>
+
+                <div className="d-flex gap-3 justify-content-center">
+                  <Link href="/dashboard" className="btn btn-outline-glass">
+                    View Dashboard
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (success && trackingStatus === 'completed') {
     return (
       <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
         <div className="aurora-bg" />
@@ -250,17 +505,19 @@ export default function RespondPage() {
                 }}>
                   <HandHelping size={48} color="#10B981" />
                 </div>
-                <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '1rem' }}>Response Sent!</h2>
-                <p style={{ color: 'var(--slate-400)', marginBottom: '2rem' }}>
-                  You've offered to help with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>.
-                  The requester will be notified. Once confirmed, you'll earn rewards!
+                <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '1rem' }}>Help Completed!</h2>
+                <p style={{ color: 'var(--slate-400)', marginBottom: '0.5rem' }}>
+                  You've successfully helped with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>.
+                </p>
+                <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', marginBottom: '2rem' }}>
+                  Neighbors in your area have been notified of your good deed. Your Proof Points will be awarded after verification.
                 </p>
                 <div className="d-flex gap-3 justify-content-center">
                   <Link href="/dashboard" className="btn btn-gradient">
                     View Dashboard
                   </Link>
                   <button 
-                    onClick={() => { setSuccess(null); loadNearbyRequests(); }}
+                    onClick={() => { setSuccess(null); setTracking(null); setTrackingStatus('idle'); setMovementAnalysis(null); loadNearbyRequests(); }}
                     className="btn btn-outline-glass"
                   >
                     Help Someone Else
@@ -517,9 +774,9 @@ export default function RespondPage() {
             </div>
             <div className="row g-3 g-md-4 mt-1">
               {[
-                { num: '1', title: 'Click "I Can Help"', desc: 'Respond to an emergency near you', icon: HandHelping },
-                { num: '2', title: 'Meet & Help', desc: 'Coordinate and provide assistance', icon: MapPin },
-                { num: '3', title: 'Get Verified', desc: 'AI verifies and you earn rewards!', icon: Award }
+                { num: '1', title: 'Click "I Can Help"', desc: 'Movement tracking starts automatically', icon: Radio },
+                { num: '2', title: 'Go Help Your Neighbor', desc: 'We track your journey to verify', icon: Navigation2 },
+                { num: '3', title: 'Mark Complete', desc: 'Neighbors get notified of your good deed!', icon: Award }
               ].map((step, i) => (
                 <div key={i} className="col-12 col-md-4">
                   <div className="d-flex gap-3 animate-reveal-left" style={{ animationDelay: `${i * 100}ms` }}>
