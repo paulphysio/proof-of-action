@@ -4,7 +4,7 @@ import { useWallet } from '@/lib/near-wallet';
 import { useState, useEffect } from 'react';
 import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/lib/supabase';
 import { generateGeohash } from '@/lib/ai-verification';
-import { notifyActionConfirmed, notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
+import { notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications, notifyTrackingStarted } from '@/lib/notifications';
 import Link from 'next/link';
 import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
 import RequesterStaticMap from '@/components/maps/RequesterStaticMap';
@@ -25,7 +25,8 @@ import {
   Sparkles,
   Navigation,
   Radio,
-  Navigation2
+  Navigation2,
+  Shield
 } from 'lucide-react';
 
 function buildNearbyGeohashPrefixes(lat, lon, prefixLength) {
@@ -169,6 +170,15 @@ export default function RespondPage() {
     }
   };
 
+  /**
+   * Convert geohash to approximate lat/lon
+   */
+  function geohashToLatLon(geohash) {
+    // Simplified - just return user location as approximation
+    // In production, use proper geohash decoding
+    return userLocation || { lat: 40.7128, lon: -74.0060 };
+  }
+
   const handleRespond = async (request) => {
     setResponding(request.id);
     try {
@@ -206,7 +216,7 @@ export default function RespondPage() {
           newTracker.statusInterval = statusInterval;
         }
         
-        notifyActionConfirmed(response);
+        notifyTrackingStarted(request);
         if (request?.requester_wallet) {
           fetch('/api/push/notify-requester', {
             method: 'POST',

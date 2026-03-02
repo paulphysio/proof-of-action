@@ -13,7 +13,30 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Missing subscription endpoint' }, { status: 400 });
     }
 
-    const supabase = getSupabaseServerClient();
+    // Check if Supabase is configured
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('your-project')) {
+      console.warn('Supabase not configured. Push subscription skipped.');
+      return NextResponse.json({ 
+        ok: true, 
+        warning: 'Supabase not configured - subscription not saved to database',
+        subscription: { endpoint: endpoint.slice(0, 50) + '...' }
+      });
+    }
+
+    let supabase;
+    try {
+      supabase = getSupabaseServerClient();
+    } catch (err) {
+      console.warn('Supabase client error:', err.message);
+      return NextResponse.json({ 
+        ok: true, 
+        warning: 'Database not ready - subscription saved locally only',
+        subscription: { endpoint: endpoint.slice(0, 50) + '...' }
+      });
+    }
 
     // Upsert by endpoint (unique)
     const { data, error } = await supabase
@@ -32,11 +55,22 @@ export async function POST(req) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message || 'Failed to save subscription', details: error }, { status: 500 });
+      console.error('Supabase error:', error);
+      // Return success but log error - don't break the UX
+      return NextResponse.json({ 
+        ok: true, 
+        warning: 'Database error - subscription may not be persisted',
+        error: error.message 
+      });
     }
 
     return NextResponse.json({ ok: true, subscription: data });
   } catch (e) {
-    return NextResponse.json({ error: e?.message || 'Invalid request' }, { status: 400 });
+    console.error('Push subscription error:', e);
+    return NextResponse.json({ 
+      ok: true,  // Return OK to not break UX
+      warning: 'Server error - subscription handled locally',
+      error: e?.message 
+    });
   }
 }

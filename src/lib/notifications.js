@@ -160,10 +160,24 @@ export function notifyNearbyEmergency(request) {
   );
 }
 
-// Show action confirmation notification
+// Show tracking started notification
+export function notifyTrackingStarted(request) {
+  return sendLocalNotification(
+    '📍 Help Session Started',
+    {
+      body: `You're now helping with "${request.request_type}". Movement tracking is active.`,
+      tag: `tracking-${request.id}`,
+      actions: [
+        { action: 'view', title: 'View Progress' }
+      ]
+    }
+  );
+}
+
+// Show action confirmation notification (called AFTER verification)
 export function notifyActionConfirmed(response) {
   return sendLocalNotification(
-    '✅ Action Confirmed!',
+    '✅ Action Verified!',
     {
       body: 'Your helpful action has been verified. You earned 10 Proof Points!',
       tag: `confirmation-${response.id}`,
