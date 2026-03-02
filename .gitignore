@@ -39,3 +39,44 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# =============================================================================
+# HACKATHON: Files judges don't need to see
+# =============================================================================
+
+# Setup and documentation files (keep for reference)
+SETUP.md
+FILECOIN_SETUP.md
+challenge-recommendations.txt
+pl-genesis-submission.md
+
+# Test files
+poa-test.txt
+*.test.*
+
+# Private keys and sensitive data (already covered by .env* but being explicit)
+*private*.json
+*wallet*.json
+mnemonic*.txt
+
+# Local development files
+.local/
+temp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =============================================================================
+# KEEP THESE FILES (judges need to see)
+# =============================================================================
+# src/ - Source code
+# public/ - Static assets  
+# package.json - Dependencies
+# README.md - Project description
+# supabase-schema.sql - Database structure
+# .env.example - Configuration template
+# =============================================================================

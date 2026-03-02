@@ -28,6 +28,9 @@ import {
   Home,
   Activity
 } from 'lucide-react';
+import WorldIDVerification from '@/components/WorldIDVerification';
+import FilecoinStorageStatus from '@/components/FilecoinStorageStatus';
+import { Fingerprint } from 'lucide-react';
 
 export default function Dashboard() {
   const { isSignedIn, accountId, signIn } = useWallet();
@@ -272,6 +275,20 @@ export default function Dashboard() {
               Welcome back, {accountId?.slice(0, 6)}...
             </p>
           </div>
+        </div>
+
+        {/* World ID Verification - Human-Centric Feature */}
+        <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '50ms' }}>
+          <WorldIDVerification 
+            onVerified={(result) => {
+              console.log('World ID verified:', result);
+            }}
+          />
+        </div>
+
+        {/* Filecoin Storage Status - Decentralized Storage */}
+        <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '75ms' }}>
+          <FilecoinStorageStatus walletAddress={accountId} />
         </div>
 
         {/* Stats Row - Mobile Optimized */}

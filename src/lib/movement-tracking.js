@@ -9,6 +9,7 @@
  */
 
 import { generateGeohash } from './ai-verification';
+import { storeTrackingDataOnFilecoin, storeReputationOnFilecoin } from './filecoin';
 
 // Configuration
 const TRACKING_INTERVAL = 30000; // 30 seconds
@@ -304,9 +305,11 @@ export class MovementTracker {
 }
 
 /**
- * Store tracking data to Supabase
+ * Store tracking data to Supabase and Filecoin
+ * Creates verifiable reputation record on Filecoin
  */
 export async function storeTrackingData(supabase, trackingData) {
+  // Store to Supabase
   const { data, error } = await supabase
     .from('movement_tracking')
     .insert({
@@ -324,6 +327,28 @@ export async function storeTrackingData(supabase, trackingData) {
     .single();
     
   if (error) throw error;
+  
+  // Also store on Filecoin for verifiable reputation (Agent Reputation & Portable Identity)
+  try {
+    const filecoinResult = await storeTrackingDataOnFilecoin(trackingData);
+    if (filecoinResult.success) {
+      console.log('✅ Movement tracking stored on Filecoin:', filecoinResult.cid);
+      
+      // Store responder reputation on Filecoin
+      await storeReputationOnFilecoin(trackingData.responderWallet, {
+        type: 'movement_verification',
+        responseId: trackingData.responseId,
+        confidence: trackingData.analysis.confidence,
+        pattern: trackingData.analysis.movementPattern,
+        filecoinCid: filecoinResult.cid,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (filecoinError) {
+    console.warn('Filecoin storage failed (non-critical):', filecoinError);
+    // Don't throw - Filecoin is optional for core functionality
+  }
+  
   return data;
 }
 

@@ -1,0 +1,2277 @@
+Fresh Code
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$50,000
+Total Prize Pool
+Challenge Overview
+Build new solutions or expand existing codebases that meaningfully integrate partner bounties. Winners are eligible for the PL_Genesis Accelerator.
+
+
+
+Reminder: Fresh Code vs. Existing Code
+
+
+
+Fresh Code and Existing Code are not standalone challenges.
+
+You still need to build for one of the official sponsor challenges listed for the hackathon.
+
+
+
+When you submit your project, you’ll select whether your code is Fresh or Existing.
+
+That selection determines which prize category your project is evaluated under.
+
+
+
+Don’t forget to choose Fresh Code or Existing Code when you submit.
+
+Judges
+View all VIPs
+Sabeen
+Sabeen
+Prizes
+View all prizes
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Fresh Code
+
+$5,000 USD
+
+Fresh Code
+
+Protocol Labs
+View all requirements
+
+Existing Code
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$50,000
+Total Prize Pool
+Challenge Overview
+Build new solutions or expand existing codebases that meaningfully integrate partner bounties. Winners are eligible for the PL_Genesis Accelerator.
+
+
+
+Reminder: Fresh Code vs. Existing Code
+
+
+
+Fresh Code and Existing Code are not standalone challenges.
+
+You still need to build for one of the official sponsor challenges listed for the hackathon.
+
+
+
+When you submit your project, you’ll select whether your code is Fresh or Existing.
+
+That selection determines which prize category your project is evaluated under.
+
+
+
+Don’t forget to choose Fresh Code or Existing Code when you submit.
+
+Judges
+View all VIPs
+Sabeen
+Sabeen
+Prizes
+View all prizes
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+💡
+
+Top 10
+
+Protocol Labs
+Existing Code
+
+$5,000 USD
+
+Existing Code
+
+Protocol Labs
+View all requirements
+
+Flow: The Future of Finance
+Sponsored by:
+Flow
+Flow
+$10,000
+Total Prize Pool
+Challenge Overview
+Consumer DeFi brings decentralized finance into everyday life.
+
+It turns powerful on-chain primitives into products that feel like modern personal finance and are accessible by everyday people.
+
+No jargon. No manual steps. No “sign this transaction” fatigue. Just intuitive, automated financial systems that users can trust and actually stick with—while retaining true ownership of their assets.
+
+
+
+Common Consumer DeFi Features Include:
+
+Walletless onboarding (email, passkeys, social)
+Sponsored gas — users never think about fees
+Financial actions expressed in human language
+Automation via rules, schedules, and autopilots
+Strong security that’s invisible to the end user
+
+Why Build on Flow?
+Flow is the leading consumer L1 trusted by millions of users and global brands including PayPal, NBA, and Disney. Flow is designed to support high-volume, user-facing applications—with primitives that make DeFi applications significantly easier and safer to build. Flow is easy to build on for EVM-familiar Solidity devs as well as those interested in experimenting with the features unlocked by Cadence.
+
+
+
+Flow DeFi Builder Spotlight
+During the hackathon, we are launching an optional Flow DeFi Builder Spotlight - a highly selective program for experienced builders creating high-quality DeFi applications that are built in public and can be demo’d at the end of the hackathon .
+
+
+
+Only the top 10 teams will be accepted.
+
+Selected teams receive:
+
+Product & protocol mentorship
+
+UX and flow audits
+
+Promotion across Flow channels
+
+Free SEO & marketing sessions (valued at $250+/hour)
+
+Potential funding introductions
+
+🗓 Application deadline: February 10th
+
+👉 Apply here
+
+Example Project Ideas
+Ideabank (Non-Exhaustive)
+Use these as inspiration—not constraints:
+
+Scheduled Savings Vault
+Auto-Restaking App
+DCA Borrow Loop
+Auto-Rebalancing Treasury
+Self-Hedging Vault
+Adaptive Liquidity Manager
+AI-Managed Portfolio
+Subscription Payments
+On-chain Payroll & Grants
+Save-the-Change DeFi
+Lossless Daily Lottery
+Scheduled Payouts
+Portfolio Splitter + DCA
+RWA Yield Router
+Yield-Backed Gift Cards
+Submission Requirements
+summary
+video
+github
+demo
+documentation
+Resources
+View all resources
+Flow-Scheduled Transactions
+Candence
+Judging Criteria
+Impact/Usefulness
+Does the project solve a real problem? Could it meaningfully improve lives or systems if deployed?
+
+Technical Execution
+The complexity, robustness, and quality of the code or architecture — does it work and was it hard to build?
+
+Completeness/Functionality
+Is the product finished and fully functional? Or is it just a prototype with broken elements?
+
+Scalability/Future Potential
+Could the project scale beyond the hackathon? Does it have a sustainable architecture or business model?
+
+Prizes
+View all prizes
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+🏆
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+💰
+
+Top 10
+
+Flow
+Flow: The Future of Finance
+
+$1,000 USD
+
+Flow: The Future of Finance
+
+Submission Requirements
+
+summary
+video
+github
+demo
+documentation
+Flow
+View all requirements
+
+Zama: Confidential Onchain Finance
+Sponsored by:
+Zama
+Zama
+$5,000
+Total Prize Pool
+Challenge Overview
+Public blockchains are transparent by default, exposing balances, strategies, and user activity to the public. This level of transparency has hindered the adoption of onchain finance by institutions, DeFi protocols and everyday users.
+
+
+
+With the Zama Protocol, powered by Fully Homomorphic Encryption (FHE), computation can run directly on encrypted data, enabling confidential and verifiable onchain finance.
+
+
+
+Your challenge is to design and prototype applications that bring confidentiality on public blockchain, and build financial systems where sensitive data remains encrypted at all times.
+
+
+
+Developers can write confidential smart contracts using Solidity and familiar tooling. By using encrypted integer (euint) data types, developers can easily define which parts of smart contracts remain private and specify access rules that determine who can decrypt specific data directly within the smart contract logic.
+
+
+
+Submission Requirements
+
+A working prototype using Zama Protocol (fhEVM)
+Public GitHub repository including:
+Source code
+Setup instructions
+Clear README and documentation
+Demo video or live demo showcasing the application
+
+
+Judging Criteria
+
+Innovation — Novel confidential finance use case
+Compliance awareness — Designs that consider regulatory or compliance-friendly privacy models
+Real-world potential — Practical relevance to onchain finance
+Technical implementation — Correct and effective use of Zama tools
+Production readiness — Quality, robustness, and architectural design
+Usability — Documentation, clarity, and developer experience
+
+
+Resources
+
+Zama Protocol Documentation 
+
+Zama Protocol Litepaper
+
+Example Project Ideas
+Confidential token issuance and management
+
+Confidential payments or transfers
+
+Private balances or portfolios
+
+Confidential trading systems
+
+Confidential lending or credit logic
+
+Private DAO treasury management
+
+Confidential real-world asset (RWA) applications
+
+Confidential onchain payroll system
+
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Zama
+Zama: Confidential Onchain Finance
+
+$2,500 USD
+
+Zama: Confidential Onchain Finance
+
+Zama
+View all requirements
+
+🥈
+
+2nd Place
+
+Zama
+Zama: Confidential Onchain Finance
+
+$1,500 USD
+
+Zama: Confidential Onchain Finance
+
+Zama
+View all requirements
+
+🥉
+
+3rd Place
+
+Zama
+Zama: Confidential Onchain Finance
+
+$1,000 USD
+
+Zama: Confidential Onchain Finance
+
+Zama
+View all requirements
+
+Filecoin
+Sponsored by:
+Filecoin Foundation
+Filecoin Foundation
+$2,500
+Total Prize Pool
+Challenge Overview
+The future of AI belongs to agents that operate autonomously, coordinate trustlessly, and sustain themselves economically without centralized control. Filecoin is sponsoring challenges that build the foundational infrastructure to make this vision real. These bounties focus on enabling agents to independently manage data on Filecoin, establish verifiable identities and reputations, coordinate securely with other agents, and participate in real economic systems. Developers will create the core primitives that allow AI agents to store state, broker storage deals, monetize datasets, and sustain themselves under actual cost constraints. By anchoring agent operations on Filecoin's decentralized network, these challenges establish the building blocks for a new paradigm where autonomous agents discover, trust, and transact at scale.
+
+
+Ideas
+
+
+1. Agent Storage SDK
+
+Challenge Overview
+
+
+
+Build a framework-agnostic SDK that enables AI agents to autonomously store, retrieve, and manage data on Filecoin via FOC without human intervention. Bounty Description Minimal agent storage interface (store, retrieve, renew, prune) Agent-usable wallet abstraction with cross-chain funding Default storage policies (cost, redundancy, TTL) Deployment on calibnet (mainnet bonus) with integration docs
+
+
+
+2. Onchain Agent Registry 
+
+Challenge Overview
+
+
+
+Deploy AI agents as first-class onchain entities with persistent metadata, state, and logs stored on Filecoin, enabling large-scale discovery and coordination. Bounty Description Ethereum-based registry contracts Filecoin-backed metadata, state, and execution logs Multi-agent coordination demo Explorer/dashboard visualizing agents and storage activity
+
+
+
+ 3. Agent Reputation & Portable Identity 
+
+Challenge Overview
+
+
+
+Design a tamper-resistant, portable identity system where agent reputation is derived from verifiable history anchored on Filecoin. Bounty Description CID-rooted identity objects stored on Filecoin Reputation scoring from historical data Proof-of-history demo Cross-environment identity portability + verifier tooling
+
+
+
+4. Autonomous Agent Economy 
+
+Challenge Overview
+
+Create a live onchain economic environment where AI agents operate under real cost constraints and must sustain themselves. Bounty Description Onchain budget and fee rules Filecoin-backed agent state Live agent cohort under real economic limits Transparent dashboard + post-mortem analysis
+
+
+
+5. Fee-Gated Agent Communication 
+
+Challenge Overview
+
+
+
+Build a secure, peer-to-peer messaging protocol for AI agents with onchain fee enforcement and Filecoin-backed message archives. Bounty Description Encrypted P2P agent messaging Onchain fee/staking mechanism Filecoin-backed message persistence Live demo with spam-resistance experiment
+
+
+
+6. Autonomous Infrastructure Brokerage
+
+Challenge Overview
+
+
+
+Develop broker agents that autonomously evaluate, negotiate, and manage Filecoin storage deals for other agents. Bounty Description Storage deal comparison + recommendation engine Automated deal creation and migration Onchain commission/fee model Metrics dashboard (deals, savings, retention)
+
+
+
+7. Agent-Generated Data Marketplace 
+
+Challenge Overview
+
+
+
+Build a marketplace where AI agents generate, price, and sell Filecoin-backed datasets with verifiable provenance and onchain settlement. Bounty Description Marketplace contracts (listing, escrow, settlement) CID-rooted dataset storage Producer + consumer agent demo Revenue and transaction dashboard
+
+
+
+Submission requirements
+
+
+1. Your project must use Synapse SDK or Filecion Pin in a meaningful way (storage, retrieval, or payment).
+
+2. Your project must deploy to the Filecoin Calibration Testnet.
+
+3. Must include a working demo (frontend or CLI).
+
+4. Open-source code submitted via GitHub.
+
+5. Demo Video of the project
+
+
+
+Judging criteria
+
+
+Technical Execution | 40% 
+
+Does the project demonstrate quality application development? Does the project leverage Filecoin Onchain Cloud? Is the code of good quality and is it functional?
+
+
+
+Potential Impact | 20% 
+
+How big of an impact could the project have in the real world? How useful is the project to a broad market of users? How significant is the problem the project addresses, and does it efficiently solve it?
+
+
+
+Innovation / Wow Factor | 30% 
+
+How novel and original is the idea? Does it address a significant problem or create a unique solution?
+
+
+
+Presentation / Demo | 10%
+
+Is the problem clearly defined, and is the solution effectively presented through a demo and documentation? Have they explained how they used Synapse SDK and Filecoin Pin ? Have they included documentation or an architectural diagram?
+
+
+
+Resources
+
+Filecoin Documentation 
+Developer Tool
+Starter Kit
+Dev Tool/SDK 
+Dev Tool/SDL
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Filecoin Foundation
+Filecoin
+
+$1,250 USD
+
+Filecoin
+
+Filecoin Foundation
+View all requirements
+
+🏆
+
+2nd Place
+
+Filecoin Foundation
+Filecoin
+
+$750 USD
+
+Filecoin
+
+Filecoin Foundation
+View all requirements
+
+🏆
+
+3rd Place
+
+Filecoin Foundation
+Filecoin
+
+$500 USD
+
+Filecoin
+
+Filecoin Foundation
+View all requirements
+
+Starknet
+Sponsored by:
+Starknet
+Starknet
+$5,000
+Total Prize Pool
+Challenge Overview
+Starknet joins the PL_Genesis Hackathon to promote privacy innovation within the Bitcoin ecosystem. This bounty challenges developers to design and build tools, protocols, or applications that enhance financial privacy for Bitcoin users, leveraging zero-knowledge proofs (ZK) and Starknet's scalable cryptographic infrastructure.
+
+
+
+The total prize pool is $5,000 USD, dedicated to outstanding contributions in this privacy track. Depending on the quality and diversity of submissions, the award may be split among up to five (5) finalist teams. We reserve the right not to award the prize if submissions do not meet the expected quality standards.
+
+
+
+Submission Requirements
+
+- Open-source repository with functional code (GitHub link required).
+
+- Clear documentation explaining architecture, key features, and how privacy is improved.
+
+- A short demo video (3–5 minutes) showcasing the project in action.
+
+- A README specifying dependencies, instructions for running the project, and team members.
+
+- Submission must be completed within the PL Genesis deadline using the official platform.
+
+
+
+Judging Criteria 
+
+Projects will be evaluated based on:
+
+
+
+Privacy Innovation (30%) 
+
+Originality and impact of the approach to enhance Bitcoin privacy. -
+
+
+
+Technical Execution (25%) 
+
+Quality, functionality, and robustness of the implementation.
+
+
+
+Integration with Starknet (20%) 
+
+Effective use of Starknet or ZK technology within the solution.
+
+
+
+Usability and Design (15%) 
+
+Clarity of user experience and accessibility.
+
+
+
+Potential Impact (10%) 
+
+Relevance and potential for real-world adoption or further development.
+
+
+
+Resources
+
+
+
+Starknet Docs
+
+Starknet Learn
+
+Starknet Book
+
+Starknet GitHub
+
+Example Project Ideas
+- Private BTC swap using zero-knowledge proofs
+
+- Private lending with BTC collateral
+
+- Private yield on BTC
+
+- Dark pool / private orderbook for Bitcoin trading
+
+- Shielded wallet UI for Bitcoin transactions
+
+- Private payment app leveraging Starknet infrastructure
+
+- Sealed-bid auction system for Bitcoin assets
+
+Prizes
+View all prizes
+🏆
+
+Winner
+
+Starknet
+Starknet
+
+$1,000 USD
+
+Starknet
+
+Starknet
+View all requirements
+
+🏆
+
+Winner
+
+Starknet
+Starknet
+
+$1,000 USD
+
+Starknet
+
+Starknet
+View all requirements
+
+🏆
+
+Winner
+
+Starknet
+Starknet
+
+$1,000 USD
+
+Starknet
+
+Starknet
+View all requirements
+
+🏆
+
+Winner
+
+Starknet
+Starknet
+
+$1,000 USD
+
+Starknet
+
+Starknet
+View all requirements
+
+🏆
+
+Winner
+
+Starknet
+Starknet
+
+$1,000 USD
+
+Starknet
+
+Starknet
+View all requirements
+
+World Build 3: The Human-Centric App Challenge
+Sponsored by:
+World
+World
+$5,000
+Total Prize Pool
+Challenge Overview
+The age of AI is flooding the internet with synthetic content and automated actors. The future of the web belongs to applications that can distinguish, verify, and empower real humans. World is sponsoring challenges to build "Hyperscale Mini Apps" that leverage the World Network’s unique primitives: World ID (Sybil-resistant identity) and World App (direct access to 38M+ users).
+
+
+
+These bounties focus on creating "human-only" digital environments, seamless financial rails, and social experiences that were previously impossible due to bot-farming. Developers will build Mini Apps that live directly inside World App, creating a new paradigm of "Human-to-App" interaction that is instant, verifiably real, and globally accessible.
+
+
+
+Ideas
+
+1. The "Sybil-Proof" Social Graph
+
+Challenge Overview: Build a social or community Mini App where every interaction is gated by World ID, ensuring 100% human-to-human engagement without bots or trolls.
+
+
+
+Bounty Description: Integration of World ID (Incognito Action); On-chain social actions (voting, tipping, or posting); Zero-gas transaction flow using World’s financial rails; Dashboard showing "Human-only" engagement metrics.
+
+
+
+2. Human-Centric DeFi (Universal Access)
+
+Challenge Overview: Create a financial Mini App that utilizes World App’s gas-free transactions to provide "Everyday DeFi" to non-crypto natives.
+
+
+
+Bounty Description: Non-custodial lending, savings, or remittance interface; One-tap "Verify & Claim" mechanics for rewards; High-utility UX designed for the 38M+ mobile users; Integration of World’s stablecoin rails.
+
+
+
+3. Real-World Asset (RWA) Gateways
+
+Challenge Overview: Build a Mini App that bridges real-world assets or services to verified humans, using World ID to ensure one-person-one-claim.
+
+
+
+Bounty Description: RWA distribution or ticketing system; Verifiable proof-of-humanity for asset access; Cross-chain settlement bonus; In-app notification integration for user updates.
+
+
+
+4. The "Human-Only" Marketplace
+
+Challenge Overview: Create a peer-to-peer marketplace for goods, services, or data where identity verification eliminates the "trust gap" typical of anonymous web3 commerce.
+
+
+
+Bounty Description: World ID-gated merchant and buyer profiles; Escrow or reputation system based on verification history; Mobile-first checkout inside World App; Dispute resolution framework.
+
+
+
+5. Proof of Contribution (Human Capital)
+
+Challenge Overview: Design a system for "Work-to-Earn" where humans are rewarded for creative or physical tasks that AI cannot perform.
+
+
+
+Bounty Description: Task-verification logic; Automated payout in World-compatible assets; Reputation soulbound tokens (SBTs) for "Proof of Skill"; Integration with FWB’s creative ecosystem.
+
+
+
+Submission Requirements
+
+
+
+Mini App Integration: Project must be built as a World App Mini App or utilize World ID for core functionality.
+
+
+
+Deployment: Must be deployed to World Chain (Mainnet or Testnet).
+
+
+
+Human Verification: Must demonstrate a meaningful use of the World ID "Proof of Personhood" (Orb-verified) SDK.
+
+
+
+Working Demo: Functional frontend accessible via mobile or the World App simulator.
+
+
+
+Open Source: Code must be submitted via a public GitHub repository with a clear README.
+
+
+
+Judging Criteria
+
+
+
+Humanity & Utility (40%): Does the project solve a real problem for humans? How effectively does it use World ID to prevent bot interference or Sybil attacks?
+
+
+
+Technical Execution (30%): Is the code clean and functional? Does it leverage World Chain’s gas-free/low-latency features effectively? Is the Mini App UX "hyperscale ready"?
+
+
+
+Viral Potential / Market Fit (20%): How likely is this to gain traction among World App’s 38M+ users? Is the idea original and "World-first"?
+
+
+
+Presentation & Demo (10%): Is the problem clearly defined? Does the video demo clearly show the user journey from World ID verification to the final action?
+
+
+
+Resources
+
+
+
+World Developer Portal 
+
+
+
+Mini App SDK: World App JS Bridge / World ID SDK
+
+
+
+Starter Kits: World Build "Hyperscale" Template (Next.js + WorldID)
+
+
+
+FWB Community: Developer support channel in the FWB Discord
+
+
+
+Prizes
+View all prizes
+🏆
+
+Best Application
+
+World
+World Build 3: The Human-Centric App Challenge
+
+$5,000 USD
+
+World Build 3: The Human-Centric App Challenge
+
+World
+View all requirements
+
+Lit Protocol: NextGen AI Apps
+Sponsored by:
+Lit Protocol
+Lit Protocol
+$1,000
+Total Prize Pool
+Challenge Overview
+Build the next generation of autonomous AI applications using Lit Protocol's decentralized key management infrastructure. This challenge invites developers to create innovative projects that leverage either Vincent for AI agent wallet management or Lit Protocol V1 (Naga) for programmable signing and encryption.
+
+
+
+Lit Protocol enables capabilities that traditional smart contracts can't achieve - private computation, cross-chain signing, and programmable cryptographic operations. Vincent extends this power to AI agents, providing them with secure, non-custodial wallets protected by programmable guardrails.
+
+
+
+Your challenge is to build applications that showcase the unique advantages of decentralized key management, whether that's enabling AI agents to autonomously manage assets, creating privacy-preserving applications, or building cross-chain experiences that were previously impossible.
+
+
+
+All submissions must include:
+
+
+
+Working prototype or demo - Deployed application or comprehensive demo video showing core functionality
+Source code repository - Public GitHub repo with clear README and setup instructions
+Project documentation including a clear description of what the project does and the problem it solves, technical architecture overview, and instructions for running/testing the project
+Demo video (2-5 minutes) - Walkthrough of your application's key features
+Integration proof - Must demonstrably use either:
++ Vincent API for AI agent wallet management, OR
+
++ Lit Protocol V1 (Naga) SDK for PKPs, encryption, or Lit Actions
+
+Example Project Ideas
+AI Agent Applications (using Vincent):
+
+
+
+Autonomous DeFi Manager - AI agent that executes trading strategies across multiple chains with programmable risk limits
+
+AI Content Monetization Bot - Automated agent that creates, publishes, and manages NFT drops based on trending topics
+
+Multi-Agent Coordination System - Framework for multiple AI agents to securely collaborate and pool resources for complex tasks
+
+Personal Finance Agent - AI assistant that manages bill payments, yield optimization, and automated savings with user-defined guardrails
+
+
+
+Lit Protocol V1 (Naga) Applications:
+
+
+
+Private On-Chain Gaming - Poker, blackjack, or strategy game that keeps game state encrypted while running verifiable logic on-chain
+
+Cross-Chain Credential Manager - Universal identity system that controls access across multiple blockchains from a single PKP
+
+Encrypted Social Platform - Decentralized messaging or social app with end-to-end encryption and programmable access controls
+
+Conditional Asset Release - Escrow or inheritance system that automatically releases assets based on predefined conditions
+
+Privacy-Preserving Oracle - Oracle system that aggregates sensitive data while keeping individual inputs encrypted
+
+
+
+Hybrid Applications:
+
+
+
+AI-Powered DAO Tools - Autonomous agents that execute approved governance actions across multiple protocols
+
+
+
+Encrypted AI Data Marketplace - Platform where AI agents can purchase and decrypt training data without revealing their strategies
+
+Required Technologies
+vincent-api
+lit-protocol-v1-naga-sdk
+Submission Requirements
+demo
+video
+documentation
+github
+summary
+Judging Criteria
+Innovation/Creativity
+How original, novel, or imaginative the idea is — does it introduce something new or approach an old problem in a new way?
+
+Impact/Usefulness
+Does the project solve a real problem? Could it meaningfully improve lives or systems if deployed?
+
+Technical Execution
+The complexity, robustness, and quality of the code or architecture — does it work and was it hard to build?
+
+User Experience (UX)
+Is the product intuitive, accessible, and visually polished? Would a user understand how to use it quickly?
+
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Lit Protocol
+Lit Protocol: NextGen AI Apps
+
+$500 USD
+
+Lit Protocol: NextGen AI Apps
+
+Submission Requirements
+
+demo
+video
+documentation
+github
+summary
+Required technologies
+
+vincent-api
+
+lit-protocol-v1-naga-sdk
+
+Lit Protocol
+View all requirements
+
+🥈
+
+2nd Place
+
+Lit Protocol
+Lit Protocol: NextGen AI Apps
+
+$300 USD
+
+Lit Protocol: NextGen AI Apps
+
+Submission Requirements
+
+demo
+video
+documentation
+github
+summary
+Required technologies
+
+vincent-api
+
+lit-protocol-v1-naga-sdk
+
+Lit Protocol
+View all requirements
+
+🥉
+
+3rd Place
+
+Lit Protocol
+Lit Protocol: NextGen AI Apps
+
+$200 USD
+
+Lit Protocol: NextGen AI Apps
+
+Submission Requirements
+
+demo
+video
+documentation
+github
+summary
+Required technologies
+
+vincent-api
+
+lit-protocol-v1-naga-sdk
+
+Lit Protocol
+View all requirements
+
+NEAR: Best New or Continued Project
+Sponsored by:
+NEAR Protocol
+NEAR Protocol
+$500
+Total Prize Pool
+Challenge Overview
+This challenge rewards the best new or continued projects building on NEAR, with a focus on teams that demonstrate clear technical progress, strong execution, and momentum beyond the NEAR Innovation Sandbox hackathon. Projects that previously participated in the NEAR Innovation Sandbox hackathon are eligible and encouraged to continue building, iterate meaningfully, and level up their work within PL_Genesis: Frontiers of Collaboration.
+
+
+
+We are looking for:
+
+Net-new projects built during PL_Genesis, or
+Continued projects originating from the NEAR Innovation Sandbox hackathon that demonstrate clear improvements, expansion, or refinement
+
+
+Challenge Details
+
+
+Build AI products that people keep using because they save time, reduce risk, or unlock a workflow that was previously not safe or practical.
+
+
+
+Good fits for this track:
+
+Autonomous systems that keep working after the user closes the tab. Think “already working on the thing you want”, with a clear boundary for what the system can and cannot do.
+User-owned memory and knowledge that is portable, inspectable, and revocable. If your product depends on memory, treat it as user data, not app data.
+Payments as part of the workflow, not a checkout screen. If an agent can request, route, or schedule payments, the payment logic should be auditable and constrained.
+
+
+We’re not looking for chatbot demos. We’re looking for products with a real user, a real job-to-be-done, and a path to continued use.
+
+
+
+“One job” is encouraged: a single, bounded workflow the agent can do end-to-end (but broader systems are welcome if the boundaries and controls are still clear).
+
+
+
+KEY INFORMATION & REQUIREMENTS HERE.
+
+Example Project Ideas
+KEY INFORMATION & REQUIREMENTS HERE.
+
+Submission Requirements
+summary
+github
+demo
+Judging Criteria
+Impact/Usefulness
+Does the project solve a real problem? Could it meaningfully improve lives or systems if deployed?
+
+Technical Execution
+The complexity, robustness, and quality of the code or architecture — does it work and was it hard to build?
+
+Completeness/Functionality
+Is the product finished and fully functional? Or is it just a prototype with broken elements?
+
+User Experience (UX)
+Is the product intuitive, accessible, and visually polished? Would a user understand how to use it quickly?
+
+Prizes
+View all prizes
+🏆
+
+Winner
+
+NEAR Protocol
+NEAR: Best New or Continued Project
+
+$500 USD
+
+NEAR: Best New or Continued Project
+
+Submission Requirements
+
+summary
+github
+demo
+NEAR Protocol
+View all requirements
+
+Storacha
+Sponsored by:
+Storacha
+Storacha
+$500 + Credits
+Total Prize Pool
+Challenge Overview
+1. Persistent Agent Memory for openclaw agents
+
+Problem: OpenClaw agents lose all context when you restart or switch devices. Every conversation/preference starts from scratch.
+Solution: Store agent state, conversation history, learned preferences on storacha. Agent pulls its memory from Storacha on any device - laptop, phone, server.
+Build agents that actually remember and evolve, not amnesia bots that reset daily.
+2. Multi-Agent Coordination
+
+Problem: Running multiple OpenClaw agents? They can't share knowledge or delegate tasks to each other. Each works in isolation.
+Solution: Agents store shared task queues, execution logs, and knowledge on Storacha and you can share data using UCANs. Agent A learns something → stored on storacha → Agent B instantly accesses it using UCANs. Build agent swarms that collaborate and scale, not solo workers.
+3. Decentralized RAG Knowledge Base
+
+Build uncensorable, verifiable knowledge systems for autonomous agents.
+Problem: AI agents need updated knowledge but centralized RAG systems are single points of failure. Data can be censored, lost, or tampered with.
+Storacha Solution: Store training data, embeddings, and vector indices on Storacha. Content-addressed retrieval ensures data integrity. Any agent can query without centralized gatekeepers.
+4. Storacha Tray icon app
+
+Build an app that sits in the system tray and allows users to quickly drag and drop files to upload them to Storacha.
+5. Longest UCAN delegation chain
+
+Build a web app that encourages users to create the longest UCAN delegation chain by sharing an initial delegation with their friends.
+The app should generate an initial delegation, and users should be given the means to re-delegate to a friend, and submit their delagation. The delegations should be stored on Storacha so that the entire chain does not have to be passed around for every share.
+There should be a leaderboard showing the longest submitted chain.
+The app should take steps to ensure users don’t cheat and programmatically generate a long delegation chain (your app could require each delegation have a unique verifiable drand randomness beacon for each delegation for example)
+6. Drand randomness chain backup
+
+Build a system to backup to Storacha each new drand randomness beacon that is generated every 30s.
+The chain should be navigatable - each random value should link to the pervious one.
+The output should be consumable programmatically.
+Consider using UCN to keep track of the head of the chain.
+7. Storacha Reseller
+
+Build an app that re-sells Storacha space.
+The app should take a crypto payment for a set amount of storage space for a given time.
+The app should create a space for a user, keep track of how much data is uploaded, and either issue delegation(s) to upload (e.g. delegated upload example) allowing users to upload directly or proxy uploads to Storacha via the app (e.g. server upload example).
+When the payment expires, the app should remove the user data from the space.
+Bonus - allow top-ups to keep data around for longer.
+
+
+Resources:
+Website: https://storacha.network/
+Documentation: https://docs.storacha.network/
+Quickstart Guide: https://docs.storacha.network/quickstart/
+How to Upload: https://docs.storacha.network/how-to/upload/
+Console (Dashboard): https://console.storacha.network/
+GitHub: https://github.com/storacha
+Awesome Storacha (examples & tools): https://github.com/storacha/awesome-storacha
+Discord: https://discord.com/invite/pqa6Dn6RnP
+Blog: https://medium.com/@storacha
+X: https://x.com/storachanetwork
+YouTube: https://www.youtube.com/@StorachaNetwork
+Farcaster: https://warpcast.com/storacha
+Bluesky: https://bsky.app/profile/storacha.network
+Reddit: https://www.reddit.com/r/Storacha
+
+
+
+
+Prize Breakdown:
+
+$500 pool
+
+1st prize: $200
+
+2nd prize: $100
+
+$50 each to the next 4 teams.
+
+All participants: Storacha Free Plan (5GB storage)
+
+Top builders: Storacha Lite Plan (100GB, 2 months free)
+
+
+
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Storacha
+Storacha
+
+$200 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+🏆
+
+2nd Place
+
+Storacha
+Storacha
+
+$100 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+🏆
+
+3rd Place
+
+Storacha
+Storacha
+
+$50 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+🏆
+
+4th Place
+
+Storacha
+Storacha
+
+$50 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+🏆
+
+5th Place
+
+Storacha
+Storacha
+
+$50 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+🏆
+
+6th Place
+
+Storacha
+Storacha
+
+$50 USD
+
+Storacha
+
+Storacha
+View all requirements
+
+Impulse AI: Autonomous ML for Every App
+Sponsored by:
+Impulse AI
+Impulse AI
+$500
+Total Prize Pool
+Challenge Overview
+Impulse AI turns complex machine learning workflows into a simple, agentic experience. It allows developers to go from a raw dataset to a production-ready model in minutes—not weeks. No "black boxes." No manual feature engineering. No "model stuck in a notebook" fatigue. Just an autonomous ML engineer that writes the code, trains the model, and deploys the API so you can focus on building your product.
+
+
+
+Common Impulse AI Use Cases Include: 
+
+Healthcare: Predicting patient outcomes or diagnostic trends from tabular records.
+FinTech & Crypto: Real-time fraud detection, churn prediction, or price forecasting.
+Sports Analytics: Predicting player performance or game outcomes based on historical stats.
+E-commerce: Personalized recommendation engines and inventory demand forecasting.
+
+
+Why Build with Impulse AI? 
+
+
+
+Impulse is designed for builders who need the power of a Senior Data Scientist without the $200K overhead. During a hackathon, speed is everything. Instead of spending 12 hours trying to clean a CSV and tune an XGBoost model, you can describe your problem in plain English, and Impulse handles the rest.
+
+
+
+Impulse AI Hacker Support & Perks 
+
+
+
+We are committed to helping the next generation of engineers deploy production-grade AI. For this hackathon, we are offering: The Impulse Pro Grant: 50% OFF our Annual Pro Plan for all participants (a $240 value) to keep your models running long after the closing ceremony.
+
+
+
+Direct Mentorship: Office hours with our founding team to help you with any bugs, architect your data schema, and optimize your model’s reasoning.
+
+
+
+Founder Spotlight: We will provide social media co-marketing and highlights for the "coolest" models deployed using
+
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Impulse AI
+Impulse AI: Autonomous ML for Every App
+
+$300 USD
+
+Impulse AI: Autonomous ML for Every App
+
+Impulse AI
+View all requirements
+
+🥈
+
+2nd Place
+
+Impulse AI
+Impulse AI: Autonomous ML for Every App
+
+$150 USD
+
+Impulse AI: Autonomous ML for Every App
+
+Impulse AI
+View all requirements
+
+🥉
+
+3rd Place
+
+Impulse AI
+Impulse AI: Autonomous ML for Every App
+
+$50 USD
+
+Impulse AI: Autonomous ML for Every App
+
+Impulse AI
+View all requirements
+
+Physical AI: Most Improved Physical AI Hackathon Project
+Sponsored by:
+Solo Tech
+Solo Tech
+$500
+Total Prize Pool
+Challenge Overview
+This bounty challenges teams from the Physical AI Hackathon to meaningfully advance their original projects as part of the PL_Genesis: Frontiers of Collaboration Hackathon. The focus is on demonstrated improvement including, technical depth, robustness, and real-world performance rather than starting from scratch.
+
+
+
+Teams are encouraged to build on their prior work by improving perception-action loops, model alignment, and generalization across tasks.
+
+
+
+This may include fine-tuning VLM or VLA models on task-specific data, implementing closed-loop policies with feedback, or extending systems to handle new shapes, layouts, or environments.
+
+
+
+🤖 Powered By
+
+​Solo Tech provides Physical AI Tuning Platform, along with the fine-tuning workflow, so teams can focus on learning and iteration instead of setup.
+
+
+
+Technical Docs
+
+Prizes
+View all prizes
+🏆
+
+Winner
+
+Solo Tech
+Physical AI: Most Improved Physical AI Hackathon Project
+
+$500 USD
+
+Physical AI: Most Improved Physical AI Hackathon Project
+
+Solo Tech
+View all requirements
+
+Funding the Commons
+Sponsored by:
+Funding the Commons
+Funding the Commons
+Opportunity to become EIR
+Total Prize Pool
+Challenge Overview
+Funding the Commons is a global community working with builders, researchers, system designers, and funders developing public infrastructure for the real world—funding systems, financial access, coordination tools, and digital public goods. Through conferences, hackathons, and residencies, they create high-signal spaces for people doing serious work, grounded in real-world conditions.
+
+
+
+One builder from the PL Genesis Hackathon will be nominated for a place in a Funding the Commons Builder Residency—an application-based, co-living container for deep work, mentorship, and collaboration with peers building real-world infrastructure. Residency dates, location, and final acceptance are subject to program availability and will be confirmed closer to the time.
+
+Prizes
+View all prizes
+🏆
+
+Winner
+
+Funding the Commons
+Funding the Commons
+
+Opportunity to be the Entrepreneur in Residence
+
+Funding the Commons
+
+Funding the Commons
+View all requirements
+
+Crecimiento
+Sponsored by:
+Crecimiento
+Crecimiento
+Challenge Overview
+Crecimiento is a movement dedicated to positioning Argentina as a global hub for technological innovation, focusing on crypto and emerging technologies. It connects community, builders, founders, startups, international partners, and public stakeholders with the goal of accelerating technology adoption, expanding the entrepreneurial ecosystem, and promoting a stable regulatory framework that enables responsible innovation. To achieve this, its work is structured through training and acceleration programs; community events and experiences; and strategic partnerships.
+
+
+
+One standout team from the PL_Genesis Hackathon will receive a guaranteed slot in the Crecimiento accelerator. The selected team must be willing to be in Argentina for the full duration of the hackathon and participate on the ground alongside the broader Crecimiento community. Through the program, founders gain access to capital, close mentorship, and a global network committed to building enduring companies rooted in real-world impact. Final acceptance and program details will be confirmed directly with Crecimiento.
+
+Infrastructure & Digital Rights
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$6,000
+Total Prize Pool
+Challenge Overview
+Infrastructure & Digital Rights
+
+
+
+Build the foundational systems that secure the internet and expand digital human rights.
+
+
+
+This track centres on decentralised cloud networks, data ownership, privacy-preserving technologies, cryptography, and censorship-resistant communication—the building blocks of an open, resilient, user-owned internet.
+
+
+
+Eligibility
+
+Projects must qualify as submissions to sponsor challenges to compete for track prizes.
+
+
+
+Prizes
+
+1st Place: $3,000
+2nd Place: $2,000
+3rd Place: $1,000
+Example Project Ideas
+Decentralized Infrastructure
+
+P2P VPNs where nodes earn for bandwidth contribution
+Distributed CDNs for media delivery without central chokepoints
+
+
+Data Ownership
+
+Personal data vaults with granular consent and monetization controls
+Portable social graphs users can take across apps
+
+
+Consumer
+
+Password managers with social recovery and no central server
+File storage apps with client-side encryption and token incentives
+"Dead man's switch" for digital inheritance and secure key transfer
+Submission Requirements
+summary
+video
+demo
+Judging Criteria
+Innovation/Creativity
+How original, novel, or imaginative the idea is — does it introduce something new or approach an old problem in a new way?
+
+Impact/Usefulness
+Does the project solve a real problem? Could it meaningfully improve lives or systems if deployed?
+
+Relevance to Theme/Challenge
+How well does the submission align with the specific track, sponsor challenge, or hackathon theme?
+
+Use of Sponsor Tech/APIs
+Especially in bounty-driven hackathons — how well did the team integrate and showcase the required sponsor technology?
+
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Protocol Labs
+Infrastructure & Digital Rights
+
+$3,000 USD
+
+Infrastructure & Digital Rights
+
+Submission Requirements
+
+summary
+video
+demo
+Protocol Labs
+View all requirements
+
+🥈
+
+2nd Place
+
+Protocol Labs
+Infrastructure & Digital Rights
+
+$2,000 USD
+
+Infrastructure & Digital Rights
+
+Submission Requirements
+
+summary
+video
+demo
+Protocol Labs
+View all requirements
+
+🥉
+
+3rd Place
+
+Protocol Labs
+Infrastructure & Digital Rights
+
+$1,000 USD
+
+Infrastructure & Digital Rights
+
+Submission Requirements
+
+summary
+video
+demo
+Protocol Labs
+View all requirements
+
+Crypto
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$6,000
+Total Prize Pool
+Challenge Overview
+Design new economic and governance systems that upgrade how value, power, and coordination work at scale.
+
+
+
+This track explores crypto as a design space for collective action —programmable treasuries, public goods funding, DePIN, DeSci, novel markets, and financial instruments that enable new forms of organization and resource allocation.
+
+
+
+Eligibility
+
+Projects must qualify as submissions to sponsor challenges to compete for track prizes.
+
+
+
+Prizes
+
+1st Place: $3,000
+2nd Place: $2,000
+3rd Place: $1,000
+Example Project Ideas
+Governance & Coordination
+
+Delegation marketplaces
+Conviction voting or quadratic funding interfaces
+DAO compensation frameworks
+Governance simulation tools
+
+
+Public Goods & Impact
+
+Retroactive funding mechanisms for open-source contributors
+Impact attestation systems
+Community treasury dashboards with spend analytics and ROI tracking
+
+
+DePIN & DeSci
+
+Sensor networks where contributors earn for environmental or infrastructure data
+Decentralized research coordination platforms
+Compute or storage marketplaces
+
+
+Consumer-Facing Applications
+
+Split-payment apps for group expenses
+Micro-investment platforms for fractional ownership of real-world assets
+Prediction markets for local events, sports, or personal goal-setting
+Savings circles (digital tontines) with automated payout logic
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Protocol Labs
+Crypto
+
+$3,000 USD
+
+Crypto
+
+Protocol Labs
+View all requirements
+
+🥈
+
+2nd Place
+
+Protocol Labs
+Crypto
+
+$2,000 USD
+
+Crypto
+
+Protocol Labs
+View all requirements
+
+🥉
+
+3rd Place
+
+Protocol Labs
+Crypto
+
+$1,000 USD
+
+Crypto
+
+Protocol Labs
+View all requirements
+
+AI & Robotics
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$6,000
+Total Prize Pool
+Challenge Overview
+Build systems that advance safe, accountable, and collaborative AI, AGI, and robotics.
+
+
+
+This track prioritizes safety, coordination, and real-world deployment over raw capability — verifiable AI, agent-to-agent communication, human-in-the-loop oversight, and autonomous systems integrated with decentralized infrastructure.
+
+
+
+As agents become economic actors, new standards for machine payments (x402), agent identity (ERC-8004), and inter-agent protocols are creating infrastructure for trustworthy autonomous systems.
+
+
+
+Eligibility
+
+Projects must qualify as submissions to sponsor challenges to compete for track prizes.
+
+Example Project Ideas
+Verifiable AI
+
+Agents with cryptographic proof of reasoning and decision provenance
+Model attestation systems that verify training data and fine-tuning history
+Audit trails for AI recommendations in high-stakes domains (medical, legal, financial)
+
+
+Agent Coordination & Commerce
+
+Multi-agent negotiation protocols with transparent bidding and settlement
+Agent-to-agent payment rails for autonomous service procurement
+Reputation systems for AI agents based on task completion and reliability
+Swarm coordination frameworks for distributed problem-solving
+
+
+Human Oversight
+
+Kill switches and intervention layers for autonomous systems
+Interpretability dashboards that surface agent intent in real-time
+Consent frameworks for human-AI collaboration with adjustable autonomy
+
+
+Robotics
+
+Fleet coordination protocols for delivery or logistics robots
+Simulation environments for testing multi-robot cooperation
+Sensor fusion networks where robots share environmental data
+
+
+Consumer
+
+Personal AI agents that negotiate subscriptions and purchases on your behalf
+AI assistants with portable memory users own and control across platforms
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Protocol Labs
+AI & Robotics
+
+$3,000 USD
+
+AI & Robotics
+
+Protocol Labs
+View all requirements
+
+🥈
+
+2nd Place
+
+Protocol Labs
+AI & Robotics
+
+$2,000 USD
+
+AI & Robotics
+
+Protocol Labs
+View all requirements
+
+🥉
+
+3rd Place
+
+Protocol Labs
+AI & Robotics
+
+$1,000 USD
+
+AI & Robotics
+
+Protocol Labs
+View all requirements
+
+Neurotech
+Sponsored by:
+Protocol Labs
+Protocol Labs
+$6,000
+Total Prize Pool
+Challenge Overview
+Explore systems at the intersection of cognition, coordination, and computation.
+
+
+
+This track spans BCI, neuro-inspired architectures, collective intelligence tooling, and speculative neurotech infrastructure. As brain-computer interfaces move from lab to market and AI systems increasingly model cognitive processes, questions of neural data rights, cognitive sovereignty, and safe augmentation become urgent design problems.
+
+
+
+Projects may be experimental or speculative, but must demonstrate conceptual rigor with consideration on safety and ethics.
+
+
+
+Eligibility
+
+Projects must qualify as submissions to sponsor challenges to compete for track prizes.
+
+
+
+Prizes
+
+1st Place: $3,000
+2nd Place: $2,000
+3rd Place: $1,000
+Example Project Ideas
+Brain-Computer Interfaces
+
+Neural data wallets with granular consent and revocation controls
+Open-source BCI signal processing pipelines for accessibility devices
+Federated learning systems that train on neural data without centralized collection
+
+
+Collective Intelligence
+
+Deliberation platforms that synthesize group reasoning into coherent outputs
+Swarm decision tools for real-time distributed consensus
+Annotation systems where crowds collaboratively train AI models
+
+
+Neuro-Inspired Systems
+
+Spiking neural network implementations for energy-efficient edge computing
+Memory architectures modeled on hippocampal consolidation
+Attention mechanisms informed by cognitive load research
+
+
+Safety & Ethics
+
+Cognitive liberty frameworks with enforceable boundaries
+Adversarial testing for BCI systems against manipulation
+Consent protocols for neurofeedback and augmentation tools
+
+
+Consumer
+
+Focus and flow-state apps using non-invasive EEG feedback
+Meditation tools with real-time brainwave visualization
+Collaborative thinking environments that map group attention and engagement
+
+
+Resources:
+
+https://youtu.be/IAx7mZCzUjI?si=_PHx_WaDkmfrAvnR - Mental models for building neurotech and different technologies currently being developed.
+Learning playlist to familiarise yourself with Neurotech vocabulary - https://www.youtube.com/playlist?list=PLnNov8ZQm7hI7SkepbXsV7F61v02pakfo
+Join the NeuroTechX Slack to join a community and check out this post! https://neurotechx.slack.com/archives/C073WP1T9/p1771252442072429
+Prizes
+View all prizes
+🏆
+
+1st Place
+
+Protocol Labs
+Neurotech
+
+$3,000 USD
+
+Neurotech
+
+Protocol Labs
+View all requirements
+
+🥈
+
+2nd Place
+
+Protocol Labs
+Neurotech
+
+$2,000 USD
+
+Neurotech
+
+Protocol Labs
+View all requirements
+
+🥉
+
+3rd Place
+
+Protocol Labs
+Neurotech
+
+$1,000 USD
