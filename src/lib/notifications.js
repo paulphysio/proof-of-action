@@ -4,17 +4,33 @@
 
 // Register service worker
 export async function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register('/service-worker.js');
-      console.log('Service Worker registered:', registration);
-      return registration;
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      return null;
-    }
+  if (!('serviceWorker' in navigator)) {
+    console.log('Service workers not supported');
+    return null;
   }
-  return null;
+  
+  try {
+    // Check if already registered
+    const existingRegistration = await navigator.serviceWorker.getRegistration();
+    if (existingRegistration) {
+      console.log('Service Worker already registered:', existingRegistration);
+      return existingRegistration;
+    }
+    
+    const registration = await navigator.serviceWorker.register('/service-worker.js', {
+      scope: '/',
+      updateViaCache: 'none'
+    });
+    console.log('Service Worker registered:', registration);
+    
+    // Wait for the service worker to be ready
+    await navigator.serviceWorker.ready;
+    
+    return registration;
+  } catch (error) {
+    console.warn('Service Worker registration failed:', error.message);
+    return null;
+  }
 }
 
 // Request notification permission
@@ -38,12 +54,18 @@ export async function subscribeToPushNotifications() {
 
     const res = await fetch('/api/push/public-key');
     if (!res.ok) {
-      throw new Error('Failed to fetch VAPID public key');
+      console.warn('Push notification setup incomplete - VAPID keys may not be configured');
+      return null;
     }
 
-    const { publicKey } = await res.json();
+    const { publicKey, error } = await res.json();
+    
+    // Gracefully handle missing VAPID configuration
     if (!publicKey || typeof publicKey !== 'string') {
-      throw new Error('Invalid VAPID public key');
+      if (error) {
+        console.warn('Push notifications not available:', error);
+      }
+      return null;
     }
 
     const subscription = await registration.pushManager.subscribe({
@@ -54,7 +76,7 @@ export async function subscribeToPushNotifications() {
     console.log('Push subscription:', subscription);
     return subscription;
   } catch (error) {
-    console.error('Push subscription failed:', error);
+    console.warn('Push subscription failed (notifications may not be available):', error);
     return null;
   }
 }

@@ -65,6 +65,9 @@ export default function RespondPage() {
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyPrefixes, setNearbyPrefixes] = useState(null);
 
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(null);
+
   const GEOFENCE_PREFIX_LENGTH = 3;
 
   useEffect(() => {
@@ -132,6 +135,7 @@ export default function RespondPage() {
   const loadNearbyRequests = async () => {
     setLoading(true);
     try {
+      // Try to get location silently first, but don't block if not available
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
@@ -145,6 +149,7 @@ export default function RespondPage() {
             setRequests(filtered);
           },
           async () => {
+            // Location denied or error - still load requests with default location
             const lat = 40.7128;
             const lon = -74.0060;
             const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
@@ -152,7 +157,8 @@ export default function RespondPage() {
             const nearby = await getNearbyRequests(prefixes);
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
-          }
+          },
+          { timeout: 5000, maximumAge: 60000 } // Quick timeout, allow cached
         );
       } else {
         const lat = 40.7128;
@@ -167,6 +173,54 @@ export default function RespondPage() {
       console.error('Error loading requests:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const requestLocationPermission = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by your browser'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          setUserLocation({ lat, lon });
+          const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+          setNearbyPrefixes(prefixes);
+          resolve({ lat, lon, prefixes });
+        },
+        (error) => {
+          reject(error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
+  const handleRespondClick = (request) => {
+    // If we don't have location, show the location prompt
+    if (!userLocation) {
+      setPendingRequest(request);
+      setShowLocationPrompt(true);
+      return;
+    }
+    // Otherwise proceed directly
+    handleRespond(request);
+  };
+
+  const confirmLocationAndRespond = async () => {
+    try {
+      await requestLocationPermission();
+      setShowLocationPrompt(false);
+      if (pendingRequest) {
+        handleRespond(pendingRequest);
+        setPendingRequest(null);
+      }
+    } catch (error) {
+      alert('Location access is required to respond to requests and track your movement for verification. Please enable location permissions and try again.');
     }
   };
 
@@ -797,7 +851,7 @@ export default function RespondPage() {
                   </div>
                   <div className="p-3 p-md-4 pt-0">
                     <button
-                      onClick={() => handleRespond(request)}
+                      onClick={() => handleRespondClick(request)}
                       disabled={responding === request.id}
                       className="btn btn-gradient w-100 d-flex align-items-center justify-content-center gap-2"
                     >
@@ -866,6 +920,72 @@ export default function RespondPage() {
           </div>
         </div>
       </div>
+
+      {/* Location Permission Modal */}
+      {showLocationPrompt && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ 
+            background: 'rgba(15, 23, 42, 0.9)', 
+            zIndex: 9999,
+            backdropFilter: 'blur(8px)'
+          }}
+        >
+          <div 
+            className="glass-card p-4 p-md-5 mx-3 animate-reveal-scale"
+            style={{ maxWidth: '450px', width: '100%' }}
+          >
+            <div className="text-center mb-4">
+              <div 
+                style={{ 
+                  width: '70px', 
+                  height: '70px', 
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1))',
+                  border: '1px solid rgba(6, 182, 212, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}
+              >
+                <MapPin size={32} color="#06B6D4" />
+              </div>
+              <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.75rem' }}>
+                Location Required
+              </h4>
+              <p style={{ color: 'var(--slate-400)', fontSize: '0.9375rem', lineHeight: 1.6 }}>
+                To respond to requests and verify your movement during help sessions, we need access to your location. This helps prevent fraud and ensures safe community interactions.
+              </p>
+            </div>
+            
+            <div className="d-flex flex-column gap-3">
+              <button 
+                onClick={confirmLocationAndRespond}
+                className="btn btn-gradient w-100 d-flex align-items-center justify-content-center gap-2"
+                style={{ padding: '0.875rem' }}
+              >
+                <Navigation size={18} />
+                Enable Location & Continue
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLocationPrompt(false);
+                  setPendingRequest(null);
+                }}
+                className="btn btn-outline-glass w-100"
+                style={{ padding: '0.875rem' }}
+              >
+                Cancel
+              </button>
+            </div>
+            
+            <p className="text-center mt-3 mb-0" style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+              Your location is only tracked during active help sessions and is never stored with personal identifiers.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

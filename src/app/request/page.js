@@ -95,6 +95,9 @@ export default function RequestPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+
   const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -104,15 +107,65 @@ export default function RequestPage() {
         },
         (err) => {
           setError('Could not get location: ' + err.message);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
       setError('Geolocation is not supported by your browser');
     }
   };
 
-  const handleSubmit = async (e) => {
+  const requestLocationPermission = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by your browser'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(6);
+          const lon = position.coords.longitude.toFixed(6);
+          setLatitude(lat);
+          setLongitude(lon);
+          resolve({ lat, lon });
+        },
+        (error) => {
+          reject(error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
+  const handleSubmitClick = async (e) => {
     e.preventDefault();
+    
+    // If location is not set, show the location prompt first
+    if (!latitude || !longitude) {
+      setPendingSubmit(true);
+      setShowLocationPrompt(true);
+      return;
+    }
+    
+    // Otherwise proceed with submit
+    await doSubmit();
+  };
+
+  const confirmLocationAndSubmit = async () => {
+    try {
+      await requestLocationPermission();
+      setShowLocationPrompt(false);
+      if (pendingSubmit) {
+        await doSubmit();
+        setPendingSubmit(false);
+      }
+    } catch (error) {
+      setError('Location access is required to post emergency requests. This helps responders find you. Please enable location permissions.');
+    }
+  };
+
+  const doSubmit = async () => {
     setLoading(true);
     setError('');
 
@@ -365,7 +418,7 @@ export default function RequestPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmitClick}>
                   {/* Step 1: Request Type - Mobile Optimized */}
                   <div className="mb-4 mb-md-5">
                     <div className="d-flex align-items-center gap-2 mb-3">
@@ -644,6 +697,72 @@ export default function RequestPage() {
           </div>
         </div>
       </div>
+
+      {/* Location Permission Modal */}
+      {showLocationPrompt && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ 
+            background: 'rgba(15, 23, 42, 0.9)', 
+            zIndex: 9999,
+            backdropFilter: 'blur(8px)'
+          }}
+        >
+          <div 
+            className="glass-card p-4 p-md-5 mx-3 animate-reveal-scale"
+            style={{ maxWidth: '450px', width: '100%' }}
+          >
+            <div className="text-center mb-4">
+              <div 
+                style={{ 
+                  width: '70px', 
+                  height: '70px', 
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(244, 63, 94, 0.1))',
+                  border: '1px solid rgba(244, 63, 94, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}
+              >
+                <MapPin size={32} color="#F43F5E" />
+              </div>
+              <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.75rem' }}>
+                Location Required
+              </h4>
+              <p style={{ color: 'var(--slate-400)', fontSize: '0.9375rem', lineHeight: 1.6 }}>
+                To post emergency requests, we need your location so nearby helpers can find you. Your exact location is never shared directly.
+              </p>
+            </div>
+            
+            <div className="d-flex flex-column gap-3">
+              <button 
+                onClick={confirmLocationAndSubmit}
+                className="btn btn-gold w-100 d-flex align-items-center justify-content-center gap-2"
+                style={{ padding: '0.875rem' }}
+              >
+                <Navigation size={18} />
+                Enable Location & Post
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLocationPrompt(false);
+                  setPendingSubmit(false);
+                }}
+                className="btn btn-outline-glass w-100"
+                style={{ padding: '0.875rem' }}
+              >
+                Cancel
+              </button>
+            </div>
+            
+            <p className="text-center mt-3 mb-0" style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+              Your location is stored as an approximate geohash, not exact coordinates.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
