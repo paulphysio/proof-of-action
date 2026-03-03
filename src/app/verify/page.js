@@ -21,6 +21,7 @@ import {
   RefreshCw,
   Sparkles,
   TrendingUp,
+  Shield,
   ShieldCheck,
   X,
   FileCheck,
