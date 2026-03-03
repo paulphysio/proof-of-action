@@ -21,8 +21,16 @@ export async function verifyWithWorldID() {
   }
 
   try {
-    // Dynamically import IDKit to avoid SSR issues
-    const { IDKit } = await import('@worldcoin/idkit');
+    // Import IDKit from npm module
+    const IDKitModule = await import('@worldcoin/idkit');
+    const IDKit = IDKitModule.default || IDKitModule.IDKit;
+    
+    if (!IDKit || typeof IDKit.init !== 'function') {
+      throw new Error('IDKit not properly imported');
+    }
+    
+    // Initialize IDKit
+    await IDKit.init();
     
     return new Promise((resolve) => {
       IDKit.open({
@@ -48,7 +56,7 @@ export async function verifyWithWorldID() {
     });
   } catch (error) {
     console.error('World ID initialization error:', error);
-    return { success: false, error: 'Failed to initialize World ID' };
+    return { success: false, error: 'Failed to initialize World ID: ' + error.message };
   }
 }
 

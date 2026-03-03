@@ -40,8 +40,9 @@ export default function WorldIDVerification({
     setError(null);
 
     try {
-      // Use mock verification for development
-      // In production, replace with: const result = await verifyWithWorldID();
+      // For demo purposes, use mock verification
+      // Real World ID requires additional setup and API keys
+      console.log('Using mock World ID verification for demo');
       const result = await mockWorldIDVerification();
 
       if (result.success) {
@@ -199,6 +200,29 @@ export default function WorldIDVerification({
             <div className="d-flex align-items-center gap-2">
               <X size={16} color="#F43F5E" />
               <span style={{ color: '#F43F5E', fontSize: '0.8125rem' }}>{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Demo Notice */}
+        {!isVerified && (
+          <div 
+            className="p-3 rounded mb-3"
+            style={{ 
+              background: 'rgba(6, 182, 212, 0.1)', 
+              border: '1px solid rgba(6, 182, 212, 0.2)' 
+            }}
+          >
+            <div className="d-flex align-items-start gap-2">
+              <Shield size={16} color="#06B6D4" className="flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="m-0" style={{ color: '#06B6D4', fontSize: '0.875rem', fontWeight: 500 }}>
+                  Demo Mode
+                </p>
+                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+                  This is a demo simulation of World ID verification. In production, it would use real World ID Orb or Device verification.
+                </p>
+              </div>
             </div>
           </div>
         )}

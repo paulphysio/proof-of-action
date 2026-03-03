@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import WorldIDVerification from '@/components/WorldIDVerification';
 import FilecoinStorageStatus from '@/components/FilecoinStorageStatus';
+import IdentityPortability from '@/components/IdentityPortability';
 import { Fingerprint } from 'lucide-react';
 
 export default function Dashboard() {
@@ -289,6 +290,11 @@ export default function Dashboard() {
         {/* Filecoin Storage Status - Decentralized Storage */}
         <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '75ms' }}>
           <FilecoinStorageStatus walletAddress={accountId} />
+        </div>
+
+        {/* Identity Portability - Cross-Environment Export/Import */}
+        <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '100ms' }}>
+          <IdentityPortability />
         </div>
 
         {/* Stats Row - Mobile Optimized */}
