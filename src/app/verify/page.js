@@ -46,30 +46,14 @@ export default function VerifyPage() {
   const loadPendingVerifications = async () => {
     setLoading(true);
     try {
-      // First get requests created by current user
-      const { data: userRequests, error: requestsError } = await supabase
-        .from('emergency_requests')
-        .select('id')
-        .eq('requester_wallet', accountId)
-        .eq('status', 'open');
-
-      if (requestsError) throw requestsError;
-      if (!userRequests || userRequests.length === 0) {
-        setPendingVerifications([]);
-        setLoading(false);
-        return;
-      }
-
-      const requestIds = userRequests.map(r => r.id);
-
-      // Get responses for those requests
+      // Get responses where current user is the responder (requests I helped with)
       const { data: responses, error } = await supabase
         .from('responses')
         .select(`
           *,
           request:emergency_requests(*)
         `)
-        .in('request_id', requestIds)
+        .eq('responder_wallet', accountId)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -223,7 +207,7 @@ export default function VerifyPage() {
         <div className="aurora-bg" />
         
         <nav className="nav-premium" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-          <div className="container">
+          <div className="container px-3 px-md-4">
             <div className="d-flex align-items-center justify-content-between py-3">
               <Link href="/" className="d-flex align-items-center gap-2 text-decoration-none">
                 <div style={{ 
@@ -236,13 +220,31 @@ export default function VerifyPage() {
                 }}>
                   <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
-                <span style={{ color: 'white', fontWeight: 700, fontSize: '1.25rem' }}>
-                  Proof-of-Action
-                </span>
+                <div className="d-none d-sm-block">
+                  <span style={{ 
+                    color: 'white', 
+                    fontWeight: 700, 
+                    fontSize: '1.25rem'
+                  }}>
+                    Proof-of-Action
+                  </span>
+                </div>
+                <div className="d-sm-none">
+                  <span style={{ 
+                    color: 'white', 
+                    fontWeight: 700, 
+                    fontSize: '1.1rem'
+                  }}>
+                    PoA
+                  </span>
+                </div>
               </Link>
-              <Link href="/dashboard" className="btn btn-outline-glass" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+              <Link href="/dashboard" className="btn btn-outline-glass d-none d-sm-flex" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
                 <ChevronLeft size={16} className="me-2" />
                 Dashboard
+              </Link>
+              <Link href="/dashboard" className="btn btn-outline-glass d-sm-none" style={{ padding: '0.5rem', fontSize: '0.875rem' }}>
+                <ChevronLeft size={18} />
               </Link>
             </div>
           </div>
@@ -261,7 +263,7 @@ export default function VerifyPage() {
                     borderBottom: `1px solid ${isVerified ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}'` 
                   }}
                 >
-                  <h4 className="m-0 d-flex align-items-center gap-2" style={{ color: 'white' }}>
+                  <h4 className="m-0 d-flex align-items-center gap-2" style={{ color: 'white', fontSize: 'clamp(1rem, 4vw, 1.5rem)' }}>
                     {isVerified ? (
                       <>
                         <Check size={24} color="#10B981" />
@@ -310,17 +312,17 @@ export default function VerifyPage() {
                         {score}%
                       </div>
                     </div>
-                    <h3 style={{ color: isVerified ? '#10B981' : '#F59E0B', fontWeight: 700 }}>
+                    <h3 style={{ color: isVerified ? '#10B981' : '#F59E0B', fontWeight: 700, fontSize: 'clamp(1.25rem, 5vw, 1.75rem)' }}>
                       Confidence Score
                     </h3>
                   </div>
 
                   <div className="glass-card mb-4" style={{ background: 'rgba(15, 23, 42, 0.5)' }}>
                     <div className="p-3" style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                      <h5 className="m-0" style={{ color: 'white', fontWeight: 600 }}>Verification Breakdown</h5>
+                      <h5 className="m-0" style={{ color: 'white', fontWeight: 600, fontSize: 'clamp(0.875rem, 3vw, 1.25rem)' }}>Verification Breakdown</h5>
                     </div>
                     <div className="p-4">
-                      <div className="row g-4">
+                      <div className="row g-2 g-md-4">
                         {[
                           { label: 'Time Proximity', score: result.breakdown.timeScore, color: '#06B6D4' },
                           { label: 'Location Proximity', score: result.breakdown.locationScore, color: '#10B981' },
@@ -329,8 +331,8 @@ export default function VerifyPage() {
                         ].map((item, i) => (
                           <div key={i} className="col-6">
                             <div className="d-flex justify-content-between mb-2">
-                              <span style={{ color: 'var(--slate-300)', fontSize: '0.875rem' }}>{item.label}</span>
-                              <span style={{ color: item.color, fontWeight: 700 }}>
+                              <span style={{ color: 'var(--slate-300)', fontSize: 'clamp(0.625rem, 2.5vw, 0.875rem)' }}>{item.label}</span>
+                              <span style={{ color: item.color, fontWeight: 700, fontSize: 'clamp(0.75rem, 3vw, 1rem)' }}>
                                 {(item.score * 100).toFixed(0)}%
                               </span>
                             </div>
@@ -395,15 +397,16 @@ export default function VerifyPage() {
                     </div>
                   )}
 
-                  <div className="d-flex gap-3 justify-content-center">
+                  <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                     <button 
                       onClick={() => setVerificationResult(null)}
                       className="btn btn-gradient"
+                      style={{ fontSize: 'clamp(0.75rem, 3vw, 1rem)' }}
                     >
                       <FileCheck size={18} className="me-2" />
                       Verify Another
                     </button>
-                    <Link href="/dashboard" className="btn btn-outline-glass">
+                    <Link href="/dashboard" className="btn btn-outline-glass" style={{ fontSize: 'clamp(0.75rem, 3vw, 1rem)' }}>
                       Go to Dashboard
                     </Link>
                   </div>
@@ -513,9 +516,9 @@ export default function VerifyPage() {
               >
                 <Brain size={20} color="#8B5CF6" />
               </div>
-              <h2 className="m-0" style={{ color: 'white', fontWeight: 700, fontSize: '1.25rem' }}>AI Verification</h2>
+              <h2 className="m-0" style={{ color: 'white', fontWeight: 700, fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}>AI Verification</h2>
             </div>
-            <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
+            <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: 'clamp(0.75rem, 3vw, 0.9rem)' }}>
               Verify community actions and prevent fraud.
             </p>
           </div>
