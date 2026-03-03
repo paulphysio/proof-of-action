@@ -46,12 +46,30 @@ export default function VerifyPage() {
   const loadPendingVerifications = async () => {
     setLoading(true);
     try {
+      // First get requests created by current user
+      const { data: userRequests, error: requestsError } = await supabase
+        .from('emergency_requests')
+        .select('id')
+        .eq('requester_wallet', accountId)
+        .eq('status', 'open');
+
+      if (requestsError) throw requestsError;
+      if (!userRequests || userRequests.length === 0) {
+        setPendingVerifications([]);
+        setLoading(false);
+        return;
+      }
+
+      const requestIds = userRequests.map(r => r.id);
+
+      // Get responses for those requests
       const { data: responses, error } = await supabase
         .from('responses')
         .select(`
           *,
           request:emergency_requests(*)
         `)
+        .in('request_id', requestIds)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
