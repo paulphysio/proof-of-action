@@ -21,16 +21,25 @@ export async function verifyWithWorldID() {
   }
 
   try {
-    // Import IDKit from npm module
-    const IDKitModule = await import('@worldcoin/idkit');
-    const IDKit = IDKitModule.default || IDKitModule.IDKit;
+    // Try to import IDKit from CDN or npm module
+    let IDKit;
     
-    if (!IDKit || typeof IDKit.init !== 'function') {
-      throw new Error('IDKit not properly imported');
+    try {
+      // Try CDN first
+      const IDKitModule = await import('@worldcoin/idkit');
+      IDKit = IDKitModule.default || IDKitModule.IDKit;
+    } catch (cdnError) {
+      // Fallback to window object if CDN loaded
+      if (window.IDKit) {
+        IDKit = window.IDKit;
+      } else {
+        throw new Error('IDKit not available');
+      }
     }
     
-    // Initialize IDKit
-    await IDKit.init();
+    if (!IDKit || typeof IDKit.open !== 'function') {
+      throw new Error('IDKit.open not available');
+    }
     
     return new Promise((resolve) => {
       IDKit.open({

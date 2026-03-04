@@ -3,21 +3,16 @@
 import { useState, useEffect } from 'react';
 import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
 import { 
-  verifyWithWorldID, 
   getWorldIDVerification, 
   saveWorldIDVerification,
   getVerificationBadgeColor,
   getVerificationBadgeText,
-  VERIFICATION_LEVELS,
-  canAccessHighValueFeatures,
-  mockWorldIDVerification
+  canAccessHighValueFeatures
 } from '@/lib/worldid';
 
 /**
- * World ID Verification Component
- * Allows users to verify their humanity using World ID
- * 
- * Challenge: World Build 3 - The Human-Centric App Challenge
+ * World ID Verification Component - REAL VERSION
+ * Uses World ID MiniKit for actual verification
  */
 
 export default function WorldIDVerification({ 
@@ -30,7 +25,6 @@ export default function WorldIDVerification({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check for existing verification on mount
     const existing = getWorldIDVerification();
     setVerification(existing);
   }, []);
@@ -40,20 +34,43 @@ export default function WorldIDVerification({
     setError(null);
 
     try {
-      // For demo purposes, use mock verification
-      // Real World ID requires additional setup and API keys
-      console.log('Using mock World ID verification for demo');
-      const result = await mockWorldIDVerification();
+      // Import MiniKit dynamically
+      const { MiniKit } = await import('@worldcoin/minikit-js');
+      
+      if (!MiniKit.isInstalled()) {
+        // Fallback: Open World App
+        window.open('https://worldcoin.org/download', '_blank');
+        setError('Please install World App to verify');
+        setIsVerifying(false);
+        return;
+      }
 
-      if (result.success) {
-        saveWorldIDVerification(result);
-        setVerification(result);
-        onVerified?.(result);
+      const app_id = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_9a2bdda755a0a2737f22e311470b1bfa';
+      
+      const result = await MiniKit.commands.verify({
+        action_id: 'verify-human',
+        signal: 'proof-of-action-verification',
+        verification_level: 'orb'
+      });
+
+      if (result?.finalPayload?.status === 'success') {
+        const verificationData = {
+          success: true,
+          nullifier_hash: result.finalPayload.nullifier_hash,
+          proof: result.finalPayload.proof,
+          merkle_root: result.finalPayload.merkle_root,
+          verification_level: result.finalPayload.verification_level
+        };
+        
+        saveWorldIDVerification(verificationData);
+        setVerification(verificationData);
+        onVerified?.(verificationData);
       } else {
-        setError(result.error || 'Verification failed');
+        setError('Verification was not completed');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during verification');
+      console.error('World ID error:', err);
+      setError(err.message || 'Verification failed');
     } finally {
       setIsVerifying(false);
     }
@@ -83,18 +100,10 @@ export default function WorldIDVerification({
             justifyContent: 'center'
           }}
         >
-          {isVerified ? (
-            <Check size={14} color={badgeColor} />
-          ) : (
-            <Shield size={14} color="#64748B" />
-          )}
+          {isVerified ? <Check size={14} color={badgeColor} /> : <Shield size={14} color="#64748B" />}
         </div>
-        <span style={{ 
-          fontSize: '0.75rem', 
-          color: isVerified ? badgeColor : '#64748B',
-          fontWeight: 500 
-        }}>
-          {isVerified ? 'Verified Human' : 'Unverified'}
+        <span style={{ color: isVerified ? badgeColor : '#64748B', fontSize: '0.75rem', fontWeight: 500 }}>
+          {isVerified ? 'Verified' : 'Unverified'}
         </span>
       </div>
     );
@@ -102,58 +111,35 @@ export default function WorldIDVerification({
 
   return (
     <div className="glass-card" style={{ overflow: 'hidden' }}>
-      {/* Header */}
-      <div 
-        className="p-3 p-md-4"
-        style={{ 
-          background: isVerified 
-            ? `linear-gradient(135deg, ${badgeColor}15, ${badgeColor}05)` 
-            : 'linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.05))',
-          borderBottom: `1px solid ${isVerified ? `${badgeColor}30` : 'rgba(100, 116, 139, 0.2)'}`
-        }}
-      >
+      <div className="p-3 p-md-4" style={{ 
+        background: isVerified 
+          ? `linear-gradient(135deg, ${badgeColor}15, ${badgeColor}05)` 
+          : 'linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.05))',
+        borderBottom: `1px solid ${isVerified ? `${badgeColor}30` : 'rgba(100, 116, 139, 0.2)'}`
+      }}>
         <div className="d-flex align-items-center gap-3">
-          <div 
-            style={{ 
-              width: '48px', 
-              height: '48px', 
-              borderRadius: '12px',
-              background: isVerified ? `${badgeColor}20` : 'rgba(100, 116, 139, 0.2)',
-              border: `2px solid ${isVerified ? badgeColor : '#64748B'}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {isVerifying ? (
-              <Loader2 size={24} color="#06B6D4" className="animate-spin" />
-            ) : isVerified ? (
-              <Fingerprint size={24} color={badgeColor} />
-            ) : (
-              <Shield size={24} color="#64748B" />
-            )}
+          <div style={{ 
+            width: '48px', height: '48px', borderRadius: '12px',
+            background: isVerified ? `${badgeColor}20` : 'rgba(100, 116, 139, 0.2)',
+            border: `2px solid ${isVerified ? badgeColor : '#64748B'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            {isVerifying ? <Loader2 size={24} color="#06B6D4" className="animate-spin" />
+              : isVerified ? <Fingerprint size={24} color={badgeColor} />
+              : <Shield size={24} color="#64748B" />}
           </div>
           <div>
-            <h5 className="m-0" style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
+            <h5 className="m-0" style={{ color: 'white', fontWeight: 600 }}>
               {isVerified ? 'Verified Human' : 'Verify Your Identity'}
             </h5>
-            <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
-              {badgeText}
-            </p>
+            <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>{badgeText}</p>
           </div>
         </div>
       </div>
 
       <div className="p-3 p-md-4">
-        {/* Status Message */}
         {isVerified ? (
-          <div 
-            className="p-3 rounded mb-3"
-            style={{ 
-              background: `${badgeColor}10`, 
-              border: `1px solid ${badgeColor}30` 
-            }}
-          >
+          <div className="p-3 rounded mb-3" style={{ background: `${badgeColor}10`, border: `1px solid ${badgeColor}30` }}>
             <div className="d-flex align-items-start gap-2">
               <Check size={16} color={badgeColor} className="flex-shrink-0 mt-0.5" />
               <div>
@@ -161,42 +147,27 @@ export default function WorldIDVerification({
                   Your identity is verified
                 </p>
                 <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
-                  You have full access to all features and can create high-priority emergency requests.
+                  You have full access to all features.
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          <div 
-            className="p-3 rounded mb-3"
-            style={{ 
-              background: 'rgba(245, 158, 11, 0.1)', 
-              border: '1px solid rgba(245, 158, 11, 0.2)' 
-            }}
-          >
+          <div className="p-3 rounded mb-3" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
             <div className="d-flex align-items-start gap-2">
               <Shield size={16} color="#F59E0B" className="flex-shrink-0 mt-0.5" />
               <div>
-                <p className="m-0" style={{ color: '#F59E0B', fontSize: '0.875rem', fontWeight: 500 }}>
-                  Verification recommended
-                </p>
+                <p className="m-0" style={{ color: '#F59E0B', fontWeight: 500 }}>Verification recommended</p>
                 <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
-                  Verified users get priority matching and can post high-value requests.
+                  Verified users get priority matching.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
-          <div 
-            className="p-3 rounded mb-3"
-            style={{ 
-              background: 'rgba(244, 63, 94, 0.1)', 
-              border: '1px solid rgba(244, 63, 94, 0.2)' 
-            }}
-          >
+          <div className="p-3 rounded mb-3" style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
             <div className="d-flex align-items-center gap-2">
               <X size={16} color="#F43F5E" />
               <span style={{ color: '#F43F5E', fontSize: '0.8125rem' }}>{error}</span>
@@ -204,110 +175,34 @@ export default function WorldIDVerification({
           </div>
         )}
 
-        {/* Demo Notice */}
-        {!isVerified && (
-          <div 
-            className="p-3 rounded mb-3"
-            style={{ 
-              background: 'rgba(6, 182, 212, 0.1)', 
-              border: '1px solid rgba(6, 182, 212, 0.2)' 
-            }}
-          >
-            <div className="d-flex align-items-start gap-2">
-              <Shield size={16} color="#06B6D4" className="flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="m-0" style={{ color: '#06B6D4', fontSize: '0.875rem', fontWeight: 500 }}>
-                  Demo Mode
-                </p>
-                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
-                  This is a demo simulation of World ID verification. In production, it would use real World ID Orb or Device verification.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Benefits List */}
         {showBenefits && (
           <div className="mb-3">
-            <h6 className="mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>
-              Verification Benefits:
-            </h6>
-            <ul className="list-unstyled m-0" style={{ color: 'var(--slate-400)' }}>
-              {[
-                'Priority matching with verified responders',
-                'Ability to post high-value emergency requests',
-                'Increased reputation and trust score',
-                'Access to premium features',
-                'Bot and Sybil-attack protection'
-              ].map((benefit, i) => (
-                <li key={i} className="d-flex align-items-start gap-2 mb-1">
-                  <Check 
-                    size={12} 
-                    color={isVerified ? badgeColor : '#64748B'} 
-                    className="flex-shrink-0 mt-1" 
-                  />
-                  <span style={{ fontSize: '0.75rem' }}>{benefit}</span>
-                </li>
-              ))}
+            <h6 className="mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>Benefits:</h6>
+            <ul className="list-unstyled m-0" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+              <li className="mb-1">✓ Priority matching with verified responders</li>
+              <li className="mb-1">✓ Post high-value emergency requests</li>
+              <li className="mb-1">✓ Increased reputation score</li>
+              <li>✓ Bot and Sybil protection</li>
             </ul>
           </div>
         )}
 
-        {/* Action Button */}
         <div className="d-flex gap-2">
           {isVerified ? (
             <>
-              <button 
-                onClick={handleVerify}
-                disabled={isVerifying}
-                className="btn btn-outline-glass flex-fill"
-              >
-                {isVerifying ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin me-2" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    <Fingerprint size={16} className="me-2" />
-                    Refresh Verification
-                  </>
-                )}
+              <button onClick={handleVerify} disabled={isVerifying} className="btn btn-outline-glass flex-fill">
+                {isVerifying ? <><Loader2 size={16} className="animate-spin me-2" />Verifying...</>
+                  : <><Shield size={16} className="me-2" />Verify Again</>}
               </button>
-              <button 
-                onClick={handleClear}
-                className="btn btn-outline-danger"
-                style={{ borderColor: 'rgba(244, 63, 94, 0.3)', color: '#F43F5E' }}
-              >
-                <X size={16} />
-              </button>
+              <button onClick={handleClear} className="btn btn-outline-danger"><X size={16} /></button>
             </>
           ) : (
-            <button 
-              onClick={handleVerify}
-              disabled={isVerifying}
-              className="btn btn-gradient w-100"
-            >
-              {isVerifying ? (
-                <>
-                  <Loader2 size={18} className="animate-spin me-2" />
-                  Verifying with World ID...
-                </>
-              ) : (
-                <>
-                  <Fingerprint size={18} className="me-2" />
-                  Verify with World ID
-                </>
-              )}
+            <button onClick={handleVerify} disabled={isVerifying} className="btn btn-gradient w-100 d-flex align-items-center justify-content-center gap-2">
+              {isVerifying ? <><Loader2 size={18} className="animate-spin" /><span>Connecting...</span></>
+                : <><Fingerprint size={18} /><span>Verify with World ID</span></>}
             </button>
           )}
         </div>
-
-        {/* Privacy Note */}
-        <p className="m-0 mt-3 text-center" style={{ color: 'var(--slate-500)', fontSize: '0.6875rem' }}>
-          Powered by World ID • Zero-knowledge proof • Privacy preserving
-        </p>
       </div>
     </div>
   );
