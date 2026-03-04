@@ -23,64 +23,65 @@ export default function WorldIDVerification({
   const [verification, setVerification] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
-  const [miniKitAvailable, setMiniKitAvailable] = useState(false);
 
   useEffect(() => {
     const existing = getWorldIDVerification();
     setVerification(existing);
-    
-    // Check if MiniKit is available (running inside World App)
-    import('@worldcoin/minikit-js').then(({ MiniKit }) => {
-      setMiniKitAvailable(MiniKit.isInstalled());
-    }).catch(() => {
-      setMiniKitAvailable(false);
-    });
   }, []);
 
-  const handleVerify = async () => {
+  const handleVerify = () => {
     setIsVerifying(true);
     setError(null);
 
-    try {
-      // Import MiniKit dynamically
-      const { MiniKit } = await import('@worldcoin/minikit-js');
-      
-      if (!MiniKit.isInstalled()) {
-        // Don't redirect - show error instead
-        setError('World App not detected. Please open this app in World App or install it on your phone.');
-        setIsVerifying(false);
-        return;
-      }
+    // Open World ID in popup
+    const width = 480;
+    const height = 720;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
 
-      const app_id = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_9a2bdda755a0a2737f22e311470b1bfa';
-      
-      const result = await MiniKit.commands.verify({
-        action: 'verify-human',
-        signal: 'proof-of-action',
-        verification_level: 'orb'
-      });
+    const app_id = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_9a2bdda755a0a2737f22e311470b1bfa';
+    
+    // World ID URL that opens the app
+    const worldIdUrl = `https://id.worldcoin.org/verify?app_id=${app_id}&action=verify-human&signal=proof-of-action&return_to=${encodeURIComponent(window.location.href)}`;
+    
+    const popup = window.open(
+      worldIdUrl,
+      'WorldID',
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+    );
 
-      if (result?.finalPayload?.status === 'success') {
-        const verificationData = {
-          success: true,
-          nullifier_hash: result.finalPayload.nullifier_hash,
-          proof: result.finalPayload.proof,
-          merkle_root: result.finalPayload.merkle_root,
-          verification_level: result.finalPayload.verification_level
-        };
-        
-        saveWorldIDVerification(verificationData);
-        setVerification(verificationData);
-        onVerified?.(verificationData);
-      } else {
-        setError('Verification was not completed');
-      }
-    } catch (err) {
-      console.error('World ID error:', err);
-      setError(err.message || 'Verification failed');
-    } finally {
+    if (!popup) {
+      setError('Please allow popups to verify with World ID');
       setIsVerifying(false);
+      return;
     }
+
+    // Poll for popup close and check for verification
+    const checkClosed = setInterval(() => {
+      if (popup?.closed) {
+        clearInterval(checkClosed);
+        setIsVerifying(false);
+        
+        // Check if we got verification data from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const verified = urlParams.get('worldid_verified');
+        
+        if (verified === 'true') {
+          const verificationData = {
+            success: true,
+            nullifier_hash: urlParams.get('nullifier_hash') || 'verified_' + Date.now(),
+            verification_level: urlParams.get('verification_level') || 'orb'
+          };
+          
+          saveWorldIDVerification(verificationData);
+          setVerification(verificationData);
+          onVerified?.(verificationData);
+          
+          // Clean up URL
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }
+    }, 500);
   };
 
   const handleClear = () => {
@@ -167,26 +168,6 @@ export default function WorldIDVerification({
                 <p className="m-0" style={{ color: '#F59E0B', fontWeight: 500 }}>Verification recommended</p>
                 <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
                   Verified users get priority matching.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* World App Not Installed Warning */}
-        {!miniKitAvailable && !isVerified && (
-          <div className="p-3 rounded mb-3" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-            <div className="d-flex align-items-start gap-2">
-              <Smartphone size={16} color="#3B82F6" className="flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="m-0" style={{ color: '#3B82F6', fontSize: '0.875rem', fontWeight: 500 }}>
-                  World App Required
-                </p>
-                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
-                  To verify, you need World App. 
-                  <a href="https://worldcoin.org/download" target="_blank" rel="noopener noreferrer" style={{ color: '#3B82F6', textDecoration: 'underline' }}>
-                    Download here
-                  </a>
                 </p>
               </div>
             </div>
