@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
+import { Shield, Check, X, Loader2, Fingerprint, Smartphone } from 'lucide-react';
 import { 
   getWorldIDVerification, 
   saveWorldIDVerification,
@@ -23,10 +23,18 @@ export default function WorldIDVerification({
   const [verification, setVerification] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
+  const [miniKitAvailable, setMiniKitAvailable] = useState(false);
 
   useEffect(() => {
     const existing = getWorldIDVerification();
     setVerification(existing);
+    
+    // Check if MiniKit is available (running inside World App)
+    import('@worldcoin/minikit-js').then(({ MiniKit }) => {
+      setMiniKitAvailable(MiniKit.isInstalled());
+    }).catch(() => {
+      setMiniKitAvailable(false);
+    });
   }, []);
 
   const handleVerify = async () => {
@@ -38,9 +46,8 @@ export default function WorldIDVerification({
       const { MiniKit } = await import('@worldcoin/minikit-js');
       
       if (!MiniKit.isInstalled()) {
-        // Fallback: Open World App
-        window.open('https://worldcoin.org/download', '_blank');
-        setError('Please install World App to verify');
+        // Don't redirect - show error instead
+        setError('World App not detected. Please open this app in World App or install it on your phone.');
         setIsVerifying(false);
         return;
       }
@@ -48,8 +55,8 @@ export default function WorldIDVerification({
       const app_id = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_9a2bdda755a0a2737f22e311470b1bfa';
       
       const result = await MiniKit.commands.verify({
-        action_id: 'verify-human',
-        signal: 'proof-of-action-verification',
+        action: 'verify-human',
+        signal: 'proof-of-action',
         verification_level: 'orb'
       });
 
@@ -160,6 +167,26 @@ export default function WorldIDVerification({
                 <p className="m-0" style={{ color: '#F59E0B', fontWeight: 500 }}>Verification recommended</p>
                 <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
                   Verified users get priority matching.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* World App Not Installed Warning */}
+        {!miniKitAvailable && !isVerified && (
+          <div className="p-3 rounded mb-3" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+            <div className="d-flex align-items-start gap-2">
+              <Smartphone size={16} color="#3B82F6" className="flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="m-0" style={{ color: '#3B82F6', fontSize: '0.875rem', fontWeight: 500 }}>
+                  World App Required
+                </p>
+                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+                  To verify, you need World App. 
+                  <a href="https://worldcoin.org/download" target="_blank" rel="noopener noreferrer" style={{ color: '#3B82F6', textDecoration: 'underline' }}>
+                    Download here
+                  </a>
                 </p>
               </div>
             </div>
