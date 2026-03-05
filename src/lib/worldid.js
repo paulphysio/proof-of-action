@@ -151,7 +151,8 @@ export function clearWorldIDVerification() {
 export const VERIFICATION_LEVELS = {
   ORB: 'orb',           // Highest level - biometric verification
   DEVICE: 'device',     // Device-based verification
-  NONE: 'none'          // No verification
+  NONE: 'none',          // No verification
+  DEVICE_LEGACY: 'deviceLegacy' // Device-based verification
 };
 
 /**
@@ -161,7 +162,8 @@ export const VERIFICATION_LEVELS = {
  */
 export function canAccessHighValueFeatures(verificationLevel) {
   return verificationLevel === VERIFICATION_LEVELS.ORB || 
-         verificationLevel === VERIFICATION_LEVELS.DEVICE;
+         verificationLevel === VERIFICATION_LEVELS.DEVICE ||
+         verificationLevel === VERIFICATION_LEVELS.DEVICE_LEGACY;
 }
 
 /**
@@ -174,6 +176,8 @@ export function getVerificationBadgeColor(level) {
     case VERIFICATION_LEVELS.ORB:
       return '#10B981'; // Green for Orb verification
     case VERIFICATION_LEVELS.DEVICE:
+      return '#06B6D4'; // Cyan for device verification
+    case VERIFICATION_LEVELS.DEVICE_LEGACY:
       return '#06B6D4'; // Cyan for device verification
     default:
       return '#64748B'; // Slate for no verification
@@ -190,6 +194,8 @@ export function getVerificationBadgeText(level) {
     case VERIFICATION_LEVELS.ORB:
       return 'Verified Human (Orb)';
     case VERIFICATION_LEVELS.DEVICE:
+      return 'Verified Device';
+    case VERIFICATION_LEVELS.DEVICE_LEGACY:
       return 'Verified Device';
     default:
       return 'Not Verified';
