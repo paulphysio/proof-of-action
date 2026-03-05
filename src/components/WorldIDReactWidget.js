@@ -140,7 +140,45 @@ export default function WorldIDReactWidget({ onVerified }) {
           proof: proofData?.proof,
           merkle_root: proofData?.merkle_root,
           verification_level: 'deviceLegacy',
+          timestamp: new Date().toISOString(),
         };
+        
+        // Store verification on Filecoin via API route
+        try {
+          const filecoinResponse = await fetch('/api/filecoin/store', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              type: 'world-id',
+              walletAddress: verificationData.nullifier_hash,
+              data: verificationData
+            }),
+          });
+
+          const filecoinResult = await filecoinResponse.json();
+          
+          if (filecoinResult.success) {
+            console.log('✅ World ID verification stored on Filecoin:', filecoinResult.pieceCid);
+            
+            // Store local reference
+            if (typeof window !== 'undefined') {
+              const existing = JSON.parse(localStorage.getItem('filecoin_storage') || '[]');
+              existing.push({
+                type: 'world-id',
+                pieceCid: filecoinResult.pieceCid,
+                timestamp: new Date().toISOString(),
+                network: filecoinResult.network || 'calibration',
+                explorer: filecoinResult.explorer
+              });
+              localStorage.setItem('filecoin_storage', JSON.stringify(existing));
+            }
+          } else {
+            console.warn('⚠️ Failed to store on Filecoin:', filecoinResult.error);
+          }
+        } catch (filecoinError) {
+          console.warn('⚠️ Filecoin storage error:', filecoinError.message);
+          // Continue with local storage even if Filecoin fails
+        }
         
         saveWorldIDVerification(verificationData);
         setVerification(verificationData);
