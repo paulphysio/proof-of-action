@@ -64,56 +64,12 @@ export default function WorldIDMobile({ onVerified }) {
         environment: 'production',
       }).preset(deviceLegacy({ signal: 'proof-of-action' }));
 
-      // Step 3: Get connector URI and create deep link
+      // Step 3: Get connector URI and open directly in mobile browser
       const connectUrl = request.connectorURI;
       
-      // For mobile, create a deep link that opens World App directly
-      const worldAppDeepLink = `worldcoin://connect?uri=${encodeURIComponent(connectUrl)}`;
-      
-      // Try to open World App via deep link
-      const opened = window.open(worldAppDeepLink, '_blank');
-      
-      // Fallback to QR code if deep link fails
-      if (!opened || opened.closed || typeof opened.closed === 'undefined') {
-        // Deep link failed, show QR code as fallback
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(connectUrl)}`;
-        
-        // Create a simple modal with QR code
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-        `;
-        
-        modal.innerHTML = `
-          <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 90%;">
-            <h3 style="margin: 0 0 10px 0;">Scan with World App</h3>
-            <img src="${qrApiUrl}" style="width: 200px; height: 200px;" />
-            <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">
-              Scan this QR code with your World App
-            </p>
-            <button onclick="this.parentElement.parentElement.remove()" style="
-              margin-top: 15px;
-              padding: 8px 16px;
-              background: #06B6D4;
-              color: white;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-            ">Close</button>
-          </div>
-        `;
-        
-        document.body.appendChild(modal);
-      }
+      // For mobile, open the connect URL directly in the same tab
+      // This will redirect to World App if installed, or show mobile web version
+      window.location.href = connectUrl;
 
       // Step 4: Poll for completion
       const response = await request.pollUntilCompletion();
@@ -312,7 +268,7 @@ export default function WorldIDMobile({ onVerified }) {
               {isVerifying ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  <span>Launching World App...</span>
+                  <span>Redirecting to World ID...</span>
                 </>
               ) : (
                 <>
@@ -328,10 +284,10 @@ export default function WorldIDMobile({ onVerified }) {
             <div className="mt-3">
               <h6 className="m-0 mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>Mobile Benefits:</h6>
               <ul className="m-0 ps-3" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
-                <li>📱 Opens World App automatically</li>
+                <li>📱 Direct redirect to World ID</li>
                 <li>🚀 Single device verification</li>
                 <li>⚡ No QR code scanning needed</li>
-                <li>🔄 QR fallback if deep link fails</li>
+                <li>🔄 Seamless mobile experience</li>
               </ul>
             </div>
           )}

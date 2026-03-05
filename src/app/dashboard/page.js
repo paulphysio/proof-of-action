@@ -28,7 +28,7 @@ import {
   Home,
   Activity
 } from 'lucide-react';
-import WorldIDMobile from '@/components/WorldIDMobile';
+import WorldIDReactWidget from '@/components/WorldIDReactWidget';
 import FilecoinStorageStatus from '@/components/FilecoinStorageStatus';
 import IdentityPortability from '@/components/IdentityPortability';
 import { Fingerprint } from 'lucide-react';
@@ -280,7 +280,7 @@ export default function Dashboard() {
 
         {/* World ID Verification - Human-Centric Feature */}
         <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '50ms' }}>
-          <WorldIDMobile 
+          <WorldIDReactWidget 
             onVerified={(result) => {
               console.log('World ID verified:', result);
             }}
