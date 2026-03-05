@@ -1,11 +1,9 @@
 'use client';
 
+console.log('WorldIDWidget.js loaded');
+
 import { useState, useCallback, useEffect } from 'react';
 import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
-import { 
-  IDKitRequestWidget,
-  deviceLegacy,
-} from '@worldcoin/idkit';
 import { 
   getWorldIDVerification, 
   saveWorldIDVerification,
@@ -24,6 +22,8 @@ export default function WorldIDWidget({ onVerified }) {
   const [error, setError] = useState(null);
   const [widgetOpen, setWidgetOpen] = useState(false);
 
+  console.log('WorldIDWidget mounted');
+
   // Load existing verification on mount
   useEffect(() => {
     const existing = getWorldIDVerification();
@@ -33,6 +33,7 @@ export default function WorldIDWidget({ onVerified }) {
   }, []);
 
   const handleVerify = useCallback(async () => {
+    console.log('handleVerify called');
     setIsVerifying(true);
     setError(null);
     setWidgetOpen(true);
@@ -254,32 +255,55 @@ function WorldIDWidgetComponent({ open, onOpenChange, onSuccess, onError, onVeri
   const [rpContext, setRpContext] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  console.log('WorldIDWidgetComponent rendered, open:', open);
+
   // Fetch RP signature when widget opens
   const fetchRpSignature = useCallback(async () => {
     if (rpContext) return rpContext;
 
     setLoading(true);
     try {
+      console.log('Fetching RP signature...');
+      
       const response = await fetch('/api/rp-signature', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ action: 'verify-human' }),
       });
 
+      console.log('RP signature response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to get RP signature');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to get RP signature (${response.status})`);
       }
 
       const rpSig = await response.json();
+      console.log('RP signature received:', rpSig);
+      
+      // Check environment variables
+      const rpId = process.env.NEXT_PUBLIC_RP_ID;
+      const appId = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID;
+      console.log('NEXT_PUBLIC_RP_ID:', rpId);
+      console.log('NEXT_PUBLIC_WORLDCOIN_APP_ID:', appId);
+      
+      if (!rpId) {
+        throw new Error('NEXT_PUBLIC_RP_ID is not configured');
+      }
+      
+      if (!appId) {
+        throw new Error('NEXT_PUBLIC_WORLDCOIN_APP_ID is not configured');
+      }
       
       const context = {
-        rp_id: process.env.NEXT_PUBLIC_RP_ID,
+        rp_id: rpId,
         nonce: rpSig.nonce,
         created_at: rpSig.created_at,
         expires_at: rpSig.expires_at,
         signature: rpSig.sig,
       };
 
+      console.log('RP context created:', context);
       setRpContext(context);
       return context;
     } catch (error) {
@@ -293,14 +317,26 @@ function WorldIDWidgetComponent({ open, onOpenChange, onSuccess, onError, onVeri
 
   const handleWidgetOpen = useCallback(async (isOpen) => {
     if (isOpen) {
-      const context = await fetchRpSignature();
-      if (!context) {
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('RP signature request timed out')), 10000)
+      );
+      
+      try {
+        const context = await Promise.race([fetchRpSignature(), timeoutPromise]);
+        if (!context) {
+          onOpenChange(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Widget open error:', error);
+        onError(error);
         onOpenChange(false);
         return;
       }
     }
     onOpenChange(isOpen);
-  }, [fetchRpSignature, onOpenChange]);
+  }, [fetchRpSignature, onOpenChange, onError]);
 
   if (!rpContext && open) {
     return (
@@ -323,6 +359,10 @@ function WorldIDWidgetComponent({ open, onOpenChange, onSuccess, onError, onVeri
       preset={deviceLegacy({ signal: 'proof-of-action' })}
       handleVerify={onVerify}
       onSuccess={onSuccess}
+      onError={(error) => {
+        console.error('IDKit widget error:', error);
+        onError(error);
+      }}
     />
   );
 }
