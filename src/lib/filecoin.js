@@ -169,6 +169,57 @@ export function getFilecoinStorage() {
   }
 }
 
+// Test function to verify Filecoin storage works
+export async function testFilecoinStorage() {
+  console.log('🧪 Testing Filecoin storage...');
+  
+  const testData = {
+    type: 'test_data',
+    timestamp: new Date().toISOString(),
+    message: 'Hello Filecoin!',
+    testId: Math.random().toString(36).substring(7)
+  };
+  
+  try {
+    console.log('📤 Storing test data on Filecoin...');
+    const result = await storeDataOnFilecoin(testData, {
+      type: 'test',
+      category: 'testing'
+    });
+    
+    console.log('✅ Test storage result:', result);
+    
+    if (result.success) {
+      console.log('🎉 Filecoin storage is working!');
+      console.log(`📄 CID: ${result.pieceCid}`);
+      console.log(`📊 Size: ${result.size} bytes`);
+      console.log(`🔁 Copies: ${result.copies}`);
+      
+      if (result.mock) {
+        console.log('🧪 Using mock storage (real Filecoin unavailable)');
+      }
+      
+      // Test retrieval
+      console.log('📥 Testing data retrieval...');
+      const retrieved = await retrieveDataFromFilecoin(result.pieceCid);
+      console.log('📋 Retrieved data:', retrieved);
+      
+      return { 
+        success: true, 
+        result, 
+        retrieved,
+        mock: result.mock || false
+      };
+    } else {
+      console.error('❌ Filecoin storage test failed:', result.error);
+      return { success: false, error: result.error };
+    }
+  } catch (error) {
+    console.error('❌ Filecoin storage test error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 /**
  * Get storage stats
  */

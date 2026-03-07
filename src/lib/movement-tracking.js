@@ -330,22 +330,39 @@ export async function storeTrackingData(supabase, trackingData) {
   
   // Also store on Filecoin for verifiable reputation (Agent Reputation & Portable Identity)
   try {
+    console.log('📤 Attempting to store movement tracking on Filecoin...');
+    console.log('📊 Tracking data:', {
+      responseId: trackingData.responseId,
+      locationsCount: trackingData.locations?.length,
+      confidence: trackingData.analysis?.confidence
+    });
+    
     const filecoinResult = await storeTrackingDataOnFilecoin(trackingData);
+    console.log('✅ Filecoin storage result:', filecoinResult);
+    
     if (filecoinResult.success) {
-      console.log('✅ Movement tracking stored on Filecoin:', filecoinResult.cid);
+      console.log('✅ Movement tracking stored on Filecoin:', filecoinResult.pieceCid);
       
       // Store responder reputation on Filecoin
-      await storeReputationOnFilecoin(trackingData.responderWallet, {
+      console.log('📤 Storing reputation on Filecoin...');
+      const reputationResult = await storeReputationOnFilecoin(trackingData.responderWallet, {
         type: 'movement_verification',
         responseId: trackingData.responseId,
         confidence: trackingData.analysis.confidence,
         pattern: trackingData.analysis.movementPattern,
-        filecoinCid: filecoinResult.cid,
+        filecoinCid: filecoinResult.pieceCid,
         timestamp: new Date().toISOString()
       });
+      console.log('✅ Reputation storage result:', reputationResult);
+    } else {
+      console.warn('⚠️ Filecoin storage returned failure:', filecoinResult.error);
     }
   } catch (filecoinError) {
-    console.warn('Filecoin storage failed (non-critical):', filecoinError);
+    console.warn('❌ Filecoin storage failed (non-critical):', filecoinError);
+    console.warn('Error details:', {
+      message: filecoinError.message,
+      stack: filecoinError.stack
+    });
     // Don't throw - Filecoin is optional for core functionality
   }
   

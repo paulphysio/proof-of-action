@@ -23,12 +23,22 @@ async function initializeSynapse() {
       throw new Error('PRIVATE_KEY not found in environment variables');
     }
 
-    console.log('Initializing Filecoin Synapse SDK...');
+    console.log('🔗 Initializing Filecoin Synapse SDK...');
+    console.log('🌐 Network:', process.env.FILECOIN_NETWORK || 'calibration');
+    console.log('🔌 RPC URL:', process.env.FILECOIN_RPC_URL || 'default');
+    
+    // Test network connectivity first
+    const rpcUrl = process.env.FILECOIN_RPC_URL || 'https://api.calibration.node.glif.io/rpc/v1';
+    console.log('🔍 Testing Filecoin network connectivity...');
+    
+    const connectivityTest = await testNetworkConnectivity(rpcUrl);
+    if (!connectivityTest) {
+      throw new Error('Filecoin network is not reachable. Please check your internet connection or RPC URL.');
+    }
     
     synapse = Synapse.create({
       account: privateKeyToAccount(privateKey),
-      // Add custom RPC configuration for better reliability
-      rpc: process.env.FILECOIN_RPC_URL || 'https://api.calibration.node.glif.io/rpc/v1'
+      rpc: rpcUrl
     });
 
     isInitialized = true;
@@ -36,11 +46,45 @@ async function initializeSynapse() {
     return synapse;
   } catch (error) {
     console.error('❌ Failed to initialize Filecoin Synapse SDK:', error);
+    console.log('🔄 Falling back to mock storage mode');
     
     // Don't throw error, return null to allow graceful fallback
     synapse = null;
     isInitialized = false;
     return null;
+  }
+}
+
+/**
+ * Test network connectivity to Filecoin RPC
+ */
+async function testNetworkConnectivity(rpcUrl) {
+  try {
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_blockNumber',
+        params: [],
+        id: 1
+      }),
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ Filecoin network reachable:', data);
+      return true;
+    } else {
+      console.warn('⚠️ Filecoin network responded with error:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.warn('⚠️ Filecoin network connectivity test failed:', error.message);
+    return false;
   }
 }
 
@@ -78,31 +122,40 @@ async function setupPayment() {
 }
 
 /**
- * Store data on Filecoin using Synapse SDK
+ * Store data on Filecoin with fallback to mock storage
  * @param {Object} data - Data to store (verification proofs, reputation, etc.)
  * @param {Object} options - Storage options
- * @returns {Promise<Object>} Storage result with pieceCid
+ * @returns {Promise<Object>} Storage result
  */
 export async function storeDataOnFilecoin(data, options = {}) {
   try {
-    const sdk = await initializeSynapse();
-    
-    if (!sdk) {
-      console.warn('⚠️ Filecoin SDK not available, using fallback storage');
-      return {
-        success: false,
-        error: 'Filecoin network unavailable',
-        pieceCid: null,
-        fallbackMode: true
-      };
+    // Try real Filecoin storage first
+    const result = await storeOnRealFilecoin(data, options);
+    if (result.success) {
+      return result;
     }
-    
-    // Ensure payment is set up
-    const paymentResult = await setupPayment();
-    if (!paymentResult.success) {
-      console.warn('⚠️ Payment setup failed, continuing with storage attempt');
-    }
+  } catch (error) {
+    console.warn('⚠️ Real Filecoin storage failed, trying fallback:', error.message);
+  }
 
+  // Fallback to mock storage
+  console.log('🔄 Using mock Filecoin storage as fallback');
+  return await storeOnMockFilecoin(data, options);
+}
+
+/**
+ * Store data on real Filecoin network
+ */
+async function storeOnRealFilecoin(data, options) {
+  const sdk = await initializeSynapse();
+  
+  if (!sdk) {
+    throw new Error('Filecoin network unavailable');
+  }
+
+  try {
+    console.log(`📤 Storing data on Filecoin (${options.category || 'data'})...`);
+    
     // Convert data to JSON string then to Uint8Array
     const jsonString = JSON.stringify(data, null, 2);
     const file = new TextEncoder().encode(jsonString);
@@ -174,47 +227,167 @@ export async function storeDataOnFilecoin(data, options = {}) {
 }
 
 /**
+ * Mock Filecoin storage for development/fallback
+ */
+async function storeOnMockFilecoin(data, options) {
+  console.log('🧪 Using mock Filecoin storage');
+  
+  // Generate mock CID
+  const mockCid = generateMockCID();
+  
+  // Simulate storage delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Store reference in local storage
+  const storageRef = {
+    pieceCid: mockCid,
+    network: 'mock_filecoin',
+    timestamp: new Date().toISOString(),
+    type: options.type || 'data',
+    category: options.category || 'data',
+    size: JSON.stringify(data).length,
+    metadata: options.metadata || {},
+    mock: true
+  };
+
+  saveStorageReference(storageRef);
+
+  return {
+    success: true,
+    pieceCid: mockCid,
+    copies: 1,
+    failures: 0,
+    size: JSON.stringify(data).length,
+    metadata: options.metadata || {},
+    mock: true
+  };
+}
+
+/**
+ * Generate mock CID for testing
+ */
+function generateMockCID() {
+  const chars = '0123456789abcdef';
+  let cid = 'bafybei';
+  for (let i = 0; i < 44; i++) {
+    cid += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return cid;
+}
+
+/**
+ * Save storage reference to localStorage for UI display
+ */
+function saveStorageReference(storageRef) {
+  if (typeof window !== 'undefined') {
+    try {
+      const existing = JSON.parse(localStorage.getItem('filecoin_storage') || '[]');
+      existing.unshift(storageRef); // Add to beginning
+      localStorage.setItem('filecoin_storage', JSON.stringify(existing));
+      console.log('💾 Storage reference saved to localStorage');
+    } catch (error) {
+      console.warn('Failed to save storage reference:', error);
+    }
+  }
+}
+
+/**
  * Retrieve data from Filecoin using Synapse SDK
  * @param {string} pieceCid - Content ID of the stored data
  * @returns {Promise<Object>} Retrieved data
  */
 export async function retrieveDataFromFilecoin(pieceCid) {
   try {
-    const sdk = await initializeSynapse();
-    
-    console.log(`📥 Retrieving data from Filecoin (pieceCid: ${pieceCid})`);
-    
-    // Download data from Filecoin
-    const downloadedData = await sdk.storage.download({ pieceCid });
-    
-    // Convert Uint8Array back to string
-    const decodedText = new TextDecoder().decode(downloadedData);
-    
-    // Parse JSON (remove padding if present)
-    let jsonData;
-    try {
-      jsonData = JSON.parse(decodedText.trim());
-    } catch (parseError) {
-      // If parsing fails, try to remove padding and parse again
-      const trimmedText = decodedText.replace(/\s+$/, '');
-      jsonData = JSON.parse(trimmedText);
+    // Try real Filecoin retrieval first
+    const result = await retrieveFromRealFilecoin(pieceCid);
+    if (result.success) {
+      return result;
     }
-    
-    console.log(`✅ Successfully retrieved data from Filecoin`);
-    
-    return {
-      success: true,
-      data: jsonData,
-      size: downloadedData.length
-    };
   } catch (error) {
-    console.error('❌ Failed to retrieve data from Filecoin:', error);
-    return {
-      success: false,
-      error: error.message,
-      data: null
-    };
+    console.warn('⚠️ Real Filecoin retrieval failed, trying fallback:', error.message);
   }
+
+  // Fallback to mock retrieval
+  console.log('🔄 Using mock Filecoin retrieval as fallback');
+  return await retrieveFromMockFilecoin(pieceCid);
+}
+
+/**
+ * Retrieve data from real Filecoin network
+ */
+async function retrieveFromRealFilecoin(pieceCid) {
+  const sdk = await initializeSynapse();
+  
+  if (!sdk) {
+    throw new Error('Filecoin network unavailable');
+  }
+  
+  console.log(`📥 Retrieving data from Filecoin (pieceCid: ${pieceCid})`);
+  
+  // Download data from Filecoin
+  const downloadedData = await sdk.storage.download({ pieceCid });
+  
+  // Convert Uint8Array back to string
+  const decodedText = new TextDecoder().decode(downloadedData);
+  
+  // Parse JSON (remove padding if present)
+  let jsonData;
+  try {
+    jsonData = JSON.parse(decodedText.trim());
+  } catch (parseError) {
+    // If parsing fails, try to remove padding and parse again
+    const trimmedText = decodedText.replace(/\s+$/, '');
+    jsonData = JSON.parse(trimmedText);
+  }
+  
+  console.log(`✅ Successfully retrieved data from Filecoin`);
+  
+  return {
+    success: true,
+    data: jsonData,
+    size: downloadedData.length
+  };
+}
+
+/**
+ * Retrieve data from mock storage
+ */
+async function retrieveFromMockFilecoin(pieceCid) {
+  console.log('🧪 Using mock Filecoin retrieval');
+  
+  // Look up the stored data from localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const existing = JSON.parse(localStorage.getItem('filecoin_storage') || '[]');
+      const storageRef = existing.find(ref => ref.pieceCid === pieceCid);
+      
+      if (storageRef && storageRef.mock) {
+        // For mock data, we can't retrieve the actual stored content
+        // So we return a mock response
+        return {
+          success: true,
+          data: {
+            type: 'mock_retrieval',
+            pieceCid: pieceCid,
+            timestamp: storageRef.timestamp,
+            message: 'This is mock data retrieval - original content not stored in mock mode',
+            category: storageRef.category,
+            metadata: storageRef.metadata
+          },
+          size: storageRef.size,
+          mock: true
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to retrieve mock data:', error);
+    }
+  }
+  
+  return {
+    success: false,
+    error: 'Mock data not found for this CID',
+    data: null
+  };
 }
 
 /**

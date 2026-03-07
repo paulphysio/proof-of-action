@@ -284,6 +284,7 @@ export default function RespondPage() {
       if (response) {
         // Store commitment to help on Filecoin
         try {
+          console.log('📤 Storing response commitment on Filecoin...');
           const commitmentData = {
             requestId: request.id,
             responderWallet: accountId,
@@ -305,10 +306,27 @@ export default function RespondPage() {
             ) : null
           };
           
+          console.log('📊 Commitment data:', {
+            requestId: commitmentData.requestId,
+            responderWallet: commitmentData.responderWallet,
+            hasLocation: !!commitmentData.initialLocation,
+            hasWorldID: !!commitmentData.worldIDVerification
+          });
+          
           const commitmentResult = await storeResponseCommitmentOnFilecoin(commitmentData);
           console.log('✅ Response commitment stored on Filecoin:', commitmentResult);
+          
+          if (commitmentResult.success) {
+            console.log(`🎉 Commitment CID: ${commitmentResult.pieceCid}`);
+          } else {
+            console.warn('⚠️ Commitment storage failed:', commitmentResult.error);
+          }
         } catch (filecoinError) {
-          console.warn('Filecoin commitment storage failed (non-critical):', filecoinError);
+          console.warn('❌ Filecoin commitment storage failed (non-critical):', filecoinError);
+          console.warn('Error details:', {
+            message: filecoinError.message,
+            stack: filecoinError.stack
+          });
         }
         
         setSuccess(request);
