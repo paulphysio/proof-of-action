@@ -109,8 +109,19 @@ export async function savePushSubscription(subscription, walletAddress, geohashP
 
 // Send local notification
 export function sendLocalNotification(title, options = {}) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') {
-    console.log('Notifications not available or permission denied');
+  if (!('Notification' in window)) {
+    console.log('🔕 Notifications not supported in this browser');
+    return;
+  }
+
+  if (Notification.permission !== 'granted') {
+    console.log('🔕 Notification permission not granted');
+    return;
+  }
+
+  // Check if we're on HTTPS (required for notifications)
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    console.warn('🔕 Notifications require HTTPS in production. Current protocol:', location.protocol);
     return;
   }
 
@@ -127,43 +138,37 @@ export function sendLocalNotification(title, options = {}) {
 
   const mergedOptions = { ...defaultOptions, ...options };
 
-  // Actions are not supported for non-persistent notifications created via `new Notification()`.
-  // If actions are present, prefer showing a persistent notification via the Service Worker.
-  if (
-    Array.isArray(mergedOptions.actions) &&
-    mergedOptions.actions.length > 0 &&
-    'serviceWorker' in navigator
-  ) {
+  // Try service worker first (better for HTTPS)
+  if ('serviceWorker' in navigator && 'showNotification' in ServiceWorkerRegistration.prototype) {
     navigator.serviceWorker.ready
       .then((registration) => {
+        console.log('🔔 Showing notification via service worker');
         return registration.showNotification(title, mergedOptions);
       })
       .catch((error) => {
-        console.error('Persistent notification failed, falling back:', error);
-
-        // Fallback: show a basic notification without actions.
-        const { actions, ...fallbackOptions } = mergedOptions;
-        const notification = new Notification(title, fallbackOptions);
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-        };
-        return notification;
+        console.warn('Service worker notification failed, falling back:', error);
+        showFallbackNotification(title, mergedOptions);
       });
-
-    return;
+  } else {
+    showFallbackNotification(title, mergedOptions);
   }
+}
 
-  // Basic notification (no actions)
-  const { actions, ...fallbackOptions } = mergedOptions;
-  const notification = new Notification(title, fallbackOptions);
-
-  notification.onclick = () => {
-    window.focus();
-    notification.close();
-  };
-
-  return notification;
+// Fallback notification for when service worker fails
+function showFallbackNotification(title, options) {
+  try {
+    console.log('🔔 Showing fallback notification');
+    const { actions, ...fallbackOptions } = options;
+    const notification = new Notification(title, fallbackOptions);
+    
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+    return notification;
+  } catch (error) {
+    console.error('Fallback notification failed:', error);
+  }
 }
 
 // Show nearby emergency notification

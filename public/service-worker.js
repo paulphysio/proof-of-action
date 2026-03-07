@@ -4,8 +4,8 @@ const urlsToCache = [
   '/dashboard',
   '/request',
   '/respond',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-192x192.svg',
+  '/icons/icon-512x512.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -45,14 +45,17 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-192x192.svg',
     tag: data.tag,
-    requireInteraction: true,
-    actions: data.actions || [],
-    data: { url: data.url }
+    requireInteraction: data.requireInteraction || false,
+    data: data.data || {}
   };
-  
+
+  if (data.actions && Array.isArray(data.actions)) {
+    options.actions = data.actions;
+  }
+
   event.waitUntil(
     self.registration.showNotification(data.title, options)
   );
@@ -60,30 +63,28 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
-  const action = event.action;
-  const notification = event.notification;
-  const url = notification?.data?.url;
-  
-  event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((clientList) => {
-      if (url && typeof url === 'string') {
-        return clients.openWindow(url);
-      }
 
-      if (action === 'respond') {
-        return clients.openWindow('/respond');
-      } else if (action === 'view') {
-        return clients.openWindow('/dashboard');
-      }
-      
-      for (const client of clientList) {
-        if (client.url === '/' && 'focus' in client) {
-          return client.focus();
+  if (event.action === 'respond') {
+    event.waitUntil(
+      clients.openWindow('/respond')
+    );
+  } else if (event.action === 'view') {
+    event.waitUntil(
+      clients.openWindow(event.notification.data?.url || '/dashboard')
+    );
+  } else {
+    // Default click - focus or open the app
+    event.waitUntil(
+      clients.matchAll().then((clientList) => {
+        for (const client of clientList) {
+          if (client.url === event.notification.data?.url && 'focus' in client) {
+            return client.focus();
+          }
         }
-      }
-      
-      return clients.openWindow('/');
-    })
-  );
+        if (clients.openWindow) {
+          return clients.openWindow(event.notification.data?.url || '/dashboard');
+        }
+      })
+    );
+  }
 });

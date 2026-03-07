@@ -525,13 +525,14 @@ export default function RespondPage() {
                     {/* Left Column - Map */}
                     <div className="col-md-6">
                       <RequesterStaticMap 
-                        requesterLocation={userLocation ? {
-                          lat: parseFloat(userLocation.lat) + 0.002, // Offset to show relative position
-                          lon: parseFloat(userLocation.lon) + 0.002
-                        } : { lat: 40.7128, lon: -74.0060 }}
+                        requesterLocation={success.geohash ? geohashToLatLon(success.geohash) : { lat: 40.7128, lon: -74.0060 }}
                         requesterGeohash={success.geohash}
                         requestType={success.request_type}
                         requestTime={success.created_at}
+                        responderLocation={userLocation ? {
+                          lat: parseFloat(userLocation.lat),
+                          lon: parseFloat(userLocation.lon)
+                        } : null}
                       />
                     </div>
 

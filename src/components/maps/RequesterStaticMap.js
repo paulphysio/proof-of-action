@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, Clock } from 'lucide-react';
 
 /**
- * Static Requester Map
- * Shows requester's location (static) for responder to navigate to
- * Used on the respond page so responder knows where to go
+ * Route Map
+ * Shows route from responder's location to requester's location
+ * Used on the respond page so responder can see the path to navigate
  */
 export default function RequesterStaticMap({ 
   requesterLocation, 
   requesterGeohash,
   requestType,
-  requestTime
+  requestTime,
+  responderLocation = null
 }) {
   const canvasRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -69,12 +70,19 @@ export default function RequesterStaticMap({
       ctx.stroke();
     }
 
-    // Center the map on requester location
+    // Calculate map bounds to include both locations
     const padding = 50;
-    const mapRange = 0.008; // Approx 800m radius
+    const mapRange = 0.015; // Larger range to show route
     
-    const centerLat = requesterLocation?.lat || 40.7128;
-    const centerLon = requesterLocation?.lon || -74.0060;
+    // Center map between responder and requester
+    let centerLat = requesterLocation?.lat || 40.7128;
+    let centerLon = requesterLocation?.lon || -74.0060;
+    
+    // If responder location is available, center between them
+    if (responderLocation) {
+      centerLat = (centerLat + responderLocation.lat) / 2;
+      centerLon = (centerLon + responderLocation.lon) / 2;
+    }
     
     const scaleX = (width - padding * 2) / mapRange;
     const scaleY = (height - padding * 2) / mapRange;
@@ -82,6 +90,41 @@ export default function RequesterStaticMap({
 
     const toX = (lon) => width / 2 + (lon - centerLon) * scale;
     const toY = (lat) => height / 2 - (lat - centerLat) * scale;
+
+    // Draw route line from responder to requester
+    if (responderLocation) {
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([]);
+      
+      // Draw curved route line
+      ctx.beginPath();
+      ctx.moveTo(toX(responderLocation.lon), toY(responderLocation.lat));
+      
+      // Add curve for more natural route appearance
+      const midX = (toX(responderLocation.lon) + toX(centerLon)) / 2;
+      const midY = (toY(responderLocation.lat) + toY(centerLat)) / 2;
+      const curveOffset = 20;
+      
+      ctx.quadraticCurveTo(
+        midX + curveOffset, 
+        midY - curveOffset, 
+        toX(centerLon), 
+        toY(centerLat)
+      );
+      ctx.stroke();
+      
+      // Draw route dots
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        const x = (1-t)*(1-t)*toX(responderLocation.lon) + 2*(1-t)*t*(midX + curveOffset) + t*t*toX(centerLon);
+        const y = (1-t)*(1-t)*toY(responderLocation.lat) + 2*(1-t)*t*(midY - curveOffset) + t*t*toY(centerLat);
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
     // Draw geohash area (approximate)
     const geohashSize = 0.002; // Approx geohash size
@@ -116,6 +159,27 @@ export default function RequesterStaticMap({
       ctx.textAlign = 'left';
       ctx.fillText(`${meters}m`, toX(centerLon) + radius + 5, toY(centerLat) - 5);
     });
+
+    // Draw responder location (if available)
+    if (responderLocation) {
+      const respX = toX(responderLocation.lon);
+      const respY = toY(responderLocation.lat);
+
+      // Responder location circle (blue)
+      ctx.beginPath();
+      ctx.arc(respX, respY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.8)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // Responder label
+      ctx.fillStyle = 'rgba(6, 182, 212, 1)';
+      ctx.font = '600 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('YOU', respX, respY - 15);
+    }
 
     // Draw requester location pin
     const x = toX(centerLon);
