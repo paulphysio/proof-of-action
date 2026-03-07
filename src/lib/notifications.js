@@ -115,8 +115,8 @@ export function sendLocalNotification(title, options = {}) {
   }
 
   const defaultOptions = {
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-192x192.svg',
     tag: 'proof-of-action',
     requireInteraction: true,
     actions: [

@@ -7,7 +7,49 @@ import { generateGeohash } from '@/lib/ai-verification';
 import { notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications, notifyTrackingStarted } from '@/lib/notifications';
 import Link from 'next/link';
 import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
+import { storeResponseCommitmentOnFilecoin } from '@/lib/filecoin';
+import { getWorldIDVerification } from '@/lib/worldid';
 import RequesterStaticMap from '@/components/maps/RequesterStaticMap';
+
+// Calculate distance between two coordinates
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Simple geohash decoder (approximate location)
+function geohashToLatLon(geohash) {
+  // This is a simplified decoder - in production use a proper geohash library
+  const base32 = '0123456789bcdefghjkmnpqrstuvwxyz';
+  let lat = -90, lon = -180;
+  let latRange = 180, lonRange = 360;
+  
+  for (let i = 0; i < geohash.length; i++) {
+    const char = geohash[i];
+    const index = base32.indexOf(char);
+    
+    for (let j = 4; j >= 0; j--) {
+      const bit = (index >> j) & 1;
+      
+      if (j % 2 === 1) {
+        lonRange /= 2;
+        lon += bit * lonRange;
+      } else {
+        latRange /= 2;
+        lat += bit * latRange;
+      }
+    }
+  }
+  
+  return { lat: lat + latRange/2, lon: lon + lonRange/2 };
+}
 import { 
   Wallet,
   HandHelping,
@@ -240,6 +282,35 @@ export default function RespondPage() {
       const response = await createResponse(request.id, accountId);
       
       if (response) {
+        // Store commitment to help on Filecoin
+        try {
+          const commitmentData = {
+            requestId: request.id,
+            responderWallet: accountId,
+            timestamp: new Date().toISOString(),
+            initialLocation: userLocation ? {
+              lat: userLocation.lat,
+              lon: userLocation.lng,
+              geohash: generateGeohash(userLocation.lat, userLocation.lng, 6),
+              accuracy: userLocation.accuracy
+            } : null,
+            estimatedArrival: new Date(Date.now() + 20 * 60 * 1000).toISOString(), // 20 mins estimate
+            worldIDVerification: getWorldIDVerification(),
+            emergencyType: request.emergency_type,
+            urgencyLevel: request.urgency_level,
+            distanceToRequest: userLocation ? calculateDistance(
+              userLocation.lat, userLocation.lng,
+              geohashToLatLon(request.geohash).lat,
+              geohashToLatLon(request.geohash).lon
+            ) : null
+          };
+          
+          const commitmentResult = await storeResponseCommitmentOnFilecoin(commitmentData);
+          console.log('✅ Response commitment stored on Filecoin:', commitmentResult);
+        } catch (filecoinError) {
+          console.warn('Filecoin commitment storage failed (non-critical):', filecoinError);
+        }
+        
         setSuccess(request);
         setTracking(response);
         setTrackingStatus('active');

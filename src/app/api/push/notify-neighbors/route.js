@@ -47,8 +47,8 @@ export default async function handler(req, res) {
         const notificationPayload = JSON.stringify({
           title: 'Neighbor Helped Nearby',
           body: `${responderWallet.slice(0, 8)}... helped with ${requestType}`,
-          icon: '/icons/icon-192x192.png',
-          badge: '/icons/icon-72x72.png',
+          icon: '/icons/icon-192x192.svg',
+          badge: '/icons/icon-192x192.svg',
           tag: `help-completed-${Date.now()}`,
           requireInteraction: false,
           data: {

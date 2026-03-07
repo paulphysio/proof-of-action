@@ -11,9 +11,6 @@
  * ✅ Synapse SDK integration
  * ✅ USDFC payment system
  * ✅ CDN acceleration
- * ✅ Multi-provider redundancy
- * ✅ Metadata tagging
- * ✅ Emergency proof persistence
  */
 
 // Import real Filecoin implementation
@@ -21,11 +18,30 @@ import {
   storeDataOnFilecoin,
   retrieveDataFromFilecoin,
   storeWorldIDVerificationOnFilecoin,
-  storeEmergencyResponseOnFilecoin,
   storeReputationOnFilecoin,
   getFilecoinStorageStatus,
   createFilecoinStorageContext
 } from './filecoin-real';
+
+// Generate commitment hash for integrity verification
+function generateCommitmentHash(data) {
+  // Browser-compatible hash generation
+  const hashInput = JSON.stringify({
+    requestId: data.requestId,
+    responderWallet: data.responderWallet,
+    timestamp: data.timestamp || new Date().toISOString(),
+    intent: 'provide_emergency_assistance'
+  });
+  
+  // Simple hash for browser (in production, use crypto.subtle)
+  let hash = 0;
+  for (let i = 0; i < hashInput.length; i++) {
+    const char = hashInput.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
 
 // Re-export all real functions
 export {
@@ -44,7 +60,94 @@ export async function storeOnFilecoin(data, type = 'data') {
 }
 
 export async function storeTrackingDataOnFilecoin(trackingData) {
-  return storeEmergencyResponseOnFilecoin(trackingData);
+  // Store meaningful movement tracking data
+  const meaningfulData = {
+    type: 'movement_proof',
+    responseId: trackingData.responseId,
+    responderWallet: trackingData.responderWallet,
+    timestamp: new Date().toISOString(),
+    
+    // Core movement evidence
+    waypoints: trackingData.locations.map(loc => ({
+      timestamp: loc.timestamp,
+      lat: loc.latitude,
+      lon: loc.longitude,
+      geohash: loc.geohash,
+      accuracy: loc.accuracy
+    })),
+    
+    // Movement analysis for verification
+    movementAnalysis: {
+      confidence: trackingData.analysis.confidence,
+      pattern: trackingData.analysis.movementPattern,
+      distanceDelta: trackingData.analysis.distanceDelta,
+      avgSpeed: trackingData.analysis.avgSpeed,
+      directness: trackingData.analysis.directness
+    },
+    
+    // Verification metadata
+    verificationScore: trackingData.verificationScore || 0.8,
+    worldIDVerified: !!trackingData.worldIDVerification,
+    
+    // Emergency context
+    emergencyType: trackingData.emergencyType || 'unknown',
+    urgencyLevel: trackingData.urgencyLevel || 'medium',
+    
+    // Privacy controls
+    dataRetentionDays: 30, // Auto-delete after 30 days
+    privacyLevel: 'pseudonymous' // No personal data, only wallet and movement
+  };
+  
+  return storeDataOnFilecoin(meaningfulData, {
+    type: 'movement_proof',
+    category: 'emergency-response',
+    retention: '30d'
+  });
+}
+
+export async function storeResponseCommitmentOnFilecoin(responseData) {
+  // Store the initial commitment to help
+  const commitmentData = {
+    type: 'response_commitment',
+    requestId: responseData.requestId,
+    responderWallet: responseData.responderWallet,
+    commitmentTimestamp: new Date().toISOString(),
+    
+    // Initial location and intent
+    initialLocation: {
+      lat: responseData.initialLocation?.lat,
+      lon: responseData.initialLocation?.lon,
+      geohash: responseData.initialLocation?.geohash,
+      accuracy: responseData.initialLocation?.accuracy
+    },
+    
+    // Response intent
+    intent: 'provide_emergency_assistance',
+    estimatedArrival: responseData.estimatedArrival,
+    
+    // Human verification
+    worldIDVerification: responseData.worldIDVerification || null,
+    humanVerified: !!responseData.worldIDVerification,
+    
+    // Emergency context
+    emergencyType: responseData.emergencyType,
+    urgencyLevel: responseData.urgencyLevel,
+    distanceToRequest: responseData.distanceToRequest,
+    
+    // Commitment metadata
+    commitmentHash: generateCommitmentHash(responseData),
+    platformVersion: '1.0.0',
+    
+    // Privacy and retention
+    dataRetentionDays: 90, // Longer retention for commitments
+    privacyLevel: 'pseudonymous'
+  };
+  
+  return storeDataOnFilecoin(commitmentData, {
+    type: 'response_commitment',
+    category: 'emergency-response',
+    retention: '90d'
+  });
 }
 
 export async function storeRequestOnFilecoin(request) {

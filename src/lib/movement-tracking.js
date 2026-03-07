@@ -390,8 +390,8 @@ export async function notifyNeighbors(supabase, request, response, trackingData)
   const notification = {
     title: 'Neighbor Helped Nearby',
     body: `${response.responder_wallet.slice(0, 8)}... helped with ${request.request_type}`,
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-192x192.svg',
     tag: `help-completed-${request.id}`,
     data: {
       requestId: request.id,
