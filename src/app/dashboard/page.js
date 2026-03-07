@@ -32,6 +32,10 @@ import WorldIDAdaptive from '@/components/WorldIDAdaptive';
 import FilecoinStorageStatus from '@/components/FilecoinStorageStatus';
 import IdentityPortability from '@/components/IdentityPortability';
 import { Fingerprint } from 'lucide-react';
+import { 
+  getWorldIDVerification, 
+  canAccessHighValueFeatures 
+} from '@/lib/worldid';
 
 export default function Dashboard() {
   const { isSignedIn, accountId, signIn } = useWallet();
@@ -41,10 +45,14 @@ export default function Dashboard() {
   const [responses, setResponses] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [worldIDVerification, setWorldIDVerification] = useState(null);
 
   useEffect(() => {
     if (isSignedIn && accountId) {
       loadUserData();
+      // Check World ID verification
+      const verification = getWorldIDVerification();
+      setWorldIDVerification(verification);
     } else {
       setLoading(false);
     }
@@ -124,6 +132,55 @@ export default function Dashboard() {
             <span className="visually-hidden">Loading...</span>
           </div>
           <p className="mt-3" style={{ color: 'var(--slate-400)' }}>Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is verified with World ID
+  if (!canAccessHighValueFeatures(worldIDVerification?.verification_level)) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center" style={{ background: 'var(--navy-950)' }}>
+        <div className="aurora-bg" />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="row justify-content-center">
+            <div className="col-md-6 text-center">
+              <div className="glass-card p-5">
+                <div style={{ 
+                  width: '80px', 
+                  height: '80px', 
+                  borderRadius: '20px',
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}>
+                  <Fingerprint size={36} color="#EF4444" />
+                </div>
+                <h2 style={{ color: 'white', fontWeight: 700, marginBottom: '1rem' }}>Human Verification Required</h2>
+                <p style={{ color: 'var(--slate-400)', marginBottom: '2rem' }}>
+                  You must verify your humanity with World ID to access the Proof-of-Action dashboard and help save lives.
+                </p>
+                
+                <WorldIDAdaptive 
+                  onVerified={(verificationData) => {
+                    setWorldIDVerification(verificationData);
+                  }} 
+                />
+
+                <div className="mt-4">
+                  <h6 style={{ color: 'var(--slate-300)', fontSize: '0.875rem', marginBottom: '1rem', fontWeight: 600 }}>Why Verification Matters:</h6>
+                  <div className="text-start" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', lineHeight: '1.6' }}>
+                    <div className="mb-2">🛡️ <strong>Human-Only Network:</strong> Ensures only real humans can request and provide emergency help</div>
+                    <div className="mb-2">⚡ <strong>Trust System:</strong> Builds reputation based on verified actions and contributions</div>
+                    <div className="mb-2">🌍 <strong>Global Impact:</strong> Your verified humanity helps save lives worldwide</div>
+                    <div className="mb-2">🔒 <strong>Privacy First:</strong> World ID proves you're human without revealing personal data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -283,6 +340,7 @@ export default function Dashboard() {
           <WorldIDAdaptive 
             onVerified={(result) => {
               console.log('World ID verified:', result);
+              setWorldIDVerification(result);
             }}
           />
         </div>
@@ -347,16 +405,43 @@ export default function Dashboard() {
             <Activity size={18} color="var(--cyan-400)" />
           </div>
           <div className="d-flex flex-column flex-md-row gap-2 gap-md-3">
-            <Link href="/request" className="btn btn-gold d-flex align-items-center justify-content-center gap-2">
-              <Plus size={18} />
-              <span className="d-none d-sm-inline">New Emergency Request</span>
-              <span className="d-sm-none">New Request</span>
-            </Link>
-            <Link href="/respond" className="btn btn-gradient d-flex align-items-center justify-content-center gap-2">
-              <Search size={18} />
-              <span className="d-none d-sm-inline">Find Help Requests</span>
-              <span className="d-sm-none">Find Help</span>
-            </Link>
+            {canAccessHighValueFeatures(worldIDVerification?.verification_level) ? (
+              <>
+                <Link href="/request" className="btn btn-gold d-flex align-items-center justify-content-center gap-2">
+                  <Plus size={18} />
+                  <span className="d-none d-sm-inline">New Emergency Request</span>
+                  <span className="d-sm-none">New Request</span>
+                </Link>
+                <Link href="/respond" className="btn btn-gradient d-flex align-items-center justify-content-center gap-2">
+                  <Search size={18} />
+                  <span className="d-none d-sm-inline">Find Help Requests</span>
+                  <span className="d-sm-none">Find Help</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <button 
+                  className="btn btn-outline-glass d-flex align-items-center justify-content-center gap-2" 
+                  disabled
+                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                  title="Verify with World ID to create emergency requests"
+                >
+                  <Plus size={18} />
+                  <span className="d-none d-sm-inline">New Emergency Request</span>
+                  <span className="d-sm-none">New Request</span>
+                </button>
+                <button 
+                  className="btn btn-outline-glass d-flex align-items-center justify-content-center gap-2"
+                  disabled
+                  style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                  title="Verify with World ID to help others"
+                >
+                  <Search size={18} />
+                  <span className="d-none d-sm-inline">Find Help Requests</span>
+                  <span className="d-sm-none">Find Help</span>
+                </button>
+              </>
+            )}
             <Link href="/verify" className="btn btn-outline-glass d-flex align-items-center justify-content-center gap-2">
               <Award size={18} />
               <span className="d-none d-sm-inline">Verify Actions</span>
@@ -382,10 +467,22 @@ export default function Dashboard() {
                       <ClipboardList size={40} opacity={0.3} />
                     </div>
                     <p style={{ color: 'var(--slate-400)', marginBottom: '1rem', fontSize: '0.875rem' }}>No requests yet.</p>
-                    <Link href="/request" className="btn btn-gradient btn-sm">
-                      <Plus size={14} className="me-2" />
-                      Create Request
-                    </Link>
+                    {canAccessHighValueFeatures(worldIDVerification?.verification_level) ? (
+                      <Link href="/request" className="btn btn-gradient btn-sm">
+                        <Plus size={14} className="me-2" />
+                        Create Request
+                      </Link>
+                    ) : (
+                      <button 
+                        className="btn btn-outline-glass btn-sm"
+                        disabled
+                        style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                        title="Verify with World ID to create emergency requests"
+                      >
+                        <Plus size={14} className="me-2" />
+                        Create Request
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="list-group list-group-flush" style={{ background: 'transparent' }}>

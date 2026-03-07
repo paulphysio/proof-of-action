@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
 import { 
   IDKitRequestWidget,
-  deviceLegacy,
+  orbLegacy,
 } from '@worldcoin/idkit';
 import { 
   getWorldIDVerification, 
@@ -322,12 +322,12 @@ export default function WorldIDReactWidget({ onVerified }) {
             {/* Benefits */}
             {!isVerified && (
               <div className="mt-3">
-                <h6 className="m-0 mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>React Widget Benefits:</h6>
+                <h6 className="m-0 mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>Desktop QR Benefits:</h6>
                 <ul className="m-0 ps-3" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
-                  <li>📱 Embedded modal experience</li>
-                  <li>🚀 No redirects or QR codes</li>
-                  <li>⚡ Seamless mobile experience</li>
-                  <li>🔄 Official World ID widget</li>
+                  <li>�️ Scan QR code with World App</li>
+                  <li>� Cross-device verification</li>
+                  <li>⚡ Official World ID widget</li>
+                  <li>🔄 Seamless desktop experience</li>
                 </ul>
               </div>
             )}
@@ -345,7 +345,7 @@ export default function WorldIDReactWidget({ onVerified }) {
           rp_context={rpContext}
           allow_legacy_proofs={true}
           environment="production"
-          preset={deviceLegacy({ signal: 'proof-of-action' })}
+          preset={orbLegacy({ signal: "proof-of-action" })}
           handleVerify={handleWidgetVerify}
           onSuccess={handleWidgetSuccess}
           onError={handleWidgetError}

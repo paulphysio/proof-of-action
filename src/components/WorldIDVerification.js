@@ -16,7 +16,7 @@ import {
  * Uses @worldcoin/idkit-core for proper verification
  */
 
-const APP_ID = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_9a2bdda755a0a2737f22e311470b1bfa';
+const APP_ID = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID;
 
 const RP_ID = (process.env.NEXT_PUBLIC_RP_ID || '').trim();
 
@@ -71,16 +71,36 @@ export default function WorldIDVerification({
           signature: rpSig.sig,
         },
         allow_legacy_proofs: true,
-        environment: 'production',
+        environment: 'staging',
       }).preset(deviceLegacy({ signal: 'proof-of-action' }));
 
       // Step 3: Get connector URL and show QR
       const connectUrl = request.connectorURI;
+      console.log('Generated connector URI:', connectUrl);
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(connectUrl)}`;
+      console.log('QR code URL:', qrApiUrl);
       setQrCodeUrl(qrApiUrl);
 
-      // Step 4: Poll for completion
-      const response = await request.pollUntilCompletion();
+      // Step 4: Poll for completion with timeout
+      console.log('Starting polling for World ID verification...');
+      const pollPromise = request.pollUntilCompletion();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('QR code verification timed out after 2 minutes')), 120000)
+      );
+      
+      let response;
+      try {
+        response = await Promise.race([pollPromise, timeoutPromise]);
+        console.log('Polling completed successfully:', response);
+      } catch (pollError) {
+        console.error('Polling failed with error:', pollError);
+        console.error('Error details:', {
+          message: pollError.message,
+          stack: pollError.stack,
+          name: pollError.name
+        });
+        throw pollError;
+      }
 
       console.log('World ID raw pollUntilCompletion response:', response);
 
@@ -244,6 +264,13 @@ export default function WorldIDVerification({
       }
     } catch (err) {
       console.error('World ID error:', err);
+      console.error('Full error object:', {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+        cause: err.cause,
+        timestamp: new Date().toISOString()
+      });
       setError(err.message || 'Verification failed or cancelled');
       setQrCodeUrl(null);
     } finally {
