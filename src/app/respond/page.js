@@ -325,14 +325,14 @@ export default function RespondPage() {
                 category: 'emergency-response',
                 metadata: {
                   requestId: request.id,
-                  responderAddress: walletAddress,
+                  responderAddress: accountId,
                   requesterAddress: request.walletAddress,
                   requestType: request.requestType,
                   urgencyLevel: request.urgencyLevel,
                   responseTime: new Date().toISOString(),
                   commitmentType: 'emergency-response',
                   geohash: request.geohash,
-                  verificationLevel: worldIDVerification?.verificationLevel || 'none'
+                  verificationLevel: commitmentData.worldIDVerification?.verificationLevel || 'none'
                 }
               }
             })
@@ -352,7 +352,7 @@ export default function RespondPage() {
                 category: 'emergency-response',
                 metadata: {
                   requestId: request.id,
-                  responderAddress: walletAddress,
+                  responderAddress: accountId,
                   requesterAddress: request.walletAddress,
                   requestType: request.requestType,
                   urgencyLevel: request.urgencyLevel,

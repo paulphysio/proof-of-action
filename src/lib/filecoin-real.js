@@ -15,7 +15,9 @@ let isInitialized = false;
  * Initialize Synapse SDK with private key from environment
  */
 async function initializeSynapse() {
-  if (isInitialized) return synapse;
+  if (isInitialized) {
+    return synapse;
+  }
 
   try {
     const privateKey = process.env.PRIVATE_KEY;
@@ -23,18 +25,9 @@ async function initializeSynapse() {
       throw new Error('PRIVATE_KEY not found in environment variables');
     }
 
-    console.log('🔗 Initializing Filecoin Synapse SDK...');
-    console.log('🌐 Network:', process.env.FILECOIN_NETWORK || 'calibration');
-    console.log('🔌 RPC URL:', process.env.FILECOIN_RPC_URL || 'default');
-    
-    // Test network connectivity first
+    // Skip connectivity test for faster initialization
     const rpcUrl = process.env.FILECOIN_RPC_URL || 'https://api.calibration.node.glif.io/rpc/v1';
-    console.log('🔍 Testing Filecoin network connectivity...');
-    
-    const connectivityTest = await testNetworkConnectivity(rpcUrl);
-    if (!connectivityTest) {
-      throw new Error('Filecoin network is not reachable. Please check your internet connection or RPC URL.');
-    }
+    console.log('� Initializing Filecoin Synapse SDK...');
     
     synapse = Synapse.create({
       account: privateKeyToAccount(privateKey),
@@ -47,10 +40,6 @@ async function initializeSynapse() {
   } catch (error) {
     console.error('❌ Failed to initialize Filecoin Synapse SDK:', error);
     console.log('🔄 Falling back to mock storage mode');
-    
-    // Don't throw error, return null to allow graceful fallback
-    synapse = null;
-    isInitialized = false;
     return null;
   }
 }
@@ -162,37 +151,44 @@ async function storeOnRealFilecoin(data, options) {
 
     // Ensure minimum size requirement of 127 bytes
     if (file.length < 127) {
-      // Pad with meaningful content to meet minimum requirement
-      const padding = `
-        
-        === FILECOIN ONCHAIN CLOUD ===
-        Data Category: ${options.category || 'agent-data'}
-        Timestamp: ${new Date().toISOString()}
-        Network: calibration
-        Purpose: Agent Reputation & Portable Identity
-        Challenge: Filecoin Agent Reputation System
-        ==================================
-      `;
+      // Minimal padding to meet requirement
+      const padding = `=== FILECOIN DATA === Category: ${options.category || 'agent-data'} Network: calibration Timestamp: ${new Date().toISOString()} ===`;
       const paddedContent = jsonString + padding;
       const paddedFile = new TextEncoder().encode(paddedContent);
       
       console.log(`📊 Original size: ${file.length} bytes, Padded size: ${paddedFile.length} bytes`);
       
-      // Create storage context with advanced features
+      // Create storage context with optimized settings
       const context = await sdk.storage.createContext({
         withCDN: true, // Enable Filecoin Beam for faster retrieval
         metadata: {
-          category: options.category || 'agent-data',
-          type: options.type || 'identity-proof',
+          category: String(options.category || 'agent-data'),
+          type: String(options.type || 'identity-proof'),
           network: 'calibration',
           challenge: 'agent-reputation-portable-identity',
           timestamp: new Date().toISOString(),
-          ...options.metadata
+          walletAddress: String(options.walletAddress || 'unknown'),
+          requestId: String(options.metadata?.requestId || 'unknown'),
+          responderAddress: String(options.metadata?.responderAddress || 'unknown'),
+          requesterAddress: String(options.metadata?.requesterAddress || 'unknown'),
+          verificationLevel: String(options.metadata?.verificationLevel || 'none'),
+          urgencyLevel: String(options.metadata?.urgencyLevel || 'unknown'),
+          responseTime: String(options.metadata?.responseTime || new Date().toISOString()),
+          commitmentType: String(options.metadata?.commitmentType || 'unknown'),
+          geohash: String(options.metadata?.geohash || 'unknown'),
+          ...Object.fromEntries(
+            Object.entries(options.metadata || {}).map(([key, value]) => [key, String(value || '')])
+          )
         }
       });
 
-      // Upload to context with advanced features
-      const storageResult = await context.upload(paddedFile);
+      // Upload with shorter timeout for faster failure
+      const storageResult = await Promise.race([
+        context.upload(paddedFile),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Storage timeout')), 10000) // 10 second timeout
+        )
+      ]);
       
       if (!storageResult || !storageResult.pieceCid) {
         throw new Error('Storage operation failed');
@@ -217,82 +213,89 @@ async function storeOnRealFilecoin(data, options) {
         failures: storageResult.failures?.length || 0,
         withCDN: true,
         metadata: {
-          category: options.category || 'agent-data',
-          type: options.type || 'identity-proof',
-          network: 'calibration',
-          challenge: 'agent-reputation-portable-identity',
+          category: options.category || 'data',
+          type: options.type || 'data',
           ...options.metadata
         }
       };
-
-      saveStorageReference(storageRef);
 
       return {
         success: true,
         pieceCid: storageResult.pieceCid,
+        network: 'filecoin_calibration',
+        size: paddedFile.length,
         copies: storageResult.copies?.length || 1,
         failures: storageResult.failures?.length || 0,
-        size: paddedFile.length,
         withCDN: true,
+        explorer: `https://calibration.filfox.info/en/piece/${storageResult.pieceCid}`,
         metadata: storageRef.metadata
       };
     } else {
-      // For files already meeting minimum size, use standard upload
-      const storageResult = await sdk.storage.upload(file, {
+      // File is already large enough, use optimized path
+      console.log(`📊 File size: ${file.length} bytes (no padding needed)`);
+      
+      const context = await sdk.storage.createContext({
+        withCDN: true,
         metadata: {
-          category: options.category || 'agent-data',
-          type: options.type || 'identity-proof',
+          category: String(options.category || 'agent-data'),
+          type: String(options.type || 'identity-proof'),
           network: 'calibration',
           challenge: 'agent-reputation-portable-identity',
           timestamp: new Date().toISOString(),
-          ...options.metadata
+          walletAddress: String(options.walletAddress || 'unknown'),
+          requestId: String(options.metadata?.requestId || 'unknown'),
+          responderAddress: String(options.metadata?.responderAddress || 'unknown'),
+          requesterAddress: String(options.metadata?.requesterAddress || 'unknown'),
+          verificationLevel: String(options.metadata?.verificationLevel || 'none'),
+          urgencyLevel: String(options.metadata?.urgencyLevel || 'unknown'),
+          responseTime: String(options.metadata?.responseTime || new Date().toISOString()),
+          commitmentType: String(options.metadata?.commitmentType || 'unknown'),
+          geohash: String(options.metadata?.geohash || 'unknown'),
+          ...Object.fromEntries(
+            Object.entries(options.metadata || {}).map(([key, value]) => [key, String(value || '')])
+          )
         }
       });
 
+      const storageResult = await Promise.race([
+        context.upload(file),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Storage timeout')), 10000) // 10 second timeout
+        )
+      ]);
+      
       if (!storageResult || !storageResult.pieceCid) {
         throw new Error('Storage operation failed');
       }
 
       console.log(`✅ Data stored on Filecoin (pieceCid: ${storageResult.pieceCid})`);
-      console.log(`📦 Stored on ${storageResult.copies?.length || 1} providers`);
-      
-      if (storageResult.failures?.length > 0) {
-        console.warn(`⚠️ ${storageResult.failures.length} copy attempt(s) failed`);
-      }
-
-      // Store reference in local storage for UI
-      const storageRef = {
-        pieceCid: storageResult.pieceCid,
-        network: 'filecoin_calibration',
-        timestamp: new Date().toISOString(),
-        type: options.type || 'data',
-        category: options.category || 'data',
-        size: file.length,
-        copies: storageResult.copies?.length || 1,
-        failures: storageResult.failures?.length || 0,
-        metadata: {
-          category: options.category || 'agent-data',
-          type: options.type || 'identity-proof',
-          network: 'calibration',
-          challenge: 'agent-reputation-portable-identity',
-          ...options.metadata
-        }
-      };
-
-      saveStorageReference(storageRef);
 
       return {
         success: true,
         pieceCid: storageResult.pieceCid,
+        network: 'filecoin_calibration',
+        size: file.length,
         copies: storageResult.copies?.length || 1,
         failures: storageResult.failures?.length || 0,
-        size: file.length,
-        metadata: storageRef.metadata
+        withCDN: true,
+        explorer: `https://calibration.filfox.info/en/piece/${storageResult.pieceCid}`,
+        metadata: options.metadata
       };
     }
   } catch (error) {
-    console.error('❌ Failed to store data on Filecoin:', error);
-    throw error;
+    console.error('❌ Real Filecoin storage failed:', error);
+    
+    // Handle specific errors gracefully
+    if (error.message?.includes('InsufficientLockupFunds')) {
+      console.warn('💰 Insufficient FIL funds for storage. Using mock storage as fallback.');
+      throw new Error('Insufficient FIL funds for Filecoin storage');
+    } else if (error.message?.includes('Metadata value must be a string')) {
+      console.warn('📝 Metadata validation failed. Using mock storage as fallback.');
+      throw new Error('Metadata validation failed');
+    } else {
+      console.warn('⚠️ Filecoin storage error:', error.message);
+      throw error;
+    }
   }
 }
 
@@ -573,9 +576,10 @@ export async function storeReputationOnFilecoin(walletAddress, reputationData) {
     type: 'user-reputation',
     walletAddress,
     metadata: {
-      score: reputationData.score,
-      level: reputationData.level,
-      timestamp: reputationData.timestamp || new Date().toISOString()
+      score: String(reputationData.score || 0),
+      level: String(reputationData.level || 'unknown'),
+      timestamp: reputationData.timestamp || new Date().toISOString(),
+      walletAddress: String(walletAddress || 'unknown')
     }
   });
 }
