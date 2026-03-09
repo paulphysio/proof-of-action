@@ -144,7 +144,7 @@ export async function storeDataOnFilecoin(data, options = {}) {
 }
 
 /**
- * Store data on real Filecoin network
+ * Store data on real Filecoin network with advanced Synapse SDK features
  */
 async function storeOnRealFilecoin(data, options) {
   const sdk = await initializeSynapse();
@@ -162,67 +162,137 @@ async function storeOnRealFilecoin(data, options) {
 
     // Ensure minimum size requirement of 127 bytes
     if (file.length < 127) {
-      // Pad with spaces to meet minimum requirement
-      const padding = ' '.repeat(127 - file.length);
-      const paddedFile = new TextEncoder().encode(jsonString + padding);
+      // Pad with meaningful content to meet minimum requirement
+      const padding = `
+        
+        === FILECOIN ONCHAIN CLOUD ===
+        Data Category: ${options.category || 'agent-data'}
+        Timestamp: ${new Date().toISOString()}
+        Network: calibration
+        Purpose: Agent Reputation & Portable Identity
+        Challenge: Filecoin Agent Reputation System
+        ==================================
+      `;
+      const paddedContent = jsonString + padding;
+      const paddedFile = new TextEncoder().encode(paddedContent);
       
-      console.log(`Data padded from ${file.length} to ${paddedFile.length} bytes to meet minimum requirement`);
+      console.log(`📊 Original size: ${file.length} bytes, Padded size: ${paddedFile.length} bytes`);
       
-      // Upload with default options (2 copies for durability)
-      const { pieceCid, copies, failures } = await sdk.storage.upload(paddedFile, {
+      // Create storage context with advanced features
+      const context = await sdk.storage.createContext({
+        withCDN: true, // Enable Filecoin Beam for faster retrieval
         metadata: {
-          category: options.category || 'emergency-response',
-          type: options.type || 'verification-proof',
+          category: options.category || 'agent-data',
+          type: options.type || 'identity-proof',
+          network: 'calibration',
+          challenge: 'agent-reputation-portable-identity',
           timestamp: new Date().toISOString(),
           ...options.metadata
         }
       });
 
-      console.log(`✅ Data stored on ${copies.length} providers`);
-      if (failures.length > 0) {
-        console.warn(`⚠️ ${failures.length} copy attempt(s) failed`);
+      // Upload to context with advanced features
+      const storageResult = await context.upload(paddedFile);
+      
+      if (!storageResult || !storageResult.pieceCid) {
+        throw new Error('Storage operation failed');
       }
+
+      console.log(`✅ Data stored on Filecoin with CDN enabled (pieceCid: ${storageResult.pieceCid})`);
+      console.log(`📦 Stored on ${storageResult.copies?.length || 1} providers`);
+      
+      if (storageResult.failures?.length > 0) {
+        console.warn(`⚠️ ${storageResult.failures.length} copy attempt(s) failed`);
+      }
+
+      // Store reference in local storage for UI
+      const storageRef = {
+        pieceCid: storageResult.pieceCid,
+        network: 'filecoin_calibration',
+        timestamp: new Date().toISOString(),
+        type: options.type || 'data',
+        category: options.category || 'data',
+        size: paddedFile.length,
+        copies: storageResult.copies?.length || 1,
+        failures: storageResult.failures?.length || 0,
+        withCDN: true,
+        metadata: {
+          category: options.category || 'agent-data',
+          type: options.type || 'identity-proof',
+          network: 'calibration',
+          challenge: 'agent-reputation-portable-identity',
+          ...options.metadata
+        }
+      };
+
+      saveStorageReference(storageRef);
 
       return {
         success: true,
-        pieceCid: pieceCid.toString(),
-        copies: copies.length,
-        failures: failures.length,
+        pieceCid: storageResult.pieceCid,
+        copies: storageResult.copies?.length || 1,
+        failures: storageResult.failures?.length || 0,
         size: paddedFile.length,
-        metadata: options.metadata || {}
+        withCDN: true,
+        metadata: storageRef.metadata
       };
     } else {
-      // Upload without padding
-      const { pieceCid, copies, failures } = await sdk.storage.upload(file, {
+      // For files already meeting minimum size, use standard upload
+      const storageResult = await sdk.storage.upload(file, {
         metadata: {
-          category: options.category || 'emergency-response',
-          type: options.type || 'verification-proof',
+          category: options.category || 'agent-data',
+          type: options.type || 'identity-proof',
+          network: 'calibration',
+          challenge: 'agent-reputation-portable-identity',
           timestamp: new Date().toISOString(),
           ...options.metadata
         }
       });
 
-      console.log(`✅ Data stored on ${copies.length} providers`);
-      if (failures.length > 0) {
-        console.warn(`⚠️ ${failures.length} copy attempt(s) failed`);
+      if (!storageResult || !storageResult.pieceCid) {
+        throw new Error('Storage operation failed');
       }
+
+      console.log(`✅ Data stored on Filecoin (pieceCid: ${storageResult.pieceCid})`);
+      console.log(`📦 Stored on ${storageResult.copies?.length || 1} providers`);
+      
+      if (storageResult.failures?.length > 0) {
+        console.warn(`⚠️ ${storageResult.failures.length} copy attempt(s) failed`);
+      }
+
+      // Store reference in local storage for UI
+      const storageRef = {
+        pieceCid: storageResult.pieceCid,
+        network: 'filecoin_calibration',
+        timestamp: new Date().toISOString(),
+        type: options.type || 'data',
+        category: options.category || 'data',
+        size: file.length,
+        copies: storageResult.copies?.length || 1,
+        failures: storageResult.failures?.length || 0,
+        metadata: {
+          category: options.category || 'agent-data',
+          type: options.type || 'identity-proof',
+          network: 'calibration',
+          challenge: 'agent-reputation-portable-identity',
+          ...options.metadata
+        }
+      };
+
+      saveStorageReference(storageRef);
 
       return {
         success: true,
-        pieceCid: pieceCid.toString(),
-        copies: copies.length,
-        failures: failures.length,
+        pieceCid: storageResult.pieceCid,
+        copies: storageResult.copies?.length || 1,
+        failures: storageResult.failures?.length || 0,
         size: file.length,
-        metadata: options.metadata || {}
+        metadata: storageRef.metadata
       };
     }
   } catch (error) {
     console.error('❌ Failed to store data on Filecoin:', error);
-    return {
-      success: false,
-      error: error.message,
-      pieceCid: null
-    };
+    throw error;
   }
 }
 
@@ -313,7 +383,60 @@ export async function retrieveDataFromFilecoin(pieceCid) {
 }
 
 /**
- * Retrieve data from real Filecoin network
+ * Get available storage providers
+ */
+export async function getStorageProviders() {
+  try {
+    const sdk = await initializeSynapse();
+    
+    if (!sdk) {
+      console.warn('⚠️ Filecoin SDK not available - using mock providers');
+      // Return mock providers for development
+      return [
+        {
+          id: 1,
+          name: 'Mock Provider Alpha',
+          description: 'Development storage provider',
+          isActive: true,
+          serviceProvider: '0x1234567890123456789012345678901234567890',
+          pdp: { serviceURL: 'https://mock-provider.example.com' }
+        },
+        {
+          id: 2,
+          name: 'Mock Provider Beta',
+          description: 'Development storage provider',
+          isActive: true,
+          serviceProvider: '0x0987654321098765432109876543210987654321',
+          pdp: { serviceURL: 'https://mock-provider-beta.example.com' }
+        }
+      ];
+    }
+
+    const storageInfo = await sdk.storage.getStorageInfo();
+    const providers = storageInfo.providers;
+
+    console.log("📋 Available Filecoin providers:");
+    providers.forEach((provider) => {
+      console.table({
+        ID: provider.id,
+        Name: provider.name,
+        Description: provider.description,
+        Active: provider.isActive,
+        ProviderAddress: provider.serviceProvider,
+        PDPServiceURL: provider.pdp.serviceURL,
+      });
+    });
+
+    return providers;
+  } catch (error) {
+    console.error('❌ Failed to get storage providers:', error);
+    // Return empty array on error to prevent UI crashes
+    return [];
+  }
+}
+
+/**
+ * Retrieve data from real Filecoin network with enhanced features
  */
 async function retrieveFromRealFilecoin(pieceCid) {
   const sdk = await initializeSynapse();
@@ -324,29 +447,40 @@ async function retrieveFromRealFilecoin(pieceCid) {
   
   console.log(`📥 Retrieving data from Filecoin (pieceCid: ${pieceCid})`);
   
-  // Download data from Filecoin
-  const downloadedData = await sdk.storage.download({ pieceCid });
-  
-  // Convert Uint8Array back to string
-  const decodedText = new TextDecoder().decode(downloadedData);
-  
-  // Parse JSON (remove padding if present)
-  let jsonData;
   try {
-    jsonData = JSON.parse(decodedText.trim());
-  } catch (parseError) {
-    // If parsing fails, try to remove padding and parse again
-    const trimmedText = decodedText.replace(/\s+$/, '');
-    jsonData = JSON.parse(trimmedText);
+    // Download data from Filecoin
+    const downloadedData = await sdk.storage.download({ pieceCid });
+    
+    // Convert Uint8Array back to string
+    const decodedText = new TextDecoder().decode(downloadedData);
+    
+    // Parse JSON (remove padding if present)
+    let jsonData;
+    try {
+      jsonData = JSON.parse(decodedText.trim());
+    } catch (parseError) {
+      // If parsing fails, try to extract JSON from padded content
+      const jsonStart = decodedText.indexOf('{');
+      const jsonEnd = decodedText.lastIndexOf('}');
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        const jsonOnly = decodedText.substring(jsonStart, jsonEnd + 1);
+        jsonData = JSON.parse(jsonOnly);
+      } else {
+        throw new Error('Could not parse JSON from retrieved data');
+      }
+    }
+    
+    console.log(`✅ Successfully retrieved data from Filecoin (${downloadedData.length} bytes)`);
+    
+    return {
+      success: true,
+      data: jsonData,
+      size: downloadedData.length
+    };
+  } catch (error) {
+    console.error('❌ Failed to retrieve data from Filecoin:', error);
+    throw error;
   }
-  
-  console.log(`✅ Successfully retrieved data from Filecoin`);
-  
-  return {
-    success: true,
-    data: jsonData,
-    size: downloadedData.length
-  };
 }
 
 /**

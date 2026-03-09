@@ -313,20 +313,63 @@ export default function RespondPage() {
             hasWorldID: !!commitmentData.worldIDVerification
           });
           
-          const commitmentResult = await storeResponseCommitmentOnFilecoin(commitmentData);
-          console.log('✅ Response commitment stored on Filecoin:', commitmentResult);
-          
-          if (commitmentResult.success) {
-            console.log(`🎉 Commitment CID: ${commitmentResult.pieceCid}`);
-          } else {
-            console.warn('⚠️ Commitment storage failed:', commitmentResult.error);
-          }
-        } catch (filecoinError) {
-          console.warn('❌ Filecoin commitment storage failed (non-critical):', filecoinError);
-          console.warn('Error details:', {
-            message: filecoinError.message,
-            stack: filecoinError.stack
+          const commitmentResult = await fetch('/api/filecoin/store-commitment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              commitmentData: commitmentData,
+              options: {
+                type: 'response_commitment',
+                category: 'emergency-response',
+                metadata: {
+                  requestId: request.id,
+                  responderAddress: walletAddress,
+                  requesterAddress: request.walletAddress,
+                  requestType: request.requestType,
+                  urgencyLevel: request.urgencyLevel,
+                  responseTime: new Date().toISOString(),
+                  commitmentType: 'emergency-response',
+                  geohash: request.geohash,
+                  verificationLevel: worldIDVerification?.verificationLevel || 'none'
+                }
+              }
+            })
           });
+
+          const result = await commitmentResult.json();
+          
+          if (result.success) {
+            console.log('✅ Response commitment stored on Filecoin:', result.result.pieceCid);
+            // Store reference in local storage for UI
+            if (typeof window !== 'undefined') {
+              const storageRef = {
+                pieceCid: result.result.pieceCid,
+                network: 'filecoin_calibration',
+                timestamp: new Date().toISOString(),
+                type: 'response_commitment',
+                category: 'emergency-response',
+                metadata: {
+                  requestId: request.id,
+                  responderAddress: walletAddress,
+                  requesterAddress: request.walletAddress,
+                  requestType: request.requestType,
+                  urgencyLevel: request.urgencyLevel,
+                  responseTime: new Date().toISOString(),
+                  commitmentType: 'emergency-response'
+                }
+              };
+              
+              const existingStorage = JSON.parse(localStorage.getItem('filecoinStorage') || '[]');
+              existingStorage.unshift(storageRef);
+              localStorage.setItem('filecoinStorage', JSON.stringify(existingStorage));
+            }
+          } else {
+            console.error('❌ Failed to store response commitment:', result.error);
+          }
+        } catch (error) {
+          console.error('❌ Error storing response commitment:', error);
         }
         
         setSuccess(request);

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWallet } from '@/lib/near-wallet';
 import { getWorldIDVerification } from '@/lib/worldid';
 import { getFilecoinStorage } from '@/lib/filecoin';
+import QRCode from 'qrcode';
 import { 
   Download, 
   Upload, 
@@ -36,6 +37,8 @@ export default function IdentityPortability() {
   const [importData, setImportData] = useState('');
   const [importError, setImportError] = useState('');
   const [importSuccess, setImportSuccess] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [qrError, setQrError] = useState('');
 
   const generateIdentityPackage = () => {
     const worldId = getWorldIDVerification();
@@ -135,18 +138,57 @@ export default function IdentityPortability() {
     reader.readAsText(file);
   };
 
-  const generateQRData = () => {
-    const data = generateIdentityPackage();
-    // Create a compact version for QR
-    const compact = {
-      v: data.version,
-      w: data.wallet?.slice(0, 20),
-      wid: data.worldId?.nullifier_hash?.slice(0, 20),
-      pts: data.proofOfHistory.totalRecords,
-      ts: Date.now()
-    };
-    return JSON.stringify(compact);
+  const generateQRData = async () => {
+    try {
+      const data = generateIdentityPackage();
+      // Create a compact version for QR with meaningful data
+      const compact = {
+        v: data.version,                    // Version
+        w: data.wallet?.slice(0, 20),      // Wallet (truncated)
+        wid: data.worldId?.nullifier_hash?.slice(0, 20), // World ID (truncated)
+        wl: data.worldId?.verification_level, // Verification level
+        pts: data.proofOfHistory.totalRecords, // Total proof count
+        cal: data.proofOfHistory.calibrationRecords, // Filecoin records
+        ts: Date.now(),                     // Timestamp
+        app: 'poa-identity',               // App identifier
+        sig: 'demo'                        // Signature placeholder
+      };
+      
+      const qrDataString = JSON.stringify(compact);
+      
+      // Generate QR code as data URL
+      const qrDataUrl = await QRCode.toDataURL(qrDataString, {
+        width: 200,
+        margin: 1,
+        color: {
+          dark: '#1e293b',
+          light: '#ffffff'
+        },
+        errorCorrectionLevel: 'L'
+      });
+      
+      setQrCodeUrl(qrDataUrl);
+      setQrError('');
+      return qrDataUrl;
+    } catch (error) {
+      console.error('Failed to generate QR code:', error);
+      setQrError('Failed to generate QR code');
+      return null;
+    }
   };
+
+  const handleRegenerateQR = () => {
+    setQrCodeUrl('');
+    setQrError('');
+    generateQRData();
+  };
+
+  // Generate QR code when panel is opened
+  useEffect(() => {
+    if (showQR) {
+      generateQRData();
+    }
+  }, [showQR]);
 
   return (
     <div className="glass-card p-4">
@@ -335,40 +377,87 @@ export default function IdentityPortability() {
             </div>
           </div>
 
-          {/* Simulated QR Code */}
-          <div 
-            className="mx-auto mb-3 d-flex align-items-center justify-content-center"
-            style={{ 
-              width: '200px', 
-              height: '200px', 
-              background: 'white',
-              borderRadius: '12px',
-              padding: '12px'
-            }}
-          >
+          {qrError ? (
             <div 
+              className="p-3 rounded mb-3"
+              style={{ background: 'rgba(244, 63, 94, 0.15)' }}
+            >
+              <div className="d-flex align-items-center gap-2 justify-content-center">
+                <AlertTriangle size={16} color="#F43F5E" />
+                <span style={{ color: '#F43F5E', fontSize: '0.875rem' }}>{qrError}</span>
+              </div>
+              <button 
+                onClick={handleRegenerateQR}
+                className="btn btn-outline-glass btn-sm mt-2"
+                style={{ fontSize: '0.75rem' }}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : qrCodeUrl ? (
+            <div className="mb-3">
+              <img 
+                src={qrCodeUrl} 
+                alt="Identity QR Code" 
+                style={{ 
+                  width: '200px', 
+                  height: '200px',
+                  borderRadius: '12px',
+                  border: '4px solid white',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <p className="mt-2 mb-2" style={{ color: '#10B981', fontSize: '0.75rem', fontWeight: 500 }}>
+                ✅ QR Code Generated Successfully
+              </p>
+              <button 
+                onClick={handleRegenerateQR}
+                className="btn btn-outline-glass btn-sm"
+                style={{ fontSize: '0.75rem' }}
+              >
+                🔄 Regenerate QR Code
+              </button>
+            </div>
+          ) : (
+            <div 
+              className="mx-auto mb-3 d-flex align-items-center justify-content-center"
               style={{ 
-                width: '100%', 
-                height: '100%',
-                background: 'var(--navy-950)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column'
+                width: '200px', 
+                height: '200px', 
+                background: 'white',
+                borderRadius: '12px',
+                padding: '12px'
               }}
             >
-              <QrCode size={64} color="white" />
-              <p className="mt-2 mb-0" style={{ color: 'white', fontSize: '0.625rem' }}>
-                POA Identity
-              </p>
+              <div 
+                style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  background: 'var(--navy-950)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column'
+                }}
+              >
+                <QrCode size={64} color="white" />
+                <p className="mt-2 mb-0" style={{ color: 'white', fontSize: '0.625rem' }}>
+                  Generating...
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
-          <p className="mb-0" style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
-            <Wallet size={12} className="me-1" />
-            {accountId?.slice(0, 15)}...
-          </p>
+          <div className="mb-3">
+            <p className="mb-1" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+              Contains: Identity summary, reputation score, verification status
+            </p>
+            <p className="mb-0" style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+              <Wallet size={12} className="me-1" />
+              {accountId?.slice(0, 15)}...
+            </p>
+          </div>
         </div>
       )}
 
