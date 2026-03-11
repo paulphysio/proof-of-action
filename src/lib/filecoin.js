@@ -116,6 +116,11 @@ export function getFilecoinExplorerUrl(cid) {
   return `https://calibration.filscan.io/en/cid/${cid}`;
 }
 
+// Get IPFS URL for a CID (for IPFS gateway access)
+export function getIpfsUrl(cid) {
+  return `https://w3s.link/ipfs/${cid}`;
+}
+
 // Default export
 export default {
   storeOnFilecoin,
@@ -127,5 +132,6 @@ export default {
   storeVerificationProofOnFilecoin,
   getFilecoinStorage,
   addFilecoinStorageRef,
-  getFilecoinExplorerUrl
+  getFilecoinExplorerUrl,
+  getIpfsUrl
 };
