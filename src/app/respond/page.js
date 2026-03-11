@@ -7,7 +7,7 @@ import { generateGeohash } from '@/lib/ai-verification';
 import { notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications, notifyTrackingStarted } from '@/lib/notifications';
 import Link from 'next/link';
 import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
-import { storeResponseCommitmentOnFilecoin } from '@/lib/filecoin';
+import { storeResponseCommitmentOnFilecoin, addFilecoinStorageRef, storeTrackingDataOnFilecoin } from '@/lib/filecoin';
 import { getWorldIDVerification } from '@/lib/worldid';
 import RequesterStaticMap from '@/components/maps/RequesterStaticMap';
 
@@ -282,7 +282,7 @@ export default function RespondPage() {
       const response = await createResponse(request.id, accountId);
       
       if (response) {
-        // Store commitment to help on Filecoin
+        // Store commitment to help on Filecoin (fire-and-forget)
         try {
           console.log('📤 Storing response commitment on Filecoin...');
           const commitmentData = {
@@ -291,83 +291,37 @@ export default function RespondPage() {
             timestamp: new Date().toISOString(),
             initialLocation: userLocation ? {
               lat: userLocation.lat,
-              lon: userLocation.lng,
-              geohash: generateGeohash(userLocation.lat, userLocation.lng, 6),
+              lon: userLocation.lon || userLocation.lng,
+              geohash: generateGeohash(userLocation.lat, userLocation.lon || userLocation.lng, 6),
               accuracy: userLocation.accuracy
             } : null,
-            estimatedArrival: new Date(Date.now() + 20 * 60 * 1000).toISOString(), // 20 mins estimate
+            estimatedArrival: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
             worldIDVerification: getWorldIDVerification(),
-            emergencyType: request.emergency_type,
+            emergencyType: request.emergency_type || request.request_type,
             urgencyLevel: request.urgency_level,
             distanceToRequest: userLocation ? calculateDistance(
-              userLocation.lat, userLocation.lng,
+              userLocation.lat, userLocation.lon || userLocation.lng,
               geohashToLatLon(request.geohash).lat,
               geohashToLatLon(request.geohash).lon
             ) : null
           };
           
-          console.log('📊 Commitment data:', {
-            requestId: commitmentData.requestId,
-            responderWallet: commitmentData.responderWallet,
-            hasLocation: !!commitmentData.initialLocation,
-            hasWorldID: !!commitmentData.worldIDVerification
-          });
-          
-          const commitmentResult = await fetch('/api/filecoin/store-commitment', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              commitmentData: commitmentData,
-              options: {
-                type: 'response_commitment',
-                category: 'emergency-response',
-                metadata: {
-                  requestId: request.id,
-                  responderAddress: accountId,
-                  requesterAddress: request.walletAddress,
-                  requestType: request.requestType,
-                  urgencyLevel: request.urgencyLevel,
-                  responseTime: new Date().toISOString(),
-                  commitmentType: 'emergency-response',
-                  geohash: request.geohash,
-                  verificationLevel: commitmentData.worldIDVerification?.verificationLevel || 'none'
-                }
-              }
-            })
-          });
-
-          const result = await commitmentResult.json();
-          
-          if (result.success) {
-            console.log('✅ Response commitment stored on Filecoin:', result.result.pieceCid);
-            // Store reference in local storage for UI
-            if (typeof window !== 'undefined') {
-              const storageRef = {
-                pieceCid: result.result.pieceCid,
-                network: 'filecoin_calibration',
+          // Store on Filecoin (non-blocking)
+          storeResponseCommitmentOnFilecoin(commitmentData)
+            .then(result => {
+              console.log('✅ Response commitment stored on Filecoin:', result.pieceCid);
+              // Store reference in local storage for UI
+              addFilecoinStorageRef({
+                pieceCid: result.pieceCid,
                 timestamp: new Date().toISOString(),
                 type: 'response_commitment',
-                category: 'emergency-response',
-                metadata: {
-                  requestId: request.id,
-                  responderAddress: accountId,
-                  requesterAddress: request.walletAddress,
-                  requestType: request.requestType,
-                  urgencyLevel: request.urgencyLevel,
-                  responseTime: new Date().toISOString(),
-                  commitmentType: 'emergency-response'
-                }
-              };
-              
-              const existingStorage = JSON.parse(localStorage.getItem('filecoinStorage') || '[]');
-              existingStorage.unshift(storageRef);
-              localStorage.setItem('filecoinStorage', JSON.stringify(existingStorage));
-            }
-          } else {
-            console.error('❌ Failed to store response commitment:', result.error);
-          }
+                requestId: request.id,
+                responderWallet: accountId
+              });
+            })
+            .catch(error => {
+              console.error('❌ Failed to store response commitment:', error.message);
+            });
         } catch (error) {
           console.error('❌ Error storing response commitment:', error);
         }
@@ -440,6 +394,39 @@ export default function RespondPage() {
       // Store tracking data
       const trackingData = tracker.getTrackingData();
       await storeTrackingData(supabase, trackingData);
+      
+      // Store encrypted tracking data on Filecoin (fire-and-forget)
+      try {
+        const trackingFilecoinData = {
+          responseId: tracking.id,
+          requestId: tracking.request_id,
+          responderWallet: accountId,
+          timestamp: new Date().toISOString(),
+          waypoints: tracker.locations.map(loc => ({
+            timestamp: loc.timestamp,
+            geohash: loc.geohash,
+            accuracy: loc.accuracy
+          })),
+          movementAnalysis: finalAnalysis,
+          verificationScore: finalAnalysis.confidence,
+          movedCloser: finalAnalysis.movedCloser,
+          totalDistance: finalAnalysis.totalDistance,
+          avgSpeed: finalAnalysis.avgSpeed,
+          trackingDuration: trackingData.duration,
+          privacyLevel: 'pseudonymous',
+          dataRetentionDays: 90
+        };
+        
+        storeTrackingDataOnFilecoin(trackingFilecoinData)
+          .then(result => {
+            console.log('✅ Tracking data stored on Filecoin:', result.pieceCid);
+          })
+          .catch(error => {
+            console.error('❌ Failed to store tracking data on Filecoin:', error.message);
+          });
+      } catch (error) {
+        console.error('❌ Error storing tracking data on Filecoin:', error);
+      }
       
       // Get neighbors to notify
       const response = await supabase

@@ -337,78 +337,34 @@ export async function storeTrackingData(supabase, trackingData) {
       confidence: trackingData.analysis?.confidence
     });
     
-    // Store tracking data on Filecoin via API route
-    let filecoinResult = { success: false, error: 'API call failed' };
-    try {
-      const response = await fetch('/api/filecoin/store-tracking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trackingData: trackingData,
-          options: {
-            type: 'movement_proof',
-            category: 'emergency-response',
-            metadata: {
-              requestId: trackingData.requestId,
-              responderAddress: trackingData.responderWallet,
-              trackingDuration: trackingData.trackingDuration,
-              confidence: trackingData.analysis?.confidence,
-              totalWaypoints: trackingData.waypoints?.length || 0,
-              verificationLevel: trackingData.worldIDVerification?.verificationLevel || 'none'
-            }
-          }
-        })
-      });
-
-      filecoinResult = await response.json();
-      console.log('✅ Filecoin storage result:', filecoinResult);
-    } catch (error) {
-      console.error('❌ Failed to store tracking data on Filecoin:', error);
-      filecoinResult = { success: false, error: error.message };
-    }
+    // Store tracking data on Filecoin via the filecoin.js library function
+    const filecoinResult = await storeTrackingDataOnFilecoin({
+      responseId: trackingData.responseId,
+      responderWallet: trackingData.responderWallet,
+      movementPattern: trackingData.analysis.movementPattern,
+      confidence: trackingData.analysis.confidence,
+      distanceDelta: trackingData.analysis.distanceDelta,
+      locations: trackingData.locations,
+      startTime: trackingData.startTime,
+      endTime: trackingData.endTime
+    });
+    
+    console.log('✅ Filecoin storage result:', filecoinResult);
     
     if (filecoinResult.success) {
       console.log('✅ Movement tracking stored on Filecoin:', filecoinResult.pieceCid);
       
       // Store responder reputation on Filecoin
       console.log('📤 Storing reputation on Filecoin...');
-      let reputationResult = { success: false, error: 'API call failed' };
-      try {
-        const reputationResponse = await fetch('/api/filecoin/store-reputation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            walletAddress: trackingData.responderWallet,
-            reputationData: {
-              type: 'movement_verification',
-              responseId: trackingData.responseId,
-              confidence: trackingData.analysis.confidence,
-              timestamp: new Date().toISOString(),
-              verificationLevel: trackingData.worldIDVerification?.verificationLevel || 'none'
-            },
-            options: {
-              type: 'reputation',
-              category: 'emergency-response',
-              metadata: {
-                reputationType: 'movement_verification',
-                confidence: trackingData.analysis.confidence,
-                responseId: trackingData.responseId,
-                verificationLevel: trackingData.worldIDVerification?.verificationLevel || 'none'
-              }
-            }
-          })
-        });
-
-        reputationResult = await reputationResponse.json();
-        console.log('✅ Reputation storage result:', reputationResult);
-      } catch (error) {
-        console.error('❌ Failed to store reputation on Filecoin:', error);
-        reputationResult = { success: false, error: error.message };
-      }
+      const reputationResult = await storeReputationOnFilecoin({
+        type: 'movement_verification',
+        responseId: trackingData.responseId,
+        responderWallet: trackingData.responderWallet,
+        confidence: trackingData.analysis.confidence,
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log('✅ Reputation storage result:', reputationResult);
     } else {
       console.warn('⚠️ Filecoin storage returned failure:', filecoinResult.error);
     }

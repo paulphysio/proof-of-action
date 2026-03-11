@@ -29,8 +29,8 @@ import {
   Activity
 } from 'lucide-react';
 import WorldIDAdaptive from '@/components/WorldIDAdaptive';
-import FilecoinStorageStatus from '@/components/FilecoinStorageStatus';
 import IdentityPortability from '@/components/IdentityPortability';
+import FilecoinStorageManager from '@/components/FilecoinStorageManager';
 import { Fingerprint } from 'lucide-react';
 import { 
   getWorldIDVerification, 
@@ -345,9 +345,9 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Filecoin Storage Status - Decentralized Storage */}
+        {/* Filecoin Storage Manager - Decentralized Private Storage */}
         <div className="col-12 mb-4 animate-reveal-up" style={{ animationDelay: '75ms' }}>
-          <FilecoinStorageStatus walletAddress={accountId} />
+          <FilecoinStorageManager walletAddress={accountId} />
         </div>
 
         {/* Identity Portability - Cross-Environment Export/Import */}

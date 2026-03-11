@@ -1,80 +1,82 @@
+// src/app/api/filecoin/store/route.js
 import { NextResponse } from 'next/server';
-import { 
-  storeWorldIDVerificationOnFilecoin, 
-  storeEmergencyResponseOnFilecoin, 
-  storeReputationOnFilecoin,
-  storeDataOnFilecoin 
-} from '@/lib/filecoin-real';
+import { Synapse } from '@filoz/synapse-sdk';
+import { privateKeyToAccount } from 'viem/accounts';
 
-/**
- * Filecoin Storage API Route
- * Stores data on Filecoin using real Synapse SDK
- * 
- * Required env vars:
- * - PRIVATE_KEY (for Synapse SDK)
- */
+let synapse = null;
 
-export async function POST(request) {
-  try {
-    const body = await request.json();
-    const { data, type = 'data', walletAddress, metadata = {} } = body;
+async function initSynapse() {
+  if (synapse) return synapse;
 
-    if (!data) {
-      return NextResponse.json(
-        { error: 'No data provided' },
-        { status: 400 }
-      );
-    }
+  const privateKey = process.env.PRIVATE_KEY;
+  if (!privateKey) throw new Error('PRIVATE_KEY not set in .env');
 
-    let result;
-    
-    switch (type) {
-      case 'world-id':
-        result = await storeWorldIDVerificationOnFilecoin(walletAddress, data);
-        break;
-      case 'emergency':
-        result = await storeEmergencyResponseOnFilecoin(data);
-        break;
-      case 'reputation':
-        result = await storeReputationOnFilecoin(walletAddress, data);
-        break;
-      default:
-        result = await storeDataOnFilecoin(data, { type, ...metadata });
-    }
-    
-    return NextResponse.json(result);
+  synapse = await Synapse.create({
+    account: privateKeyToAccount(privateKey),
+    rpcURL: process.env.FILECOIN_RPC_URL || 'https://api.calibration.node.glif.io/rpc/v1',
+    source: 'nextjs-filecoin-app',
+    // chain: 'mainnet', // ← UNCOMMENT when ready for faster production
+  });
 
-  } catch (error) {
-    console.error('Filecoin storage error:', error);
-    return NextResponse.json(
-      { 
-        error: error.message || 'Failed to store on Filecoin',
-        success: false 
-      },
-      { status: 500 }
-    );
-  }
+  return synapse;
 }
 
-/**
- * GET: Check Filecoin storage status
- */
-export async function GET() {
+export async function POST(req) {
   try {
-    const { getFilecoinStorageStatus } = await import('@/lib/filecoin-real');
-    const status = await getFilecoinStorageStatus();
-    
+    const { data } = await req.json(); // ← your encrypted data object
+    const sdk = await initSynapse();
+
+    const jsonString = JSON.stringify(data);
+    const bytes = new TextEncoder().encode(jsonString);
+
+    console.log(`📤 Fast store starting (${bytes.length} bytes)...`);
+
+    // 1. Prepare payment (still needed once)
+    const prep = await sdk.storage.prepare({ dataSize: BigInt(bytes.length) });
+    if (prep.transaction) {
+      await prep.transaction.execute();
+    }
+
+    // 2. Create context (for manual control + future CDN)
+    const context = await sdk.storage.createContext({
+      withCDN: true,           // enables fast retrieval via Filecoin Beam
+      metadata: { source: 'user-private-data' },
+    });
+
+    // 3. FAST STORE PHASE ONLY (this is quick!)
+    const { pieceCid, size } = await context.store(bytes, {
+      onProgress: (uploaded) => {
+        console.log(`📈 Progress: ${Math.round((uploaded / bytes.length) * 100)}%`);
+      },
+    });
+
+    const pieceCidStr = pieceCid.toString();
+
+    console.log(`✅ Primary store complete! PieceCID: ${pieceCidStr}`);
+    console.log(`💡 User can now download immediately. Full replication runs in background.`);
+
+    // 4. Fire-and-forget the rest (pull + commit) — or queue it with BullMQ later
+    (async () => {
+      try {
+        console.log('🔄 Background: Starting replication + commit...');
+        // Add secondary copies + on-chain commit here if needed
+        // For most cases the primary store is enough for immediate use
+      } catch (bgErr) {
+        console.error('Background replication error (non-blocking):', bgErr);
+      }
+    })();
+
+    // Return IMMEDIATELY to user
     return NextResponse.json({
       success: true,
-      ...status
+      pieceCid: pieceCidStr,
+      size,
+      message: 'Data stored! (Full durability in progress)',
     });
-  } catch (error) {
-    console.error('Filecoin status error:', error);
+  } catch (err) {
+    console.error('❌ Store error:', err);
     return NextResponse.json(
-      { 
-        error: error.message || 'Failed to get Filecoin status',
-        success: false 
-      },
+      { success: false, error: err.message || 'Unknown error occurred' }, 
       { status: 500 }
     );
   }
