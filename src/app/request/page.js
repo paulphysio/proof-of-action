@@ -186,14 +186,15 @@ export default function RequestPage() {
         setSuccess(true);
         notifyNearbyEmergency(request);
 
-        const prefix = typeof request.geohash === 'string' ? request.geohash.slice(0, 3) : null;
-        if (prefix) {
-          fetch('/api/push/notify-nearby', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ request, geohashPrefixes: [prefix] })
-          }).catch(() => {});
-        }
+        // Send precise location for 1km radius notification
+        fetch('/api/push/notify-nearby', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            request, 
+            location: { lat, lng: lon }
+          })
+        }).catch(() => {});
 
         setTimeout(() => {
           router.push('/dashboard');

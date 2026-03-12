@@ -44,8 +44,8 @@ export async function requestNotificationPermission() {
   return permission === 'granted';
 }
 
-// Subscribe to push notifications
-export async function subscribeToPushNotifications() {
+// Subscribe to push notifications with location
+export async function subscribeToPushNotificationsWithLocation(location) {
   try {
     const registration = await navigator.serviceWorker.ready;
 
@@ -73,7 +73,7 @@ export async function subscribeToPushNotifications() {
       applicationServerKey: urlBase64ToUint8Array(publicKey)
     });
     
-    console.log('Push subscription:', subscription);
+    console.log('Push subscription with location:', subscription);
     return subscription;
   } catch (error) {
     console.warn('Push subscription failed (notifications may not be available):', error);
@@ -81,7 +81,12 @@ export async function subscribeToPushNotifications() {
   }
 }
 
-export async function savePushSubscription(subscription, walletAddress, geohashPrefixes = []) {
+// Legacy function for backwards compatibility
+export async function subscribeToPushNotifications() {
+  return subscribeToPushNotificationsWithLocation();
+}
+
+export async function savePushSubscription(subscription, walletAddress, geohashPrefixes = [], location = null) {
   try {
     if (!subscription) return null;
 
@@ -91,7 +96,8 @@ export async function savePushSubscription(subscription, walletAddress, geohashP
       body: JSON.stringify({
         subscription,
         walletAddress: walletAddress || null,
-        geohashPrefixes: Array.isArray(geohashPrefixes) ? geohashPrefixes : []
+        geohashPrefixes: Array.isArray(geohashPrefixes) ? geohashPrefixes : [],
+        location: location // { lat, lng }
       })
     });
 
@@ -105,6 +111,62 @@ export async function savePushSubscription(subscription, walletAddress, geohashP
     console.error('Saving push subscription failed:', error);
     return null;
   }
+}
+
+// Update user location periodically
+export async function updateUserLocation() {
+  if (!('geolocation' in navigator)) {
+    console.log('Geolocation not supported');
+    return null;
+  }
+
+  try {
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      });
+    });
+
+    const location = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+
+    // Update subscription with new location
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    
+    if (subscription) {
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription,
+          location
+        })
+      });
+      console.log('Location updated:', location);
+    }
+
+    return location;
+  } catch (error) {
+    console.warn('Failed to update location:', error.message);
+    return null;
+  }
+}
+
+// Start periodic location updates
+export function startLocationUpdates(intervalMinutes = 5) {
+  // Update immediately
+  updateUserLocation();
+  
+  // Then update periodically
+  const intervalMs = intervalMinutes * 60 * 1000;
+  const intervalId = setInterval(updateUserLocation, intervalMs);
+  
+  return () => clearInterval(intervalId); // Return cleanup function
 }
 
 // Send local notification

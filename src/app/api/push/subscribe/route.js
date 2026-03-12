@@ -8,7 +8,8 @@ export async function POST(req) {
     const subscription = body?.subscription;
     const endpoint = subscription?.endpoint;
     const geohashPrefixes = Array.isArray(body?.geohashPrefixes) ? body.geohashPrefixes : [];
-
+    const location = body?.location; // { lat, lng }
+    
     if (!endpoint || typeof endpoint !== 'string') {
       return NextResponse.json({ error: 'Missing subscription endpoint' }, { status: 400 });
     }
@@ -38,19 +39,26 @@ export async function POST(req) {
       });
     }
 
+    // Prepare upsert data
+    const upsertData = {
+      wallet_address: walletAddress,
+      endpoint,
+      subscription,
+      geohash_prefixes: geohashPrefixes,
+      updated_at: new Date().toISOString()
+    };
+
+    // Add location if provided
+    if (location?.lat && location?.lng) {
+      upsertData.location_lat = location.lat;
+      upsertData.location_lng = location.lng;
+      upsertData.last_location_at = new Date().toISOString();
+    }
+
     // Upsert by endpoint (unique)
     const { data, error } = await supabase
       .from('push_subscriptions')
-      .upsert(
-        {
-          wallet_address: walletAddress,
-          endpoint,
-          subscription,
-          geohash_prefixes: geohashPrefixes,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'endpoint' }
-      )
+      .upsert(upsertData, { onConflict: 'endpoint' })
       .select()
       .single();
 
