@@ -149,22 +149,12 @@ export default function Home() {
                 <img src="/ICON.png" alt="PoA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div className="d-none d-sm-block">
-                <span style={{ 
-                  color: 'white', 
-                  fontWeight: 700, 
-                  fontSize: '1rem',
-                  letterSpacing: '-0.02em'
-                }}>
+                <span className="text-logo">
                   Proof-of-Action
                 </span>
               </div>
               <div className="d-sm-none">
-                <span style={{ 
-                  color: 'white', 
-                  fontWeight: 700, 
-                  fontSize: '0.9375rem',
-                  letterSpacing: '-0.02em'
-                }}>
+                <span className="text-logo-sm">
                   PoA
                 </span>
               </div>
@@ -225,14 +215,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <h1 style={{ 
-                  fontSize: 'clamp(1rem, 4vw, 1.5rem)', 
-                  fontWeight: 800, 
-                  lineHeight: 1.1,
-                  color: 'white',
-                  marginBottom: '1rem',
-                  letterSpacing: '-0.02em'
-                }}>
+                <h1 className="text-hero">
                   Help Your
                   <br />
                   <span className="text-gradient-health">Community.</span>
@@ -240,13 +223,7 @@ export default function Home() {
                   <span className="text-gradient-gold">Earn On-Chain.</span>
                 </h1>
                 
-                <p style={{ 
-                  fontSize: 'clamp(0.8125rem, 2vw, 0.9375rem)', 
-                  color: 'var(--slate-400)', 
-                  lineHeight: 1.6,
-                  maxWidth: '540px',
-                  marginBottom: '1.5rem'
-                }}>
+                <p className="text-hero-sub">
                   A privacy-first emergency network where real-world helpful actions 
                   are verified by AI and rewarded with blockchain tokens.
                 </p>
@@ -636,15 +613,7 @@ export default function Home() {
             >
               How It Works
             </span>
-            <h2 
-              className="animate-reveal-up"
-              style={{ 
-                color: 'white', 
-                fontWeight: 700, 
-                fontSize: 'clamp(1rem, 4vw, 1.25rem)',
-                margin: 0 
-              }}
-            >
+            <h2 className="animate-reveal-up text-section">
               Four Steps to Help
             </h2>
           </div>
@@ -764,7 +733,7 @@ export default function Home() {
                 >
                   <Lock size={24} color="#10B981" />
                 </div>
-                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '0.9375rem' }}>
+                <h3 className="text-card-title">
                   Privacy First
                 </h3>
               </div>
@@ -794,7 +763,7 @@ export default function Home() {
                     }}>
                       <item.icon size={14} color={item.color} />
                     </div>
-                    <span style={{ color: 'var(--slate-300)', fontSize: '0.8125rem' }}>{item.text}</span>
+                    <span className="text-list-item">{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -817,7 +786,7 @@ export default function Home() {
                 >
                   <Zap size={24} color="#06B6D4" />
                 </div>
-                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '0.9375rem' }}>
+                <h3 className="text-card-title">
                   Powered By
                 </h3>
               </div>
@@ -842,7 +811,7 @@ export default function Home() {
                 ))}
               </div>
               
-              <p style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', lineHeight: 1.7 }}>
+              <p className="text-list-item" style={{ lineHeight: 1.7 }}>
                 Built for production with a modular AI engine ready for ML integration. 
                 Enterprise-grade architecture with Web3 native design.
               </p>
@@ -850,16 +819,16 @@ export default function Home() {
               {/* Stats Row */}
               <div className="d-flex gap-4 mt-4">
                 <div>
-                  <div style={{ color: 'var(--cyan-400)', fontSize: '1.125rem', fontWeight: 700 }}>99.9%</div>
-                  <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Uptime</div>
+                  <div className="text-metric" style={{ color: 'var(--cyan-400)' }}>99.9%</div>
+                  <div className="text-metric-label">Uptime</div>
                 </div>
                 <div>
-                  <div style={{ color: 'var(--emerald-400)', fontSize: '1.125rem', fontWeight: 700 }}>&lt;1s</div>
-                  <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Response</div>
+                  <div className="text-metric" style={{ color: 'var(--emerald-400)' }}>&lt;1s</div>
+                  <div className="text-metric-label">Response</div>
                 </div>
                 <div>
-                  <div style={{ color: 'var(--amber-400)', fontSize: '1.125rem', fontWeight: 700 }}>0</div>
-                  <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Data Leaks</div>
+                  <div className="text-metric" style={{ color: 'var(--amber-400)' }}>0</div>
+                  <div className="text-metric-label">Data Leaks</div>
                 </div>
               </div>
             </div>

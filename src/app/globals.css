@@ -1213,3 +1213,90 @@ body {
     display: none !important;
   }
 }
+
+/* ============================================
+   UTILITY FONT SIZE CLASSES - Prevents Hydration Mismatch
+   ============================================ */
+
+/* Hero heading */
+.text-hero {
+  font-size: clamp(1rem, 4vw, 1.5rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  color: white !important;
+  margin-bottom: 1rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Hero subtext */
+.text-hero-sub {
+  font-size: clamp(0.8125rem, 2vw, 0.9375rem) !important;
+  color: var(--slate-400) !important;
+  line-height: 1.6 !important;
+  max-width: 540px !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Section heading */
+.text-section {
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: clamp(1rem, 4vw, 1.25rem) !important;
+  margin: 0 !important;
+}
+
+/* Card heading */
+.text-card-title {
+  color: white !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  font-size: 0.9375rem !important;
+}
+
+/* List item text */
+.text-list-item {
+  color: var(--slate-300) !important;
+  font-size: 0.8125rem !important;
+}
+
+/* Metric number */
+.text-metric {
+  color: inherit !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+}
+
+/* Metric label */
+.text-metric-label {
+  color: var(--slate-500) !important;
+  font-size: 0.75rem !important;
+}
+
+/* Small caption */
+.text-caption {
+  color: var(--slate-400) !important;
+  font-size: 0.75rem !important;
+  margin: 0 !important;
+}
+
+/* Logo text */
+.text-logo {
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Mobile logo text */
+.text-logo-sm {
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 0.9375rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Tag/Badge text */
+.text-tag {
+  color: var(--slate-400) !important;
+  font-size: 0.625rem !important;
+}
