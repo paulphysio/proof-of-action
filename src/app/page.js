@@ -226,11 +226,11 @@ export default function Home() {
                 </div>
                 
                 <h1 style={{ 
-                  fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
+                  fontSize: 'clamp(1rem, 4vw, 1.5rem)', 
                   fontWeight: 800, 
                   lineHeight: 1.1,
                   color: 'white',
-                  marginBottom: '1.25rem',
+                  marginBottom: '1rem',
                   letterSpacing: '-0.02em'
                 }}>
                   Help Your
@@ -480,7 +480,7 @@ export default function Home() {
                       <h6 className="m-0" style={{ color: 'white', fontWeight: 600 }}>Create New</h6>
                     </div>
                     
-                    <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', marginBottom: '1rem' }}>
+                    <p style={{ color: 'var(--slate-400)', fontSize: '0.75rem', marginBottom: '1rem' }}>
                       Generate a recovery phrase on your device. Save it securely. 
                       Anyone with this phrase can access your wallet.
                     </p>
@@ -494,7 +494,7 @@ export default function Home() {
                       </button>
                     ) : (
                       <div>
-                        <label style={{ color: 'var(--slate-300)', fontSize: '0.875rem', fontWeight: 500 }}>
+                        <label style={{ color: 'var(--slate-300)', fontSize: '0.75rem', fontWeight: 500 }}>
                           Your Recovery Phrase
                         </label>
                         <div className="position-relative mt-2">
@@ -530,7 +530,7 @@ export default function Home() {
                               borderColor: confirmedBackup ? 'var(--emerald-500)' : 'var(--navy-600)'
                             }}
                           />
-                          <label className="form-check-label" htmlFor="confirmedBackup" style={{ color: 'var(--slate-300)', fontSize: '0.875rem' }}>
+                          <label className="form-check-label" htmlFor="confirmedBackup" style={{ color: 'var(--slate-300)', fontSize: '0.75rem' }}>
                             I have saved this phrase securely
                           </label>
                         </div>
@@ -578,7 +578,7 @@ export default function Home() {
                       <h6 className="m-0" style={{ color: 'white', fontWeight: 600 }}>Import Existing</h6>
                     </div>
                     
-                    <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', marginBottom: '1rem' }}>
+                    <p style={{ color: 'var(--slate-400)', fontSize: '0.75rem', marginBottom: '1rem' }}>
                       Paste your 12- or 24-word recovery phrase to restore your wallet.
                     </p>
                     
@@ -641,7 +641,7 @@ export default function Home() {
               style={{ 
                 color: 'white', 
                 fontWeight: 700, 
-                fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+                fontSize: 'clamp(1rem, 4vw, 1.25rem)',
                 margin: 0 
               }}
             >
@@ -764,7 +764,7 @@ export default function Home() {
                 >
                   <Lock size={24} color="#10B981" />
                 </div>
-                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '1.25rem' }}>
+                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '0.9375rem' }}>
                   Privacy First
                 </h3>
               </div>
@@ -794,7 +794,7 @@ export default function Home() {
                     }}>
                       <item.icon size={14} color={item.color} />
                     </div>
-                    <span style={{ color: 'var(--slate-300)', fontSize: '0.9375rem' }}>{item.text}</span>
+                    <span style={{ color: 'var(--slate-300)', fontSize: '0.8125rem' }}>{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -817,7 +817,7 @@ export default function Home() {
                 >
                   <Zap size={24} color="#06B6D4" />
                 </div>
-                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '1.25rem' }}>
+                <h3 style={{ color: 'white', fontWeight: 700, margin: 0, fontSize: '0.9375rem' }}>
                   Powered By
                 </h3>
               </div>
@@ -842,7 +842,7 @@ export default function Home() {
                 ))}
               </div>
               
-              <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', lineHeight: 1.7 }}>
+              <p style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', lineHeight: 1.7 }}>
                 Built for production with a modular AI engine ready for ML integration. 
                 Enterprise-grade architecture with Web3 native design.
               </p>
@@ -850,15 +850,15 @@ export default function Home() {
               {/* Stats Row */}
               <div className="d-flex gap-4 mt-4">
                 <div>
-                  <div style={{ color: 'var(--cyan-400)', fontSize: '1.5rem', fontWeight: 700 }}>99.9%</div>
+                  <div style={{ color: 'var(--cyan-400)', fontSize: '1.125rem', fontWeight: 700 }}>99.9%</div>
                   <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Uptime</div>
                 </div>
                 <div>
-                  <div style={{ color: 'var(--emerald-400)', fontSize: '1.5rem', fontWeight: 700 }}>&lt;1s</div>
+                  <div style={{ color: 'var(--emerald-400)', fontSize: '1.125rem', fontWeight: 700 }}>&lt;1s</div>
                   <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Response</div>
                 </div>
                 <div>
-                  <div style={{ color: 'var(--amber-400)', fontSize: '1.5rem', fontWeight: 700 }}>0</div>
+                  <div style={{ color: 'var(--amber-400)', fontSize: '1.125rem', fontWeight: 700 }}>0</div>
                   <div style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>Data Leaks</div>
                 </div>
               </div>

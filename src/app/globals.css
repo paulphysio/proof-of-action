@@ -151,12 +151,12 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 9px; /* MINIMAL base for mobile */
+  font-size: 9px !important; /* MINIMAL base for mobile - override Bootstrap */
 }
 
 @media (min-width: 769px) {
   html {
-    font-size: 11px; /* Minimal base for desktop */
+    font-size: 11px !important; /* Minimal base for desktop - override Bootstrap */
   }
 }
 
@@ -168,7 +168,7 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  font-size: var(--text-base);
+  font-size: var(--text-base) !important; /* Override Bootstrap */
 }
 
 /* Aurora Background Effect - Dynamic */

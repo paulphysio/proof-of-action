@@ -1,4 +1,4 @@
-const CACHE_NAME = 'proof-of-action-v1';
+const CACHE_NAME = 'proof-of-action-v2'; // Bumped to clear old cache
 const urlsToCache = [
   '/',
   '/dashboard',
@@ -17,6 +17,14 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Never cache CSS or JS files - always fetch fresh
+  if (url.pathname.endsWith('.css') || url.pathname.endsWith('.js')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
