@@ -335,7 +335,7 @@ export default function RequestPage() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.25rem',
+                  fontSize: '0.875rem',
                   letterSpacing: '-0.02em'
                 }}>
                   Proof-of-Action
@@ -345,7 +345,7 @@ export default function RequestPage() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.1rem',
+                  fontSize: '0.8125rem',
                   letterSpacing: '-0.02em'
                 }}>
                   PoA
@@ -358,11 +358,11 @@ export default function RequestPage() {
                 <Wallet size={14} />
                 <span>{accountId?.slice(0, 8)}...</span>
               </div>
-              <Link href="/dashboard" className="btn btn-outline-glass d-none d-sm-flex" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+              <Link href="/dashboard" className="btn btn-outline-glass d-none d-sm-flex" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}>
                 <ChevronLeft size={16} className="me-2" />
                 Dashboard
               </Link>
-              <Link href="/dashboard" className="btn btn-outline-glass d-sm-none" style={{ padding: '0.5rem', fontSize: '0.875rem' }}>
+              <Link href="/dashboard" className="btn btn-outline-glass d-sm-none" style={{ padding: '0.5rem', fontSize: '0.75rem' }}>
                 <ChevronLeft size={18} />
               </Link>
             </div>
@@ -396,8 +396,8 @@ export default function RequestPage() {
                     <AlertTriangle size={22} color="#F43F5E" />
                   </div>
                   <div>
-                    <h4 className="m-0" style={{ color: 'white', fontWeight: 700, fontSize: '1.125rem' }}>Emergency Request</h4>
-                    <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
+                    <h4 className="m-0" style={{ color: 'white', fontWeight: 700, fontSize: '0.9375rem' }}>Emergency Request</h4>
+                    <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
                       Get help from your community
                     </p>
                   </div>
@@ -439,7 +439,7 @@ export default function RequestPage() {
                       >
                         {selectedType ? <Check size={16} /> : '1'}
                       </div>
-                      <label style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
+                      <label style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
                         What do you need?
                       </label>
                     </div>
@@ -499,7 +499,7 @@ export default function RequestPage() {
                                     style={{ 
                                       color: 'white', 
                                       fontWeight: 600, 
-                                      fontSize: '0.875rem',
+                                      fontSize: '0.8125rem',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis'
@@ -510,7 +510,7 @@ export default function RequestPage() {
                                     <span className="d-none d-sm-inline">{type.label}</span>
                                   </span>
                                 </div>
-                                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.6875rem', lineHeight: 1.3 }}>
+                                <p className="m-0 mt-1" style={{ color: 'var(--slate-400)', fontSize: '0.625rem', lineHeight: 1.3 }}>
                                   {type.desc}
                                 </p>
                               </div>
@@ -541,10 +541,10 @@ export default function RequestPage() {
                       >
                         {description ? <Check size={16} /> : '2'}
                       </div>
-                      <label style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
+                      <label style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
                         Additional Details
                       </label>
-                      <span className="ms-auto" style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                      <span className="ms-auto" style={{ color: 'var(--slate-500)', fontSize: '0.6875rem' }}>
                         (Optional)
                       </span>
                     </div>
@@ -558,7 +558,7 @@ export default function RequestPage() {
                     />
                     <div className="d-flex align-items-center gap-2 mt-2">
                       <Lock size={12} color="var(--slate-500)" />
-                      <small style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                      <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem' }}>
                         Never share personal medical details. Keep it brief and safe.
                       </small>
                     </div>
@@ -584,7 +584,7 @@ export default function RequestPage() {
                       >
                         {(latitude && longitude) ? <Check size={16} /> : '3'}
                       </div>
-                      <label style={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
+                      <label style={{ color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>
                         Your Location
                       </label>
                     </div>
@@ -596,7 +596,7 @@ export default function RequestPage() {
                           <input
                             type="text"
                             className="input-medical"
-                            style={{ paddingLeft: '36px', fontSize: '0.875rem' }}
+                            style={{ paddingLeft: '36px', fontSize: '0.8125rem' }}
                             placeholder="Latitude"
                             value={latitude}
                             onChange={(e) => setLatitude(e.target.value)}
@@ -609,7 +609,7 @@ export default function RequestPage() {
                           <input
                             type="text"
                             className="input-medical"
-                            style={{ paddingLeft: '36px', fontSize: '0.875rem' }}
+                            style={{ paddingLeft: '36px', fontSize: '0.8125rem' }}
                             placeholder="Longitude"
                             value={longitude}
                             onChange={(e) => setLongitude(e.target.value)}
@@ -629,7 +629,7 @@ export default function RequestPage() {
                       </button>
                       <div className="d-flex align-items-center gap-2">
                         <Lock size={14} color="var(--slate-500)" />
-                        <small style={{ color: 'var(--slate-500)', fontSize: '0.75rem' }}>
+                        <small style={{ color: 'var(--slate-500)', fontSize: '0.6875rem' }}>
                           Location is hashed for privacy
                         </small>
                       </div>
@@ -657,10 +657,10 @@ export default function RequestPage() {
                         <Lock size={18} color="var(--cyan-400)" />
                       </div>
                       <div>
-                        <h6 style={{ color: 'white', fontWeight: 600, marginBottom: '0.25rem', fontSize: '0.9375rem' }}>
+                        <h6 style={{ color: 'white', fontWeight: 600, marginBottom: '0.25rem', fontSize: '0.875rem' }}>
                           Privacy Protected
                         </h6>
-                        <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+                        <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.6875rem', lineHeight: 1.6 }}>
                           Location is stored as geohash (approximate area), not exact coordinates. 
                           Your wallet is your only identifier.
                         </p>
@@ -731,7 +731,7 @@ export default function RequestPage() {
               <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.75rem' }}>
                 Location Required
               </h4>
-              <p style={{ color: 'var(--slate-400)', fontSize: '0.9375rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', lineHeight: 1.6 }}>
                 To post emergency requests, we need your location so nearby helpers can find you. Your exact location is never shared directly.
               </p>
             </div>

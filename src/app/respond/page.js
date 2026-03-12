@@ -569,7 +569,7 @@ export default function RespondPage() {
                         <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.25rem' }}>
                           {trackingStatus === 'active' ? 'Help in Progress' : 'Tracking Complete'}
                         </h4>
-                        <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
+                        <p className="m-0" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
                           You're helping with <strong style={{ color: 'var(--cyan-400)' }}>{success.request_type}</strong>
                         </p>
                       </div>
@@ -599,7 +599,7 @@ export default function RespondPage() {
                         <div className="p-3 p-md-4">
                           <div className="d-flex align-items-center gap-2 mb-4">
                             <Navigation2 size={18} color="#06B6D4" />
-                            <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem' }}>Movement Tracking</span>
+                            <span style={{ color: 'white', fontWeight: 600, fontSize: '0.8125rem' }}>Movement Tracking</span>
                           </div>
                           
                           {movementAnalysis ? (
@@ -607,11 +607,11 @@ export default function RespondPage() {
                               {/* Confidence Score */}
                               <div className="mb-4">
                                 <div className="d-flex justify-content-between align-items-center mb-2">
-                                  <span style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>Movement Confidence</span>
+                                  <span style={{ color: 'var(--slate-400)', fontSize: '0.6875rem' }}>Movement Confidence</span>
                                   <span style={{ 
                                     color: movementAnalysis.confidence > 0.7 ? '#10B981' : movementAnalysis.confidence > 0.5 ? '#F59E0B' : '#F43F5E',
                                     fontWeight: 700,
-                                    fontSize: '1rem'
+                                    fontSize: '0.6875rem'
                                   }}>
                                     {Math.round(movementAnalysis.confidence * 100)}%
                                   </span>
@@ -666,7 +666,7 @@ export default function RespondPage() {
                                     <span style={{ 
                                       color: movementAnalysis.movedCloser ? '#10B981' : '#F59E0B', 
                                       fontWeight: 600, 
-                                      fontSize: '0.75rem',
+                                      fontSize: '0.6875rem',
                                       textTransform: 'capitalize'
                                     }}>
                                       {movementAnalysis.movementPattern?.replace('_', ' ')}
@@ -817,7 +817,7 @@ export default function RespondPage() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.25rem',
+                  fontSize: '0.875rem',
                   letterSpacing: '-0.02em'
                 }}>
                   Proof-of-Action
@@ -827,7 +827,7 @@ export default function RespondPage() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.1rem',
+                  fontSize: '0.8125rem',
                   letterSpacing: '-0.02em'
                 }}>
                   PoA

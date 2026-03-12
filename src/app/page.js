@@ -152,7 +152,7 @@ export default function Home() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.25rem',
+                  fontSize: '1rem',
                   letterSpacing: '-0.02em'
                 }}>
                   Proof-of-Action
@@ -162,7 +162,7 @@ export default function Home() {
                 <span style={{ 
                   color: 'white', 
                   fontWeight: 700, 
-                  fontSize: '1.1rem',
+                  fontSize: '0.9375rem',
                   letterSpacing: '-0.02em'
                 }}>
                   PoA
@@ -180,14 +180,14 @@ export default function Home() {
                   <Link 
                     href="/dashboard" 
                     className="btn btn-gradient"
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}
                   >
                     Dashboard
                   </Link>
                   <button 
                     onClick={signOut} 
                     className="btn btn-outline-glass d-none d-sm-flex"
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}
                   >
                     Sign Out
                   </button>
@@ -196,7 +196,7 @@ export default function Home() {
                 <button 
                   onClick={() => setShowOnboarding((v) => !v)} 
                   className="btn btn-gradient"
-                  style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', width: 'auto' }}
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', width: 'auto' }}
                 >
                   <Wallet size={16} className="me-2" />
                   <span className="d-none d-sm-inline">Connect</span>
@@ -226,7 +226,7 @@ export default function Home() {
                 </div>
                 
                 <h1 style={{ 
-                  fontSize: 'clamp(2rem, 7vw, 3.5rem)', 
+                  fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
                   fontWeight: 800, 
                   lineHeight: 1.1,
                   color: 'white',
@@ -241,9 +241,9 @@ export default function Home() {
                 </h1>
                 
                 <p style={{ 
-                  fontSize: 'clamp(0.9375rem, 2.5vw, 1.125rem)', 
+                  fontSize: 'clamp(0.8125rem, 2vw, 0.9375rem)', 
                   color: 'var(--slate-400)', 
-                  lineHeight: 1.7,
+                  lineHeight: 1.6,
                   maxWidth: '540px',
                   marginBottom: '1.5rem'
                 }}>
@@ -277,11 +277,11 @@ export default function Home() {
 
                 {/* Mobile Quick Stats */}
                 <div className="d-flex gap-3 mt-4 d-lg-none">
-                  <div className="d-flex align-items-center gap-2" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+                  <div className="d-flex align-items-center gap-2" style={{ color: 'var(--slate-400)', fontSize: '0.625rem' }}>
                     <Activity size={14} color="var(--emerald-400)" />
                     <span>Verified Actions</span>
                   </div>
-                  <div className="d-flex align-items-center gap-2" style={{ color: 'var(--slate-400)', fontSize: '0.75rem' }}>
+                  <div className="d-flex align-items-center gap-2" style={{ color: 'var(--slate-400)', fontSize: '0.625rem' }}>
                     <TrendingUp size={14} color="var(--cyan-400)" />
                     <span>On-Chain Rewards</span>
                   </div>
@@ -395,7 +395,7 @@ export default function Home() {
                     <div className="progress-bar-fill" style={{ width: '75%' }} />
                   </div>
                   
-                  <p style={{ color: 'var(--slate-400)', fontSize: '0.875rem', margin: 0 }}>
+                  <p style={{ color: 'var(--slate-400)', fontSize: '0.75rem', margin: 0 }}>
                     Emergency Response Reward
                   </p>
                   <div className="d-flex align-items-center justify-content-center gap-1 mt-2">

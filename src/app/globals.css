@@ -115,28 +115,28 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   
-  /* Mobile text sizes - smaller base */
-  --text-xs: 0.625rem;    /* 10px */
-  --text-sm: 0.75rem;     /* 12px */
-  --text-base: 0.8125rem; /* 13px */
-  --text-md: 0.875rem;    /* 14px */
-  --text-lg: 0.9375rem;   /* 15px */
-  --text-xl: 1rem;        /* 16px */
-  --text-2xl: 1.125rem;   /* 18px */
-  --text-3xl: 1.25rem;    /* 20px */
-  --text-4xl: 1.5rem;     /* 24px */
+  /* Mobile text sizes - MINIMAL for mobile */
+  --text-xs: 0.375rem;    /* 6px */
+  --text-sm: 0.5rem;      /* 8px */
+  --text-base: 0.5625rem;  /* 9px */
+  --text-md: 0.625rem;    /* 10px */
+  --text-lg: 0.6875rem;   /* 11px */
+  --text-xl: 0.75rem;     /* 12px */
+  --text-2xl: 0.8125rem;  /* 13px */
+  --text-3xl: 0.875rem;   /* 14px */
+  --text-4xl: 0.9375rem;  /* 15px */
   
   /* Tablet sizes */
-  --text-lg-md: 1.125rem;
-  --text-xl-md: 1.25rem;
-  --text-2xl-md: 1.5rem;
-  --text-3xl-md: 1.875rem;
+  --text-lg-md: 0.875rem;
+  --text-xl-md: 1rem;
+  --text-2xl-md: 1.125rem;
+  --text-3xl-md: 1.25rem;
   
   /* Desktop sizes */
-  --text-lg-lg: 1.25rem;
-  --text-xl-lg: 1.5rem;
-  --text-2xl-lg: 1.875rem;
-  --text-3xl-lg: 2.25rem;
+  --text-lg-lg: 0.9375rem;
+  --text-xl-lg: 1.125rem;
+  --text-2xl-lg: 1.25rem;
+  --text-3xl-lg: 1.5rem;
 }
 
 /* Base Reset - Mobile First */
@@ -151,12 +151,12 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 14px; /* Smaller base for mobile */
+  font-size: 9px; /* MINIMAL base for mobile */
 }
 
 @media (min-width: 769px) {
   html {
-    font-size: 16px; /* Larger base for desktop */
+    font-size: 11px; /* Minimal base for desktop */
   }
 }
 
@@ -232,7 +232,7 @@ body {
   border: none;
   color: white;
   font-weight: 600;
-  padding: 0.875rem 1.5rem;
+  padding: 0.625rem 1rem;
   border-radius: var(--radius-lg);
   cursor: pointer;
   overflow: hidden;
@@ -242,7 +242,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
   width: 100%;
 }
 
@@ -277,7 +277,7 @@ body {
   border: none;
   color: var(--navy-950);
   font-weight: 700;
-  padding: 0.875rem 1.5rem;
+  padding: 0.625rem 1rem;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -286,7 +286,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
   width: 100%;
 }
 
@@ -304,7 +304,7 @@ body {
   background: transparent;
   border: 1px solid var(--glass-border);
   color: var(--slate-200);
-  padding: 0.875rem 1.5rem;
+  padding: 0.625rem 1rem;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -312,7 +312,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
   width: 100%;
 }
 
@@ -332,7 +332,7 @@ body {
   border: none;
   color: white;
   font-weight: 600;
-  padding: 0.875rem 1.5rem;
+  padding: 0.625rem 1rem;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -341,7 +341,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
+  font-size: 0.75rem;
   width: 100%;
 }
 
@@ -355,9 +355,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.625rem;
   border-radius: var(--radius-full);
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   font-weight: 600;
 }
 
@@ -394,12 +394,12 @@ body {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid var(--navy-700);
   color: var(--slate-100);
-  padding: 1rem 1.25rem;
+  padding: 0.625rem 0.875rem;
   border-radius: var(--radius-lg);
   width: 100%;
   transition: all var(--transition-base);
-  font-size: 1rem;
-  min-height: 48px;
+  font-size: 0.8125rem;
+  min-height: 36px;
   -webkit-appearance: none;
   appearance: none;
 }
@@ -460,7 +460,7 @@ body {
 }
 
 .metric-value {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 700;
   background: var(--gradient-accent);
   -webkit-background-clip: text;
@@ -1069,7 +1069,7 @@ body {
   }
   
   .metric-value {
-    font-size: 2rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -1081,7 +1081,7 @@ body {
   }
   
   .metric-value {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
   }
   
   .glass-card:hover {
@@ -1144,7 +1144,7 @@ body {
   }
   
   .metric-value {
-    font-size: 1.5rem;
+    font-size: 1.125rem;
   }
   
   .glass-card {
