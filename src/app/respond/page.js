@@ -10,6 +10,7 @@ import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movem
 import { storeResponseCommitmentOnFilecoin, addFilecoinStorageRef, storeTrackingDataOnFilecoin } from '@/lib/filecoin';
 import { getWorldIDVerification } from '@/lib/worldid';
 import RequesterStaticMap from '@/components/maps/RequesterStaticMap';
+import FilecoinButton from '@/components/FilecoinButton';
 
 // Calculate distance between two coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -99,6 +100,7 @@ export default function RespondPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(null);
+  const [completingHelp, setCompletingHelp] = useState(false);
   const [tracking, setTracking] = useState(null);
   const [tracker, setTracker] = useState(null);
   const [trackingStatus, setTrackingStatus] = useState('idle'); // idle, active, completed
@@ -284,7 +286,7 @@ export default function RespondPage() {
       if (response) {
         // Store commitment to help on Filecoin (fire-and-forget)
         try {
-          console.log('📤 Storing response commitment on Filecoin...');
+          console.log('[UPLOAD]', 'Storing response commitment on Filecoin...');
           const commitmentData = {
             requestId: request.id,
             responderWallet: accountId,
@@ -309,7 +311,7 @@ export default function RespondPage() {
           // Store on Filecoin (non-blocking)
           storeResponseCommitmentOnFilecoin(commitmentData)
             .then(result => {
-              console.log('✅ Response commitment stored on Filecoin:', result.pieceCid);
+              console.log('[OK]', 'Response commitment stored on Filecoin:', result.pieceCid);
               // Store reference in local storage for UI
               addFilecoinStorageRef({
                 pieceCid: result.pieceCid,
@@ -320,10 +322,10 @@ export default function RespondPage() {
               });
             })
             .catch(error => {
-              console.error('❌ Failed to store response commitment:', error.message);
+              console.error('[X]', 'Failed to store response commitment:', error.message);
             });
         } catch (error) {
-          console.error('❌ Error storing response commitment:', error);
+          console.error('[X]', 'Error storing response commitment:', error);
         }
         
         setSuccess(request);
@@ -378,7 +380,9 @@ export default function RespondPage() {
    * Complete the help action and stop tracking
    */
   const completeHelp = async () => {
-    if (!tracker || !tracking) return;
+    if (!tracker || !tracking || completingHelp) return;
+    
+    setCompletingHelp(true);
     
     try {
       // Stop tracking
@@ -419,13 +423,13 @@ export default function RespondPage() {
         
         storeTrackingDataOnFilecoin(trackingFilecoinData)
           .then(result => {
-            console.log('✅ Tracking data stored on Filecoin:', result.pieceCid);
+            console.log('[OK]', 'Tracking data stored on Filecoin:', result.pieceCid);
           })
           .catch(error => {
-            console.error('❌ Failed to store tracking data on Filecoin:', error.message);
+            console.error('[X]', 'Failed to store tracking data on Filecoin:', error.message);
           });
       } catch (error) {
-        console.error('❌ Error storing tracking data on Filecoin:', error);
+        console.error('[X]', 'Error storing tracking data on Filecoin:', error);
       }
       
       // Get neighbors to notify
@@ -464,6 +468,11 @@ export default function RespondPage() {
       
     } catch (error) {
       console.error('Error completing help:', error);
+    } finally {
+      // Keep the button in "success" state briefly before resetting
+      setTimeout(() => {
+        setCompletingHelp(false);
+      }, 2000);
     }
   };
 
@@ -697,14 +706,19 @@ export default function RespondPage() {
                   </div>
 
                   {/* Complete Button */}
-                  <button 
+                  <FilecoinButton 
                     onClick={completeHelp}
-                    className="btn btn-gradient w-100 mt-4 d-flex align-items-center justify-content-center gap-2"
-                    style={{ padding: '1rem' }}
+                    isLoading={completingHelp}
+                    loadingText="Saving proof to Filecoin..."
+                    successText="Proof Saved!"
+                    variant="gradient"
+                    size="lg"
+                    className="mt-4"
+                    disabled={completingHelp}
                   >
                     <Check size={20} />
                     <span>Mark Help as Complete</span>
-                  </button>
+                  </FilecoinButton>
                 </div>
               </div>
             </div>
@@ -970,23 +984,18 @@ export default function RespondPage() {
                     </div>
                   </div>
                   <div className="p-3 p-md-4 pt-0">
-                    <button
+                    <FilecoinButton
                       onClick={() => handleRespondClick(request)}
+                      isLoading={responding === request.id}
+                      loadingText="Committing to Filecoin..."
+                      successText="Committed!"
+                      variant="gradient"
+                      size="md"
                       disabled={responding === request.id}
-                      className="btn btn-gradient w-100 d-flex align-items-center justify-content-center gap-2"
                     >
-                      {responding === request.id ? (
-                        <>
-                          <Loader2 size={16} className="animate-spin" />
-                          <span>Responding...</span>
-                        </>
-                      ) : (
-                        <>
-                          <HandHelping size={16} />
-                          <span>I Can Help</span>
-                        </>
-                      )}
-                    </button>
+                      <HandHelping size={18} />
+                      <span>I Can Help</span>
+                    </FilecoinButton>
                   </div>
                 </div>
               </div>

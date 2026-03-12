@@ -29,7 +29,7 @@ export async function POST(req) {
     const jsonString = JSON.stringify(data);
     const bytes = new TextEncoder().encode(jsonString);
 
-    console.log(`📤 Fast store starting (${bytes.length} bytes)...`);
+    console.log('[UPLOAD] Fast store starting (${bytes.length} bytes)...');
 
     // 1. Prepare payment (still needed once)
     const prep = await sdk.storage.prepare({ dataSize: BigInt(bytes.length) });
@@ -46,19 +46,19 @@ export async function POST(req) {
     // 3. FAST STORE PHASE ONLY (this is quick!)
     const { pieceCid, size } = await context.store(bytes, {
       onProgress: (uploaded) => {
-        console.log(`📈 Progress: ${Math.round((uploaded / bytes.length) * 100)}%`);
+        console.log('[PROGRESS] Progress: ${Math.round((uploaded / bytes.length) * 100)}%');
       },
     });
 
     const pieceCidStr = pieceCid.toString();
 
-    console.log(`✅ Primary store complete! PieceCID: ${pieceCidStr}`);
-    console.log(`💡 User can now download immediately. Full replication runs in background.`);
+    console.log('[OK] Primary store complete! PieceCID: ${pieceCidStr}');
+    console.log('[IDEA] User can now download immediately. Full replication runs in background.');
 
     // 4. Fire-and-forget the rest (pull + commit) — or queue it with BullMQ later
     (async () => {
       try {
-        console.log('🔄 Background: Starting replication + commit...');
+        console.warn('[!] Background: Starting replication + commit...');
         // Add secondary copies + on-chain commit here if needed
         // For most cases the primary store is enough for immediate use
       } catch (bgErr) {
@@ -74,7 +74,7 @@ export async function POST(req) {
       message: 'Data stored! (Full durability in progress)',
     });
   } catch (err) {
-    console.error('❌ Store error:', err);
+    console.error('[X] Store error:', err);
     return NextResponse.json(
       { success: false, error: err.message || 'Unknown error occurred' }, 
       { status: 500 }

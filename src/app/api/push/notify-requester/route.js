@@ -23,7 +23,7 @@ export async function POST(req) {
     }
 
     const payload = {
-      title: '🤝 Someone Offered to Help',
+      title: '[HANDSHAKE] Someone Offered to Help',
       body: 'A nearby helper responded to your request. Open the app to view details.',
       tag: `response-${requestId}`,
       actions: [{ action: 'view', title: 'View' }],

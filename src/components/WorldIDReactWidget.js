@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
+import { Shield, Check, X, Loader2, Fingerprint, Smartphone, Globe, Zap, RefreshCw } from 'lucide-react';
 import { 
   IDKitRequestWidget,
   orbLegacy,
@@ -158,7 +158,7 @@ export default function WorldIDReactWidget({ onVerified }) {
           const filecoinResult = await filecoinResponse.json();
           
           if (filecoinResult.success) {
-            console.log('✅ World ID verification stored on Filecoin:', filecoinResult.pieceCid);
+            console.log('[OK] World ID verification stored on Filecoin:', filecoinResult.pieceCid);
             
             // Store local reference
             if (typeof window !== 'undefined') {
@@ -173,10 +173,10 @@ export default function WorldIDReactWidget({ onVerified }) {
               localStorage.setItem('filecoin_storage', JSON.stringify(existing));
             }
           } else {
-            console.warn('⚠️ Failed to store on Filecoin:', filecoinResult.error);
+            console.warn('[WARNING] Failed to store on Filecoin:', filecoinResult.error);
           }
         } catch (filecoinError) {
-          console.warn('⚠️ Filecoin storage error:', filecoinError.message);
+          console.warn('[WARNING] Filecoin storage error:', filecoinError.message);
           // Continue with local storage even if Filecoin fails
         }
         
@@ -324,16 +324,32 @@ export default function WorldIDReactWidget({ onVerified }) {
               <div className="mt-3">
                 <h6 className="m-0 mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>Desktop QR Benefits:</h6>
                 <ul className="m-0 ps-3" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
-                  <li>�️ Scan QR code with World App</li>
-                  <li>� Cross-device verification</li>
-                  <li>⚡ Official World ID widget</li>
-                  <li>🔄 Seamless desktop experience</li>
+                  <li><Smartphone size={14} className="me-1" /> Scan QR code with World App</li>
+                  <li><Globe size={14} className="me-1" /> Cross-device verification</li>
+                  <li><Zap size={14} className="me-1" /> Official World ID widget</li>
+                  <li><RefreshCw size={14} className="me-1" /> Seamless desktop experience</li>
                 </ul>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
+          <X size={16} className="flex-shrink-0" />
+          <div className="flex-grow-1">
+            <p className="m-0 fw-semibold">Verification Failed</p>
+            <p className="m-0 small">{error}</p>
+          </div>
+          <button 
+            type="button" 
+            className="btn-close btn-close-white"
+            onClick={clearError}
+          />
+        </div>
+      )}
 
       {/* World ID React Widget */}
       {rpContext && (

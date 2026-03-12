@@ -142,7 +142,7 @@ export function sendLocalNotification(title, options = {}) {
   if ('serviceWorker' in navigator && 'showNotification' in ServiceWorkerRegistration.prototype) {
     navigator.serviceWorker.ready
       .then((registration) => {
-        console.log('🔔 Showing notification via service worker');
+        console.log('[BELL] Showing notification via service worker');
         return registration.showNotification(title, mergedOptions);
       })
       .catch((error) => {
@@ -157,7 +157,7 @@ export function sendLocalNotification(title, options = {}) {
 // Fallback notification for when service worker fails
 function showFallbackNotification(title, options) {
   try {
-    console.log('🔔 Showing fallback notification');
+    console.log('[BELL] Showing fallback notification');
     const { actions, ...fallbackOptions } = options;
     const notification = new Notification(title, fallbackOptions);
     
@@ -174,7 +174,7 @@ function showFallbackNotification(title, options) {
 // Show nearby emergency notification
 export function notifyNearbyEmergency(request) {
   return sendLocalNotification(
-    '🚨 Emergency Nearby!',
+    '[EMERGENCY] Emergency Nearby!',
     {
       body: `Someone needs ${request.request_type} nearby. Can you help?`,
       tag: `emergency-${request.id}`,
@@ -190,7 +190,7 @@ export function notifyNearbyEmergency(request) {
 // Show tracking started notification
 export function notifyTrackingStarted(request) {
   return sendLocalNotification(
-    '📍 Help Session Started',
+    '[MAP] Help Session Started',
     {
       body: `You're now helping with "${request.request_type}". Movement tracking is active.`,
       tag: `tracking-${request.id}`,
@@ -204,7 +204,7 @@ export function notifyTrackingStarted(request) {
 // Show action confirmation notification (called AFTER verification)
 export function notifyActionConfirmed(response) {
   return sendLocalNotification(
-    '✅ Action Verified!',
+    '[OK] Action Verified!',
     {
       body: 'Your helpful action has been verified. You earned 10 Proof Points!',
       tag: `confirmation-${response.id}`,
@@ -218,7 +218,7 @@ export function notifyActionConfirmed(response) {
 // Show reward notification
 export function notifyRewardReceived(reward) {
   return sendLocalNotification(
-    '🎉 Reward Received!',
+    '[PARTY] Reward Received!',
     {
       body: `You received ${reward.amount} tokens for: ${reward.reason}`,
       tag: `reward-${reward.id}`,

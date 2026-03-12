@@ -30,7 +30,7 @@ export async function POST(req) {
     }
 
     const payload = {
-      title: '🚨 Emergency Nearby!',
+      title: '[EMERGENCY] Emergency Nearby!',
       body: `Someone needs ${request.request_type || 'help'} nearby. Can you help?`,
       tag: `emergency-${request.id}`,
       actions: [

@@ -111,9 +111,32 @@
   --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --transition-smooth: 800ms cubic-bezier(0.4, 0, 0.2, 1);
   
-  /* === TYPOGRAPHY === */
+  /* === TYPOGRAPHY - MOBILE FIRST === */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Mobile text sizes - smaller base */
+  --text-xs: 0.625rem;    /* 10px */
+  --text-sm: 0.75rem;     /* 12px */
+  --text-base: 0.8125rem; /* 13px */
+  --text-md: 0.875rem;    /* 14px */
+  --text-lg: 0.9375rem;   /* 15px */
+  --text-xl: 1rem;        /* 16px */
+  --text-2xl: 1.125rem;   /* 18px */
+  --text-3xl: 1.25rem;    /* 20px */
+  --text-4xl: 1.5rem;     /* 24px */
+  
+  /* Tablet sizes */
+  --text-lg-md: 1.125rem;
+  --text-xl-md: 1.25rem;
+  --text-2xl-md: 1.5rem;
+  --text-3xl-md: 1.875rem;
+  
+  /* Desktop sizes */
+  --text-lg-lg: 1.25rem;
+  --text-xl-lg: 1.5rem;
+  --text-2xl-lg: 1.875rem;
+  --text-3xl-lg: 2.25rem;
 }
 
 /* Base Reset - Mobile First */
@@ -128,7 +151,13 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 16px;
+  font-size: 14px; /* Smaller base for mobile */
+}
+
+@media (min-width: 769px) {
+  html {
+    font-size: 16px; /* Larger base for desktop */
+  }
 }
 
 body {
@@ -136,9 +165,10 @@ body {
   background: var(--navy-950);
   color: var(--slate-100);
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.5;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  font-size: var(--text-base);
 }
 
 /* Aurora Background Effect - Dynamic */
@@ -699,6 +729,225 @@ body {
 .animate-scale-in {
   animation: scaleIn 0.3s ease-out;
 }
+
+/* ============================================
+   ENHANCED MOBILE ANIMATIONS
+   ============================================ */
+
+/* Stagger Fade In - for lists */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-stagger > * {
+  animation: stagger-fade-in 0.5s var(--transition-spring) backwards;
+}
+
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 400ms; }
+
+/* Ripple Effect for buttons */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.btn-ripple:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Heartbeat Animation */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* Loading Dots */
+@keyframes loading-dots {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.loading-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  margin: 0 2px;
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+/* Success Check Animation */
+@keyframes check-draw {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animate-check path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: check-draw 0.6s var(--transition-spring) forwards;
+}
+
+/* Glow Pulse */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+    opacity: 0.8;
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Slide Up Fade */
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up-fade 0.5s var(--transition-spring) forwards;
+}
+
+/* Shake Animation for errors */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Spin with ease */
+@keyframes spin-ease {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-ease {
+  animation: spin-ease 1s var(--transition-smooth) infinite;
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon Button Animation */
+.icon-btn {
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Card Entry Animation */
+@keyframes card-entry {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotateX(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+.animate-card-entry {
+  animation: card-entry 0.6s var(--transition-spring) forwards;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Typing Indicator */
+@keyframes typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin: 0 1px;
+  animation: typing 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
 /* Emergency Badge */
 .emergency-badge {

@@ -15,10 +15,15 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
         <meta name="theme-color" content="#0F172A" />
+        <meta name="background-color" content="#0F172A" />
         <meta name="description" content="Proof-of-Action: A privacy-first Web3 emergency network where real-world helpful actions are verified by AI and rewarded with blockchain tokens" />
         <meta name="color-scheme" content="dark" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/ICON.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

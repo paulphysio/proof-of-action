@@ -31,7 +31,7 @@ export async function GET(req) {
       throw new Error('Invalid PieceCID format received');
     }
 
-    console.log('🔄 Downloading PieceCID:', pieceCid);
+    console.log('[REFRESH] Downloading PieceCID:', pieceCid);
 
     const sdk = await initSynapse();
     const bytes = await sdk.storage.download({ pieceCid });
@@ -40,7 +40,7 @@ export async function GET(req) {
 
     return NextResponse.json({ success: true, data: parsed });
   } catch (err) {
-    console.error('❌ Retrieve error:', err);
+    console.error('[X] Retrieve error:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

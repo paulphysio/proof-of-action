@@ -26,7 +26,11 @@ import {
   Award,
   TrendingUp,
   Home,
-  Activity
+  Activity,
+  Shield,
+  Zap,
+  Globe,
+  Lock
 } from 'lucide-react';
 import WorldIDAdaptive from '@/components/WorldIDAdaptive';
 import IdentityPortability from '@/components/IdentityPortability';
@@ -172,10 +176,10 @@ export default function Dashboard() {
                 <div className="mt-4">
                   <h6 style={{ color: 'var(--slate-300)', fontSize: '0.875rem', marginBottom: '1rem', fontWeight: 600 }}>Why Verification Matters:</h6>
                   <div className="text-start" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem', lineHeight: '1.6' }}>
-                    <div className="mb-2">🛡️ <strong>Human-Only Network:</strong> Ensures only real humans can request and provide emergency help</div>
-                    <div className="mb-2">⚡ <strong>Trust System:</strong> Builds reputation based on verified actions and contributions</div>
-                    <div className="mb-2">🌍 <strong>Global Impact:</strong> Your verified humanity helps save lives worldwide</div>
-                    <div className="mb-2">🔒 <strong>Privacy First:</strong> World ID proves you're human without revealing personal data</div>
+                    <div className="mb-2"><Shield size={14} className="me-1" /> <strong>Human-Only Network:</strong> Ensures only real humans can request and provide emergency help</div>
+                    <div className="mb-2"><Zap size={14} className="me-1" /> <strong>Trust System:</strong> Builds reputation based on verified actions and contributions</div>
+                    <div className="mb-2"><Globe size={14} className="me-1" /> <strong>Global Impact:</strong> Your verified humanity helps save lives worldwide</div>
+                    <div className="mb-2"><Lock size={14} className="me-1" /> <strong>Privacy First:</strong> World ID proves you're human without revealing personal data</div>
                   </div>
                 </div>
               </div>

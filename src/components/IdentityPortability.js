@@ -408,14 +408,14 @@ export default function IdentityPortability() {
                 }}
               />
               <p className="mt-2 mb-2" style={{ color: '#10B981', fontSize: '0.75rem', fontWeight: 500 }}>
-                ✅ QR Code Generated Successfully
+                <Check size={14} className="me-1" /> QR Code Generated Successfully
               </p>
               <button 
                 onClick={handleRegenerateQR}
                 className="btn btn-outline-glass btn-sm"
                 style={{ fontSize: '0.75rem' }}
               >
-                🔄 Regenerate QR Code
+                <RefreshCw size={14} className="me-1" /> Regenerate QR Code
               </button>
             </div>
           ) : (

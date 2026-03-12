@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
+import { Shield, Check, X, Loader2, Fingerprint, Smartphone, Rocket, Zap, RefreshCw } from 'lucide-react';
 import { IDKit, deviceLegacy } from '@worldcoin/idkit-core';
 import { 
   getWorldIDVerification, 
@@ -284,10 +284,10 @@ export default function WorldIDMobile({ onVerified }) {
             <div className="mt-3">
               <h6 className="m-0 mb-2" style={{ color: 'white', fontSize: '0.875rem', fontWeight: 600 }}>Mobile Benefits:</h6>
               <ul className="m-0 ps-3" style={{ color: 'var(--slate-400)', fontSize: '0.8125rem' }}>
-                <li>📱 Direct redirect to World ID</li>
-                <li>🚀 Single device verification</li>
-                <li>⚡ No QR code scanning needed</li>
-                <li>🔄 Seamless mobile experience</li>
+                <li><Smartphone size={14} className="me-1" /> Direct redirect to World ID</li>
+                <li><Rocket size={14} className="me-1" /> Single device verification</li>
+                <li><Zap size={14} className="me-1" /> No QR code scanning needed</li>
+                <li><RefreshCw size={14} className="me-1" /> Seamless mobile experience</li>
               </ul>
             </div>
           )}

@@ -17,7 +17,7 @@ export function getFilecoinStorage() {
 
 export function saveFilecoinStorageRecord(record) {
   if (typeof window === 'undefined') {
-    console.log('📝 Running on server-side - cannot update localStorage');
+    console.log('[WRITE] Running on server-side - cannot update localStorage');
     return false;
   }
   
@@ -25,13 +25,13 @@ export function saveFilecoinStorageRecord(record) {
     const existingRecords = getFilecoinStorage();
     existingRecords.push(record);
     localStorage.setItem('filecoinStorage', JSON.stringify(existingRecords));
-    console.log('💾 Filecoin storage record saved to localStorage');
+    console.log('[SAVE] Filecoin storage record saved to localStorage');
     
     // Trigger UI update event
     window.dispatchEvent(new CustomEvent('filecoin-storage-updated', {
       detail: { record, totalRecords: existingRecords.length }
     }));
-    console.log('🔄 Dispatched filecoin-storage-updated event');
+    console.log('[REFRESH] Dispatched filecoin-storage-updated event');
     
     return true;
   } catch (error) {

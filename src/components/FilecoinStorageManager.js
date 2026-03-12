@@ -135,18 +135,18 @@ export default function FilecoinStorageManager({ walletAddress }) {
   // Store World ID verification data
   const storeWorldIDData = async () => {
     if (!password) {
-      addLog('❌ Please enter your encryption password');
+      addLog('[X] Please enter your encryption password');
       return;
     }
 
     const verification = getWorldIDVerification();
     if (!verification) {
-      addLog('❌ No World ID verification found. Please verify first.');
+      addLog('[X] No World ID verification found. Please verify first.');
       return;
     }
 
     setIsLoading(true);
-    addLog('🔐 Encrypting World ID data...');
+    addLog('[LOCK] Encrypting World ID data...');
 
     try {
       const dataToStore = {
@@ -158,7 +158,7 @@ export default function FilecoinStorageManager({ walletAddress }) {
 
       const encrypted = await encryptData(dataToStore, walletAddress, password);
       
-      addLog('📤 Uploading to Filecoin...');
+      addLog('[UPLOAD] Uploading to Filecoin...');
       const response = await fetch('/api/filecoin/store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,12 +179,12 @@ export default function FilecoinStorageManager({ walletAddress }) {
         const updated = [newItem, ...storedItems];
         localStorage.setItem('filecoin_storage', JSON.stringify(updated));
         setStoredItems(updated);
-        addLog(`✅ World ID data stored! CID: ${result.pieceCid.slice(0, 20)}...`);
+        addLog(`[OK] World ID data stored! CID: ${result.pieceCid.slice(0, 20)}...`);
       } else {
-        addLog(`❌ Storage failed: ${result.error}`);
+        addLog(`[X] Storage failed: ${result.error}`);
       }
     } catch (error) {
-      addLog(`💥 Error: ${error.message}`);
+      addLog(`[EXPLOSION] Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -193,12 +193,12 @@ export default function FilecoinStorageManager({ walletAddress }) {
   // Store custom data
   const storeCustomData = async (dataType, content) => {
     if (!password) {
-      addLog('❌ Please enter your encryption password');
+      addLog('[X] Please enter your encryption password');
       return;
     }
 
     setIsLoading(true);
-    addLog(`🔐 Encrypting ${dataType} data...`);
+    addLog(`[LOCK] Encrypting ${dataType} data...`);
 
     try {
       const dataToStore = {
@@ -210,7 +210,7 @@ export default function FilecoinStorageManager({ walletAddress }) {
 
       const encrypted = await encryptData(dataToStore, walletAddress, password);
       
-      addLog('📤 Uploading to Filecoin...');
+      addLog('[UPLOAD] Uploading to Filecoin...');
       const response = await fetch('/api/filecoin/store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -231,12 +231,12 @@ export default function FilecoinStorageManager({ walletAddress }) {
         const updated = [newItem, ...storedItems];
         localStorage.setItem('filecoin_storage', JSON.stringify(updated));
         setStoredItems(updated);
-        addLog(`✅ ${dataType} stored! CID: ${result.pieceCid.slice(0, 20)}...`);
+        addLog(`[OK] ${dataType} stored! CID: ${result.pieceCid.slice(0, 20)}...`);
       } else {
-        addLog(`❌ Storage failed: ${result.error}`);
+        addLog(`[X] Storage failed: ${result.error}`);
       }
     } catch (error) {
-      addLog(`💥 Error: ${error.message}`);
+      addLog(`[EXPLOSION] Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -245,28 +245,28 @@ export default function FilecoinStorageManager({ walletAddress }) {
   // Retrieve and decrypt data
   const retrieveData = async (item) => {
     if (!password) {
-      addLog('❌ Please enter your encryption password');
+      addLog('[X] Please enter your encryption password');
       return;
     }
 
     setIsLoading(true);
     setSelectedItem(item);
-    addLog('🔄 Retrieving from Filecoin...');
+    addLog('[REFRESH] Retrieving from Filecoin...');
 
     try {
       const response = await fetch(`/api/filecoin/retrieve?pieceCid=${item.pieceCid}`);
       const result = await response.json();
 
       if (result.success) {
-        addLog('🔓 Decrypting data...');
+        addLog('[UNLOCK] Decrypting data...');
         const decrypted = await decryptData(result.data, walletAddress, password);
         setDecryptedContent(decrypted);
-        addLog('✅ Data decrypted successfully');
+        addLog('[OK] Data decrypted successfully');
       } else {
-        addLog(`❌ Retrieval failed: ${result.error}`);
+        addLog(`[X] Retrieval failed: ${result.error}`);
       }
     } catch (error) {
-      addLog(`💥 Error: ${error.message}`);
+      addLog(`[EXPLOSION] Error: ${error.message}`);
       setDecryptedContent(null);
     } finally {
       setIsLoading(false);
@@ -282,7 +282,7 @@ export default function FilecoinStorageManager({ walletAddress }) {
       setSelectedItem(null);
       setDecryptedContent(null);
     }
-    addLog('🗑️ Removed from local list (data remains on Filecoin)');
+    addLog('[TRASH] Removed from local list (data remains on Filecoin)');
   };
 
   const copyToClipboard = (cid) => {

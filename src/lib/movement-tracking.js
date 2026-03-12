@@ -330,8 +330,8 @@ export async function storeTrackingData(supabase, trackingData) {
   
   // Also store on Filecoin for verifiable reputation (Agent Reputation & Portable Identity)
   try {
-    console.log('📤 Attempting to store movement tracking on Filecoin...');
-    console.log('📊 Tracking data:', {
+    console.log('[UPLOAD]', 'Attempting to store movement tracking on Filecoin...');
+    console.log('[DATA]', 'Tracking data:', {
       responseId: trackingData.responseId,
       locationsCount: trackingData.locations?.length,
       confidence: trackingData.analysis?.confidence
@@ -349,13 +349,13 @@ export async function storeTrackingData(supabase, trackingData) {
       endTime: trackingData.endTime
     });
     
-    console.log('✅ Filecoin storage result:', filecoinResult);
+    console.log('[OK]', 'Filecoin storage result:', filecoinResult);
     
     if (filecoinResult.success) {
-      console.log('✅ Movement tracking stored on Filecoin:', filecoinResult.pieceCid);
+      console.log('[OK]', 'Movement tracking stored on Filecoin:', filecoinResult.pieceCid);
       
       // Store responder reputation on Filecoin
-      console.log('📤 Storing reputation on Filecoin...');
+      console.log('[UPLOAD]', 'Storing reputation on Filecoin...');
       const reputationResult = await storeReputationOnFilecoin({
         type: 'movement_verification',
         responseId: trackingData.responseId,
@@ -364,12 +364,12 @@ export async function storeTrackingData(supabase, trackingData) {
         timestamp: new Date().toISOString()
       });
       
-      console.log('✅ Reputation storage result:', reputationResult);
+      console.log('[OK]', 'Reputation storage result:', reputationResult);
     } else {
-      console.warn('⚠️ Filecoin storage returned failure:', filecoinResult.error);
+      console.warn('[WARNING]', 'Filecoin storage returned failure:', filecoinResult.error);
     }
   } catch (filecoinError) {
-    console.warn('❌ Filecoin storage failed (non-critical):', filecoinError);
+    console.error('[X]', 'Filecoin storage failed (non-critical):', filecoinError);
     console.warn('Error details:', {
       message: filecoinError.message,
       stack: filecoinError.stack

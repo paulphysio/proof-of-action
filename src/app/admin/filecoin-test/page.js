@@ -87,7 +87,7 @@ export default function FilecoinTestPage() {
         setCanCommit(bal >= REQUIRED_ATTOFIL);
       }
     } catch (err) {
-      addLog(`💥 Balance check failed: ${err.message}`);
+      addLog(`[EXPLOSION] Balance check failed: ${err.message}`);
     }
   };
 
@@ -101,7 +101,7 @@ export default function FilecoinTestPage() {
       return;
     }
     if (!canCommit) {
-      setStatus('❌ Insufficient tFIL for gas');
+      setStatus('[X] Insufficient tFIL for gas');
       return;
     }
 
@@ -111,7 +111,7 @@ export default function FilecoinTestPage() {
     setUploadResult(null);
 
     try {
-      addLog('🧪 Starting Filecoin test...');
+      addLog('[TEST] Starting Filecoin test...');
 
       const testData = {
         type: 'private-user-data',
@@ -121,11 +121,11 @@ export default function FilecoinTestPage() {
       };
 
       // === ENCRYPT ON CLIENT ===
-      addLog('🔐 Encrypting data client-side...');
+      addLog('[LOCK] Encrypting data client-side...');
       const encryptedPayload = await encryptData(testData, password);
-      addLog('✅ Encryption complete — only you can read this');
+      addLog('[OK] Encryption complete — only you can read this');
 
-      addLog('📤 Sending encrypted data to Filecoin...');
+      addLog('[UPLOAD] Sending encrypted data to Filecoin...');
       const response = await fetch('/api/filecoin/store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,31 +133,31 @@ export default function FilecoinTestPage() {
       });
 
       const result = await response.json();
-      addLog(`📊 Store response: ${JSON.stringify(result)}`);
+      addLog(`[DATA] Store response: ${JSON.stringify(result)}`);
 
       if (result.success) {
         setUploadResult({ pieceCid: result.pieceCid, encryptedObj: encryptedPayload });
 
-        setStatus(`✅ Uploaded & Encrypted!\nPieceCID: ${result.pieceCid}`);
-        addLog(`🎉 Success — PieceCID: ${result.pieceCid} (encrypted)`);
+        setStatus(`[OK] Uploaded & Encrypted!\nPieceCID: ${result.pieceCid}`);
+        addLog(`[PARTY] Success — PieceCID: ${result.pieceCid} (encrypted)`);
 
         // Auto-retrieve + decrypt
-        addLog('🔄 Retrieving encrypted data...');
+        addLog('[REFRESH] Retrieving encrypted data...');
         const retrieveRes = await fetch(`/api/filecoin/retrieve?pieceCid=${result.pieceCid}`);
         const retrieveData = await retrieveRes.json();
 
         if (retrieveData.success) {
           const decrypted = await decryptData(retrieveData.data, password);
-          addLog(`✅ Decrypted & Verified: ${JSON.stringify(decrypted)}`);
+          addLog(`[OK] Decrypted & Verified: ${JSON.stringify(decrypted)}`);
         } else {
-          addLog(`❌ Retrieve failed: ${retrieveData.error}`);
+          addLog(`[X] Retrieve failed: ${retrieveData.error}`);
         }
       } else {
-        setStatus(`❌ Failed: ${result.error}`);
+        setStatus(`[X] Failed: ${result.error}`);
       }
     } catch (error) {
-      setStatus(`❌ Error: ${error.message}`);
-      addLog(`💥 ${error.message}`);
+      setStatus(`[X] Error: ${error.message}`);
+      addLog(`[EXPLOSION] ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -171,7 +171,7 @@ export default function FilecoinTestPage() {
         <h2 className="text-xl font-semibold mb-4">Wallet</h2>
         <p><strong>Address:</strong> {connectedWallet}</p>
         <p><strong>tFIL:</strong> {walletBalance !== null ? `${Number(walletBalance) / 1e18} FIL` : 'Loading...'}</p>
-        {!canCommit && <p className="text-red-600">⚠️ Add tFIL for gas</p>}
+        {!canCommit && <p className="text-red-600">[WARNING] Add tFIL for gas</p>}
 
         <div className="mt-6">
           <label className="block text-sm font-medium mb-1">
