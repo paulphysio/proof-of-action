@@ -5,57 +5,48 @@ import { Download, Smartphone, X, AlertCircle } from 'lucide-react';
 import { startLocationUpdates } from '@/lib/notifications';
 
 export default function PWAInstallGate({ children }) {
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [canInstall, setCanInstall] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showIosGuide, setShowIosGuide] = useState(false);
+  const [showAndroidGuide, setShowAndroidGuide] = useState(false);
 
+  // PWA install prompt handling (Android/Chrome) and iOS guide
   useEffect(() => {
-    // Check if already installed
-    const checkInstalled = () => {
-      // PWA in standalone mode
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        setIsInstalled(true);
-        return;
-      }
-      // iOS standalone
-      if (window.navigator.standalone === true) {
-        setIsInstalled(true);
-        return;
-      }
-      setIsInstalled(false);
-    };
+    if (typeof window === 'undefined') return;
 
-    checkInstalled();
-
-    // Listen for display mode changes
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    mediaQuery.addEventListener('change', checkInstalled);
-
-    // Check if iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    setIsIOS(isIOSDevice);
-
-    // Listen for beforeinstallprompt event (Chrome/Edge/Android)
-    const handleBeforeInstallPrompt = (e) => {
+    const onBeforeInstall = (e) => {
+      // Prevent the mini-infobar on mobile
       e.preventDefault();
       setDeferredPrompt(e);
-      setCanInstall(true);
     };
-
-    // Check if install prompt is available
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Check for appinstalled event
-    window.addEventListener('appinstalled', () => {
+    const onAppInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
-    });
+    };
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onAppInstalled);
+
+    // Hydrate from global in case the prompt fired before mount
+    if (window.__deferredPwaPrompt) {
+      setDeferredPrompt(window.__deferredPwaPrompt);
+    }
+    if (window.__pwaInstalled) setIsInstalled(true);
+    const onCustomBefore = () => {
+      if (window.__deferredPwaPrompt) setDeferredPrompt(window.__deferredPwaPrompt);
+    };
+    const onCustomInstalled = () => setIsInstalled(true);
+    window.addEventListener('pwa-beforeinstallprompt', onCustomBefore);
+    window.addEventListener('pwa-installed', onCustomInstalled);
+
+    // Detect standalone (already installed)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) setIsInstalled(true);
 
     return () => {
-      mediaQuery.removeEventListener('change', checkInstalled);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onAppInstalled);
+      window.removeEventListener('pwa-beforeinstallprompt', onCustomBefore);
+      window.removeEventListener('pwa-installed', onCustomInstalled);
     };
   }, []);
 
@@ -67,19 +58,27 @@ export default function PWAInstallGate({ children }) {
     }
   }, [isInstalled]);
 
-  const handleInstall = async () => {
-    if (!deferredPrompt) {
-      if (isIOS) {
-        setShowIOSGuide(true);
-      }
-      return;
-    }
+  const isIOS = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
+  const handleInstallClick = async () => {
+    try {
+      if (isIOS) {
+        setShowIosGuide(true);
+        return;
+      }
+      if (!deferredPrompt) {
+        // Fallback: show Android guide if prompt isn't available
+        if (isAndroid) setShowAndroidGuide(true);
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } catch (e) {
+      console.warn('PWA install failed', e);
     }
   };
 
@@ -165,7 +164,20 @@ export default function PWAInstallGate({ children }) {
           </ul>
         </div>
 
-        {showIOSGuide ? (
+        {/* Install App button - only show if iOS, Android, or deferredPrompt available */}
+        {!isInstalled && (isIOS || isAndroid || deferredPrompt) && (
+          <button 
+            onClick={handleInstallClick}
+            className="btn btn-gradient btn-lg w-100"
+            style={{ marginBottom: '1rem' }}
+          >
+            <Download size={20} className="me-2" />
+            {isIOS ? 'Add to Home Screen' : 'Install App'}
+          </button>
+        )}
+
+        {/* iOS Add to Home Screen Guide */}
+        {showIosGuide && (
           <div style={{
             background: 'rgba(245, 158, 11, 0.1)',
             border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -178,44 +190,79 @@ export default function PWAInstallGate({ children }) {
               <AlertCircle size={18} color="var(--amber-400)" className="flex-shrink-0 mt-1" />
               <div>
                 <p style={{ color: 'var(--amber-400)', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                  iOS Installation Steps:
+                  Add to Home Screen
                 </p>
-                <ol style={{ color: 'var(--slate-400)', fontSize: '0.75rem', margin: 0, paddingLeft: '1rem' }}>
-                  <li>Tap the Share button in Safari</li>
-                  <li>Scroll down and tap "Add to Home Screen"</li>
-                  <li>Tap "Add" to install</li>
-                </ol>
+                <div style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+                  <p>On iPhone/iPad, install this app by using Safari:</p>
+                  <ol style={{ paddingLeft: '1.2rem', margin: '0.5rem 0' }}>
+                    <li>Open this site in Safari.</li>
+                    <li>Tap the Share button (square with an up arrow).</li>
+                    <li>Choose "Add to Home Screen".</li>
+                    <li>Tap Add.</li>
+                  </ol>
+                </div>
               </div>
             </div>
             <button 
-              onClick={() => setShowIOSGuide(false)}
+              onClick={() => setShowIosGuide(false)}
               className="btn btn-outline-glass w-100 mt-3"
             >
               <X size={16} className="me-2" />
               Close
             </button>
           </div>
-        ) : (
-          <button 
-            onClick={handleInstall}
-            className="btn btn-gradient btn-lg w-100"
-            disabled={!canInstall && !isIOS}
-          >
-            <Download size={20} className="me-2" />
-            {canInstall || isIOS ? 'Install App' : 'App Install Not Available'}
-          </button>
         )}
 
-        {!canInstall && !isIOS && (
+        {/* Android Add to Home Screen Guide (fallback when beforeinstallprompt isn't available) */}
+        {showAndroidGuide && (
+          <div style={{
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            borderRadius: '12px',
+            padding: '1rem',
+            marginBottom: '1rem',
+            textAlign: 'left'
+          }}>
+            <div className="d-flex align-items-start gap-2">
+              <AlertCircle size={18} color="var(--amber-400)" className="flex-shrink-0 mt-1" />
+              <div>
+                <p style={{ color: 'var(--amber-400)', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                  Add to Home Screen
+                </p>
+                <div style={{ color: 'var(--slate-400)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+                  <p>On Android Chrome:</p>
+                  <ol style={{ paddingLeft: '1.2rem', margin: '0.5rem 0' }}>
+                    <li>Open this site in Chrome (not an in-app browser).</li>
+                    <li>Tap the three dots (⋮) menu.</li>
+                    <li>Select <strong>Add to Home screen</strong> (or <strong>Install app</strong>).</li>
+                  </ol>
+                  <p style={{ marginTop: '0.5rem' }}>
+                    Tip: This requires HTTPS or localhost and a supported browser.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowAndroidGuide(false)}
+              className="btn btn-outline-glass w-100 mt-3"
+            >
+              <X size={16} className="me-2" />
+              Close
+            </button>
+          </div>
+        )}
+
+        {/* Help text for unsupported browsers */}
+        {!isIOS && !isAndroid && !deferredPrompt && (
           <p style={{
             color: 'var(--slate-500)',
             fontSize: '0.6875rem',
             marginTop: '1rem'
           }}>
-            If the install button is disabled, please use Chrome or Edge browser, or add this page to your home screen manually.
+            Please use Chrome (Android) or Safari (iOS) to install this app.
           </p>
         )}
-      </div>
     </div>
-  );
+  </div>
+);
 }
