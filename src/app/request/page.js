@@ -7,6 +7,7 @@ import { generateGeohash } from '@/lib/ai-verification';
 import { notifyNearbyEmergency } from '@/lib/notifications';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { 
   Wallet,
   Pill,
@@ -355,6 +356,7 @@ export default function RequestPage() {
             </Link>
             
             <div className="d-flex align-items-center gap-2 gap-md-3">
+              <PWAInstallButton />
               <div className="wallet-chip d-none d-md-flex animate-reveal-scale">
                 <Wallet size={14} />
                 <span>{accountId?.slice(0, 8)}...</span>

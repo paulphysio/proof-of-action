@@ -6,6 +6,7 @@ import { getNearbyRequests, createResponse, getOrCreateUser, supabase } from '@/
 import { generateGeohash } from '@/lib/ai-verification';
 import { notifyNearbyEmergency, savePushSubscription, subscribeToPushNotifications, notifyTrackingStarted } from '@/lib/notifications';
 import Link from 'next/link';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { MovementTracker, storeTrackingData, notifyNeighbors } from '@/lib/movement-tracking';
 import { storeResponseCommitmentOnFilecoin, addFilecoinStorageRef, storeTrackingDataOnFilecoin } from '@/lib/filecoin';
 import { getWorldIDVerification } from '@/lib/worldid';
@@ -836,6 +837,7 @@ export default function RespondPage() {
             </Link>
             
             <div className="d-flex align-items-center gap-2 gap-md-3">
+              <PWAInstallButton />
               <div className="wallet-chip d-none d-md-flex animate-reveal-scale">
                 <Wallet size={14} />
                 <span>{accountId?.slice(0, 8)}...</span>

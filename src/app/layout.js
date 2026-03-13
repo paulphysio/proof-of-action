@@ -5,7 +5,6 @@ import './globals.css';
 import { WalletProvider } from '@/lib/near-wallet';
 import { useEffect } from 'react';
 import { registerServiceWorker } from '@/lib/notifications';
-import PWAInstallGate from '@/components/PWAInstallGate';
 
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -37,9 +36,7 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
         <WalletProvider>
-          <PWAInstallGate>
-            {children}
-          </PWAInstallGate>
+          {children}
         </WalletProvider>
       </body>
     </html>

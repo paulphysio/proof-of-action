@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { quickVerify, verifyAction } from '@/lib/ai-verification';
 import { notifyRewardReceived } from '@/lib/notifications';
 import Link from 'next/link';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { 
   Wallet,
   Brain,
@@ -239,6 +240,7 @@ export default function VerifyPage() {
                   </span>
                 </div>
               </Link>
+              <PWAInstallButton />
               <Link href="/dashboard" className="btn btn-outline-glass d-none d-sm-flex" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
                 <ChevronLeft size={16} className="me-2" />
                 Dashboard
@@ -480,6 +482,7 @@ export default function VerifyPage() {
             </Link>
             
             <div className="d-flex align-items-center gap-2 gap-md-3">
+              <PWAInstallButton />
               <div className="wallet-chip d-none d-md-flex animate-reveal-scale">
                 <Wallet size={14} />
                 <span>{accountId?.slice(0, 8)}...</span>

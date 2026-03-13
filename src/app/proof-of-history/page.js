@@ -6,6 +6,7 @@ import { getFilecoinStorage, getFilecoinExplorerUrl, getIpfsUrl } from '@/lib/fi
 import { getWorldIDVerification } from '@/lib/worldid';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { 
   Database, 
   Shield, 
@@ -132,6 +133,7 @@ export default function ProofOfHistoryPage() {
                 Proof of History
               </span>
             </Link>
+            <PWAInstallButton />
             <Link href="/dashboard" className="btn btn-outline-glass">
               <ChevronLeft size={16} className="me-2" />
               Dashboard

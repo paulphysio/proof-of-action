@@ -4,6 +4,7 @@ import { useWallet } from '@/lib/near-wallet';
 import { requestNotificationPermission, savePushSubscription, subscribeToPushNotifications } from '@/lib/notifications';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { 
   Wallet, 
   Bell, 
@@ -161,6 +162,7 @@ export default function Home() {
             </Link>
             
             <div className="d-flex align-items-center gap-2 gap-md-3">
+              <PWAInstallButton />
               {isSignedIn ? (
                 <>
                   <div className="wallet-chip d-none d-md-flex animate-reveal-scale">

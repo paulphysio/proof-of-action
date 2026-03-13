@@ -10,6 +10,7 @@ import {
   getUserReputation
 } from '@/lib/supabase';
 import Link from 'next/link';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { 
   Wallet, 
   Trophy, 
@@ -296,6 +297,7 @@ export default function Dashboard() {
             </Link>
             
             <div className="d-flex align-items-center gap-2 gap-md-3">
+              <PWAInstallButton />
               <div className="wallet-chip d-none d-md-flex animate-reveal-scale">
                 <Wallet size={14} />
                 <span>{accountId?.slice(0, 8)}...</span>
