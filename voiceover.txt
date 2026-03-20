@@ -1,0 +1,161 @@
+# Proof-of-Action Demo Video Voiceover Script
+
+## [00:00 - 00:18] INTRODUCTION - WEB APP OVERVIEW
+
+*(Soft, hopeful music begins - gentle piano with ambient tech sounds)*
+
+**Narrator:** (Warm, empathetic tone)
+In moments of crisis, every second counts. But what if help could arrive before emergency services even respond?
+
+*(Visual: Split screen showing traditional emergency call vs PoA app notification)*
+
+**Narrator:** (Confident, clear)
+Introducing Proof-of-Action - a revolutionary Web3 emergency network where community members become first responders, verified by AI, and rewarded on-chain.
+
+*(Visual: App interface scrolling through main features - wallet connection, dashboard, map view)*
+
+**Narrator:** (Inspiring)
+This isn't just another app. It's a decentralized lifeline that transforms how we help each other in critical moments. Powered by blockchain technology and artificial intelligence, Proof-of-Action creates a trusted network where your willingness to help becomes your greatest asset.
+
+*(Visual: Quick montage of app screens with glowing connections between users)*
+
+---
+
+## [00:20 - 00:40] ONBOARDING - WORLD ID VERIFICATION
+
+*(Music shifts to more focused, tech-forward beat)*
+
+**Narrator:** (Professional, reassuring)
+Getting started is simple and secure. Your journey begins with World ID verification - your passport to this trusted emergency network.
+
+*(Visual: Wallet creation screen, then World ID verification flow)*
+
+**Narrator:** (Educational)
+World ID ensures that every helper is genuinely human, creating a safe environment where trust is built into the system itself. No fake profiles, no bots - just real people ready to help real people.
+
+*(Visual: World ID verification success animation with shield icon)*
+
+**Narrator:** (Empowering)
+This human-centric approach means your reputation matters. Each verified action builds your standing in the community, unlocking greater opportunities to help and earn.
+
+*(Visual: Reputation score increasing with each successful verification)*
+
+---
+
+## [00:43 - 01:10] FILECOIN STORAGE - PERMANENT RECORDS
+
+*(Music becomes more substantial, with underlying sense of permanence)*
+
+**Narrator:** (Authoritative, clear)
+Every action matters. Every response counts. That's why Proof-of-Action stores all emergency interactions on Filecoin - creating an immutable, permanent record of your contributions.
+
+*(Visual: Animation showing data flowing from app to Filecoin network with blockchain visualization)*
+
+**Narrator:** (Passionate about security)
+Unlike traditional systems where records can be lost or manipulated, Filecoin provides cryptographic proof of every help offered, every response made, every life touched. Your good deeds become permanently etched into the fabric of the decentralized web.
+
+*(Visual: Filecoin storage confirmation with transaction hash and explorer links)*
+
+**Narrator:** (Building excitement)
+This isn't just storage - it's your legacy of help. A verifiable history that follows you across platforms, proving your reliability when it matters most.
+
+*(Visual: User's proof history page showing verified actions with timestamps)*
+
+---
+
+## [01:12 - 01:30] MAKING REQUESTS - EMERGENCY CREATION
+
+*(Music becomes urgent but controlled - heartbeat rhythm underneath)*
+
+**Narrator:** (Calm, methodical)
+When crisis strikes, Proof-of-Action turns your smartphone into a lifeline. With just a few taps, you can broadcast your need to a network of verified helpers nearby.
+
+*(Visual: Emergency request creation flow - selecting medication need, adding details)*
+
+**Narrator:** (Empathetic)
+Whether you need life-saving medication like insulin, medical supplies, or urgent assistance, your request reaches people who can help right now. Not miles away, but in your community, on your street.
+
+*(Visual: Location sharing animation showing radius of nearby responders)*
+
+**Narrator:** (Technical confidence)
+Our AI verification system ensures authenticity while protecting your privacy. Your precise location is shared only with verified responders, creating a perfect balance between rapid response and personal security.
+
+*(Visual: Request submitted successfully with notification sent animation)*
+
+---
+
+## [01:39 - 02:24] RESPONDING & MOVEMENT TRACKING
+
+*(Music shifts to active, purposeful rhythm with sense of movement)*
+
+**Narrator:** (Urgent, inspiring)
+For responders, every notification is a call to action. When someone needs help nearby, your phone becomes a beacon of hope.
+
+*(Visual: Push notification appearing, user accepting to respond)*
+
+**Narrator:** (Technical clarity)
+Once you accept, our innovative movement tracking system activates. As you travel to help someone, every step is recorded, every route verified. This isn't about surveillance - it's about creating undeniable proof that you were there when help was needed.
+
+*(Visual: Map showing responder's route in real-time with tracking points)*
+
+**Narrator:** (Building to emotional peak)
+The tracking data is securely stored on Filecoin, creating a time-stamped, geographically verified record of your journey to help. Each GPS point becomes part of an unbreakable chain of evidence.
+
+*(Visual: Filecoin storage confirmation for tracking data with hash verification)*
+
+**Narrator:** (Triumphant)
+When you arrive and provide assistance, photos, timestamps, and mutual confirmation create the final piece of verifiable proof. Your response isn't just remembered - it's immortalized on the blockchain.
+
+*(Visual: Successful response completion with reward notification)*
+
+---
+
+## [02:50 - 03:06] VERIFICATION SYSTEM - AI POWERED TRUST
+
+*(Music becomes sophisticated, intelligent - layered with subtle AI sounds)*
+
+**Narrator:** (Authoritative, cutting-edge)
+At the heart of Proof-of-Action lies our revolutionary verification system. Multiple data points converge through AI analysis to create unquestionable proof of authentic help.
+
+*(Visual: AI verification dashboard showing multiple data streams being analyzed)*
+
+**Narrator:** (Technical confidence)
+Time-stamps from Filecoin storage, location data from movement tracking, photographic evidence from both parties, and mutual confirmation all feed into our AI engine. The system cross-references, validates, and eliminates false claims automatically.
+
+*(Visual: Verification success animation with multiple checkmarks converging)*
+
+**Narrator:** (Building to powerful conclusion)
+This isn't just technology - it's trust algorithmically perfected. Every verification strengthens the network, every confirmed action builds the foundation of a new kind of emergency response system.
+
+*(Visual: Network effect animation showing verified connections spreading across map)*
+
+---
+
+## [03:06 - END] CONCLUSION - THE FUTURE OF HELP
+
+*(Music swells to emotional, inspiring crescendo)*
+
+**Narrator:** (Visionary, passionate)
+Proof-of-Action isn't just an app - it's a movement. A reimagining of how communities care for each other, powered by the trust of blockchain and the intelligence of AI.
+
+*(Visual: Montage of successful interactions - elderly person receiving medication, child getting help, community coming together)*
+
+**Narrator:** (Deeply emotional)
+Imagine a world where no one faces crisis alone. Where help is always just moments away. Where your willingness to assist others creates not just gratitude, but real value.
+
+*(Visual: Tokens being rewarded, reputation scores increasing, community growing)*
+
+**Narrator:** (Urgent call to action)
+This future is possible today. Every wallet created, every verification completed, every response made strengthens this network of hope.
+
+*(Visual: App download screen with QR code, final shot of diverse group of users)*
+
+**Narrator:** (Powerful, memorable)
+Proof-of-Action. Where humanity meets technology. Where help becomes verifiable truth. Where your best instincts become your greatest assets.
+
+*(Music reaches emotional peak, then fades gently with single piano note)*
+
+**Narrator:** (Final, impactful whisper)
+Be the help someone needs. Be the proof of action.
+
+*(Screen fades to black with PoA logo and tagline: "Verified Help. Rewarded Good. Permanent Proof.")*
