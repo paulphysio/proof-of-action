@@ -38,6 +38,11 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const shortAddress = useMemo(() => {
     if (!accountId) return '';
@@ -97,39 +102,43 @@ export default function Home() {
   return (
     <div className="min-vh-100" style={{ background: 'var(--navy-950)', position: 'relative', overflow: 'hidden' }}>
       {/* Animated Background Elements */}
-      <div className="aurora-bg" />
+      {isClient && <div className="aurora-bg" />}
       
       {/* Floating Orbs */}
-      <div 
-        className="animate-float-slow"
-        style={{
-          position: 'fixed',
-          width: '300px',
-          height: '300px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%)',
-          top: '10%',
-          right: '-100px',
-          zIndex: 0,
-          pointerEvents: 'none',
-          transform: `translateY(${scrollY * 0.1}px)`,
-        }}
-      />
-      <div 
-        className="animate-float"
-        style={{
-          position: 'fixed',
-          width: '400px',
-          height: '400px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%)',
-          bottom: '20%',
-          left: '-150px',
-          zIndex: 0,
-          pointerEvents: 'none',
-          transform: `translateY(${scrollY * -0.05}px)`,
-        }}
-      />
+      {isClient && (
+        <>
+          <div 
+            className="animate-float-slow"
+            style={{
+              position: 'fixed',
+              width: '300px',
+              height: '300px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%)',
+              top: '10%',
+              right: '-100px',
+              zIndex: 0,
+              pointerEvents: 'none',
+              transform: `translateY(${scrollY * 0.1}px)`,
+            }}
+          />
+          <div 
+            className="animate-float"
+            style={{
+              position: 'fixed',
+              width: '400px',
+              height: '400px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%)',
+              bottom: '20%',
+              left: '-150px',
+              zIndex: 0,
+              pointerEvents: 'none',
+              transform: `translateY(${scrollY * -0.05}px)`,
+            }}
+          />
+        </>
+      )}
 
       {/* Premium Navbar */}
       <nav className="nav-premium" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
@@ -209,7 +218,7 @@ export default function Home() {
                 <div className="d-flex align-items-center gap-2 mb-3">
                   <div 
                     className="emergency-badge animate-wave"
-                    style={{ animation: 'none', background: 'rgba(6, 182, 212, 0.15)', borderColor: 'rgba(6, 182, 212, 0.3)', color: 'var(--cyan-400)' }}
+                    style={{ background: 'rgba(6, 182, 212, 0.15)', borderColor: 'rgba(6, 182, 212, 0.3)', color: 'var(--cyan-400)' }}
                   >
                     <Sparkles size={14} />
                     <span className="d-none d-sm-inline">Web3 Emergency Network</span>

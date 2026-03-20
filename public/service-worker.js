@@ -1,4 +1,6 @@
-const CACHE_NAME = 'proof-of-action-v2'; // Bumped to clear old cache
+const CACHE_NAME = 'proof-of-action-v3'; // Bumped to clear old cache and fix caching issues
+const isDevelopment = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
 const urlsToCache = [
   '/',
   '/dashboard',
@@ -17,21 +19,56 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // During development, bypass cache completely for live updates
+  if (isDevelopment) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   const url = new URL(event.request.url);
   
-  // Never cache CSS or JS files - always fetch fresh
-  if (url.pathname.endsWith('.css') || url.pathname.endsWith('.js')) {
+  // Never cache CSS, JS, or HTML files during development
+  if (url.pathname.endsWith('.css') || 
+      url.pathname.endsWith('.js') || 
+      url.pathname.endsWith('.html') ||
+      url.pathname.includes('/_next/') ||
+      url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(event.request));
     return;
   }
   
+  // For HTML pages, use network-first strategy
+  if (url.pathname.endsWith('/') || url.pathname.includes('/page')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // Cache the fresh response
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          // If network fails, try cache
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+  
+  // For other assets (icons, images), use cache-first
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         if (response) {
           return response;
         }
-        return fetch(event.request);
+        return fetch(event.request).then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        });
       })
   );
 });

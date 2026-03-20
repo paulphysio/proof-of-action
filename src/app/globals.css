@@ -186,24 +186,22 @@ body {
     radial-gradient(ellipse at 10% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
     var(--navy-950);
   animation: aurora-flow 20s ease-in-out infinite;
+  /* Suppress hydration warning for filter animations */
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
 @keyframes aurora-flow {
   0%, 100% { 
     transform: scale(1) rotate(0deg); 
-    filter: hue-rotate(0deg);
   }
   25% {
     transform: scale(1.02) rotate(1deg);
-    filter: hue-rotate(3deg);
   }
   50% { 
     transform: scale(1.05) rotate(0deg); 
-    filter: hue-rotate(8deg);
   }
   75% {
     transform: scale(1.02) rotate(-1deg);
-    filter: hue-rotate(3deg);
   }
 }
 
