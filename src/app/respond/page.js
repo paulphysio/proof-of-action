@@ -186,6 +186,8 @@ export default function RespondPage() {
           async (position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            console.log('Location obtained:', { lat, lon, accuracy }); // Debug log
             setUserLocation({ lat, lon });
             const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
             setNearbyPrefixes(prefixes);
@@ -193,17 +195,23 @@ export default function RespondPage() {
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
           },
-          async () => {
+          async (error) => {
+            console.error('Geolocation error:', error); // Debug log
             // Location denied or error - still load requests with default location
             const lat = 40.7128;
             const lon = -74.0060;
+            setUserLocation({ lat, lon });
             const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
             setNearbyPrefixes(prefixes);
             const nearby = await getNearbyRequests(prefixes);
             const filtered = nearby.filter(r => r.requester_wallet !== accountId);
             setRequests(filtered);
           },
-          { timeout: 5000, maximumAge: 60000 } // Quick timeout, allow cached
+          { 
+            enableHighAccuracy: true, 
+            timeout: 10000, 
+            maximumAge: 0 // Don't use cached location
+          }
         );
       } else {
         const lat = 40.7128;
