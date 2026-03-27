@@ -187,16 +187,66 @@ export default function RespondPage() {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
-            console.log('Location obtained:', { lat, lon, accuracy }); // Debug log
-            setUserLocation({ lat, lon });
-            const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
-            setNearbyPrefixes(prefixes);
-            const nearby = await getNearbyRequests(prefixes);
-            const filtered = nearby.filter(r => r.requester_wallet !== accountId);
-            setRequests(filtered);
+            const altitude = position.coords.altitude;
+            const altitudeAccuracy = position.coords.altitudeAccuracy;
+            const heading = position.coords.heading;
+            const speed = position.coords.speed;
+            
+            console.log('🎯 ABSOLUTE LOCATION OBTAINED:', { 
+              lat, 
+              lon, 
+              accuracy: `${accuracy}m`,
+              altitude: altitude ? `${altitude}m` : 'N/A',
+              altitudeAccuracy: altitudeAccuracy ? `${altitudeAccuracy}m` : 'N/A',
+              heading: heading ? `${heading}°` : 'N/A',
+              speed: speed ? `${speed}m/s` : 'N/A'
+            });
+            
+            // If accuracy is poor, try once more for better precision
+            if (accuracy > 20) {
+              console.log('📍 Location accuracy poor, retrying for better precision...');
+              navigator.geolocation.getCurrentPosition(
+                (retryPosition) => {
+                  const retryLat = retryPosition.coords.latitude;
+                  const retryLon = retryPosition.coords.longitude;
+                  const retryAccuracy = retryPosition.coords.accuracy;
+                  console.log('🎯 RETRY LOCATION:', { 
+                    lat: retryLat, 
+                    lon: retryLon, 
+                    accuracy: `${retryAccuracy}m` 
+                  });
+                  setUserLocation({ lat: retryLat, lon: retryLon });
+                  const prefixes = buildNearbyGeohashPrefixes(retryLat, retryLon, GEOFENCE_PREFIX_LENGTH);
+                  setNearbyPrefixes(prefixes);
+                  getNearbyRequests(prefixes).then(nearby => {
+                    const filtered = nearby.filter(r => r.requester_wallet !== accountId);
+                    setRequests(filtered);
+                  });
+                },
+                (retryError) => {
+                  console.error('Retry failed, using first location:', retryError);
+                  setUserLocation({ lat, lon });
+                  const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+                  setNearbyPrefixes(prefixes);
+                  getNearbyRequests(prefixes).then(nearby => {
+                    const filtered = nearby.filter(r => r.requester_wallet !== accountId);
+                    setRequests(filtered);
+                  });
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+              );
+            } else {
+              setUserLocation({ lat, lon });
+              const prefixes = buildNearbyGeohashPrefixes(lat, lon, GEOFENCE_PREFIX_LENGTH);
+              setNearbyPrefixes(prefixes);
+              const nearby = await getNearbyRequests(prefixes);
+              const filtered = nearby.filter(r => r.requester_wallet !== accountId);
+              setRequests(filtered);
+            }
           },
           async (error) => {
-            console.error('Geolocation error:', error); // Debug log
+            console.error('❌ Geolocation error:', error); 
+            console.log('📍 Falling back to default location');
             // Location denied or error - still load requests with default location
             const lat = 40.7128;
             const lon = -74.0060;
@@ -209,8 +259,8 @@ export default function RespondPage() {
           },
           { 
             enableHighAccuracy: true, 
-            timeout: 10000, 
-            maximumAge: 0 // Don't use cached location
+            timeout: 15000,           // Longer timeout for maximum precision
+            maximumAge: 0             // Always get fresh location
           }
         );
       } else {
@@ -248,7 +298,7 @@ export default function RespondPage() {
         (error) => {
           reject(error);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     });
   };

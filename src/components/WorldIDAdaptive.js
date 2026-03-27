@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import WorldIDMobile from '@/components/WorldIDMobile';
-import WorldIDVerification from '@/components/WorldIDVerification';
+import WorldIDWidget from '@/components/WorldIDWidget';
 
 function detectMobile() {
   if (typeof window === 'undefined') return false;
@@ -29,9 +29,9 @@ export default function WorldIDAdaptive({ onVerified }) {
   }, []);
 
   const Component = useMemo(() => {
-    // Desktop: Use WorldIDVerification (working QR code)
+    // Desktop: Use WorldIDWidget (fixed widget with proper callbacks)
     // Mobile: Use WorldIDMobile (deep link, no QR)
-    return isMobile ? WorldIDMobile : WorldIDVerification;
+    return isMobile ? WorldIDMobile : WorldIDWidget;
   }, [isMobile]);
 
   return <Component onVerified={onVerified} />;

@@ -19,13 +19,21 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Never intercept API calls - let them go directly to avoid CORS issues
+  if (url.pathname.startsWith('/api/') || 
+      url.hostname.includes('supabase.co') ||
+      url.hostname.includes('worldcoin.org') ||
+      url.hostname.includes('api.qrserver.com')) {
+    return; // Don't intercept - let browser handle directly
+  }
+  
   // During development, bypass cache completely for live updates
   if (isDevelopment) {
     event.respondWith(fetch(event.request));
     return;
   }
-
-  const url = new URL(event.request.url);
   
   // Never cache CSS, JS, or HTML files during development
   if (url.pathname.endsWith('.css') || 

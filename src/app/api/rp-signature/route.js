@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { signRequest } from '@worldcoin/idkit/signing';
+import { signRequest } from '@worldcoin/idkit-server';
 
 /**
  * Generate RP signature for World ID verification

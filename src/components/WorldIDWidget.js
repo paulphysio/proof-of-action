@@ -1,9 +1,8 @@
 'use client';
 
-console.log('WorldIDWidget.js loaded');
-
 import { useState, useCallback, useEffect } from 'react';
-import { Shield, Check, X, Loader2, Fingerprint } from 'lucide-react';
+import { Shield, Check, X, Loader2, Fingerprint, QrCode } from 'lucide-react';
+import { IDKitRequestWidget, orbLegacy } from '@worldcoin/idkit';
 import { 
   getWorldIDVerification, 
   saveWorldIDVerification,
@@ -13,16 +12,26 @@ import {
 } from '@/lib/worldid';
 
 /**
- * World ID Widget Component - React Widget Version for Mobile-First UX
- * Uses IDKitRequestWidget for embedded modal instead of QR code
+ * Simplified World ID Widget Component
+ * Uses IDKitRequestWidget with proper error handling and debugging
  */
 export default function WorldIDWidget({ onVerified }) {
   const [verification, setVerification] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
   const [widgetOpen, setWidgetOpen] = useState(false);
+  const [rpContext, setRpContext] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   console.log('WorldIDWidget mounted');
+  
+  // Debug environment variables
+  console.log('Environment check:', {
+    rpId: process.env.NEXT_PUBLIC_RP_ID,
+    appId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID,
+    hasRpId: !!process.env.NEXT_PUBLIC_RP_ID,
+    hasAppId: !!process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID
+  });
 
   // Load existing verification on mount
   useEffect(() => {
@@ -32,12 +41,78 @@ export default function WorldIDWidget({ onVerified }) {
     }
   }, []);
 
-  const handleVerify = useCallback(async () => {
+  // Pre-fetch RP signature when component mounts
+  useEffect(() => {
+    const fetchRpSignature = async () => {
+      if (rpContext) return;
+
+      setLoading(true);
+      try {
+        console.log('Pre-fetching RP signature...');
+        
+        const response = await fetch('/api/rp-signature', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'verify-human' }),
+        });
+
+        console.log('RP signature response status:', response.status);
+        console.log('RP signature response ok:', response.ok);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('RP signature error response:', errorData);
+          throw new Error(errorData.error || `Failed to get RP signature (${response.status})`);
+        }
+
+        const rpSig = await response.json();
+        console.log('RP signature received:', rpSig);
+        
+        // Check environment variables
+        const rpId = process.env.NEXT_PUBLIC_RP_ID;
+        const appId = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID;
+        console.log('NEXT_PUBLIC_RP_ID:', rpId);
+        console.log('NEXT_PUBLIC_WORLDCOIN_APP_ID:', appId);
+        
+        if (!rpId) {
+          throw new Error('NEXT_PUBLIC_RP_ID is not configured');
+        }
+        
+        if (!appId) {
+          throw new Error('NEXT_PUBLIC_WORLDCOIN_APP_ID is not configured');
+        }
+        
+        const context = {
+          rp_id: rpId,
+          nonce: rpSig.nonce,
+          created_at: rpSig.created_at,
+          expires_at: rpSig.expires_at,
+          signature: rpSig.sig,
+        };
+
+        console.log('RP context created:', context);
+        setRpContext(context);
+      } catch (error) {
+        console.error('Failed to fetch RP signature:', error);
+        setError(error.message || 'Failed to prepare verification');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRpSignature();
+  }, []);
+
+  const handleVerify = useCallback(() => {
     console.log('handleVerify called');
+    if (!rpContext) {
+      setError('Not ready to verify. Please try again.');
+      return;
+    }
     setIsVerifying(true);
     setError(null);
     setWidgetOpen(true);
-  }, []);
+  }, [rpContext]);
 
   const handleWidgetVerify = useCallback(async (result) => {
     try {
@@ -75,12 +150,13 @@ export default function WorldIDWidget({ onVerified }) {
           nullifier_hash: proofData?.nullifier || proofData?.nullifier_hash,
           proof: proofData?.proof,
           merkle_root: proofData?.merkle_root,
-          verification_level: 'deviceLegacy',
+          verification_level: 'orbLegacy',
         };
         
         saveWorldIDVerification(verificationData);
         setVerification(verificationData);
         setWidgetOpen(false);
+        setIsVerifying(false);
         onVerified?.(verificationData);
       } else {
         throw new Error(verifyResult.detail || 'Verification failed');
@@ -89,21 +165,20 @@ export default function WorldIDWidget({ onVerified }) {
       console.error('World ID error:', err);
       setError(err.message);
       setWidgetOpen(false);
-    } finally {
       setIsVerifying(false);
     }
   }, [onVerified]);
 
   const handleWidgetSuccess = useCallback((result) => {
     console.log('World ID widget success:', result);
-    // Widget flow completed successfully
-  }, []);
+    handleWidgetVerify(result);
+  }, [handleWidgetVerify]);
 
   const handleWidgetError = useCallback((error) => {
     console.error('World ID widget error:', error);
     setError(error.message || 'Verification failed');
-    setIsVerifying(false);
     setWidgetOpen(false);
+    setIsVerifying(false);
   }, []);
 
   const clearError = () => setError(null);
@@ -113,6 +188,8 @@ export default function WorldIDWidget({ onVerified }) {
   const badgeColor = getVerificationBadgeColor(verification?.verification_level);
   const badgeText = getVerificationBadgeText(verification?.verification_level);
   const canAccessPremium = canAccessHighValueFeatures(verification?.verification_level);
+
+  console.log('WorldIDWidgetComponent rendered, open:', widgetOpen);
 
   return (
     <>
@@ -171,6 +248,12 @@ export default function WorldIDWidget({ onVerified }) {
                 <p className="m-0 mb-3" style={{ color: 'var(--slate-400)', fontSize: '0.875rem' }}>
                   Prove you're a real human with World ID to unlock premium features and enhance your reputation.
                 </p>
+                {loading && (
+                  <div className="d-flex align-items-center justify-content-center gap-2 mb-3">
+                    <Loader2 className="animate-spin" />
+                    <span style={{ color: 'var(--slate-400)' }}>Preparing verification...</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -204,16 +287,21 @@ export default function WorldIDWidget({ onVerified }) {
                   transition: 'all 0.2s ease'
                 }}
                 onClick={handleVerify}
-                disabled={isVerifying}
+                disabled={isVerifying || loading || !rpContext}
               >
                 {isVerifying ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
                     <span>Verifying...</span>
                   </>
+                ) : loading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Preparing...</span>
+                  </>
                 ) : (
                   <>
-                    <Fingerprint size={18} />
+                    <QrCode size={18} />
                     <span>Verify with World ID</span>
                   </>
                 )}
@@ -237,132 +325,21 @@ export default function WorldIDWidget({ onVerified }) {
       </div>
 
       {/* World ID Widget */}
-      <WorldIDWidgetComponent
-        open={widgetOpen}
-        onOpenChange={setWidgetOpen}
-        onSuccess={handleWidgetSuccess}
-        onError={handleWidgetError}
-        onVerify={handleWidgetVerify}
-      />
+      {rpContext && (
+        <IDKitRequestWidget
+          open={widgetOpen}
+          onOpenChange={setWidgetOpen}
+          app_id={process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID}
+          action="verify-human"
+          rp_context={rpContext}
+          allow_legacy_proofs={true}
+          environment="staging" // Use staging for testing
+          preset={orbLegacy({ signal: 'proof-of-action' })}
+          handleVerify={handleWidgetVerify}
+          onSuccess={handleWidgetSuccess}
+          onError={handleWidgetError}
+        />
+      )}
     </>
-  );
-}
-
-/**
- * Internal widget component that handles the RP signature fetching
- */
-function WorldIDWidgetComponent({ open, onOpenChange, onSuccess, onError, onVerify }) {
-  const [rpContext, setRpContext] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  console.log('WorldIDWidgetComponent rendered, open:', open);
-
-  // Fetch RP signature when widget opens
-  const fetchRpSignature = useCallback(async () => {
-    if (rpContext) return rpContext;
-
-    setLoading(true);
-    try {
-      console.log('Fetching RP signature...');
-      
-      const response = await fetch('/api/rp-signature', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'verify-human' }),
-      });
-
-      console.log('RP signature response status:', response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to get RP signature (${response.status})`);
-      }
-
-      const rpSig = await response.json();
-      console.log('RP signature received:', rpSig);
-      
-      // Check environment variables
-      const rpId = process.env.NEXT_PUBLIC_RP_ID;
-      const appId = process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID;
-      console.log('NEXT_PUBLIC_RP_ID:', rpId);
-      console.log('NEXT_PUBLIC_WORLDCOIN_APP_ID:', appId);
-      
-      if (!rpId) {
-        throw new Error('NEXT_PUBLIC_RP_ID is not configured');
-      }
-      
-      if (!appId) {
-        throw new Error('NEXT_PUBLIC_WORLDCOIN_APP_ID is not configured');
-      }
-      
-      const context = {
-        rp_id: rpId,
-        nonce: rpSig.nonce,
-        created_at: rpSig.created_at,
-        expires_at: rpSig.expires_at,
-        signature: rpSig.sig,
-      };
-
-      console.log('RP context created:', context);
-      setRpContext(context);
-      return context;
-    } catch (error) {
-      console.error('Failed to fetch RP signature:', error);
-      onError(error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [rpContext, onError]);
-
-  const handleWidgetOpen = useCallback(async (isOpen) => {
-    if (isOpen) {
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('RP signature request timed out')), 10000)
-      );
-      
-      try {
-        const context = await Promise.race([fetchRpSignature(), timeoutPromise]);
-        if (!context) {
-          onOpenChange(false);
-          return;
-        }
-      } catch (error) {
-        console.error('Widget open error:', error);
-        onError(error);
-        onOpenChange(false);
-        return;
-      }
-    }
-    onOpenChange(isOpen);
-  }, [fetchRpSignature, onOpenChange, onError]);
-
-  if (!rpContext && open) {
-    return (
-      <div className="d-flex align-items-center justify-content-center p-4">
-        <Loader2 className="animate-spin" />
-        <span className="ms-2">Preparing verification...</span>
-      </div>
-    );
-  }
-
-  return (
-    <IDKitRequestWidget
-      open={open}
-      onOpenChange={handleWidgetOpen}
-      app_id={process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID}
-      action="verify-human"
-      rp_context={rpContext}
-      allow_legacy_proofs={true}
-      environment="production"
-      preset={deviceLegacy({ signal: 'proof-of-action' })}
-      handleVerify={onVerify}
-      onSuccess={onSuccess}
-      onError={(error) => {
-        console.error('IDKit widget error:', error);
-        onError(error);
-      }}
-    />
   );
 }

@@ -23,8 +23,13 @@ export async function POST(request) {
     }
     
     // Forward to World ID verification API
+    // Use staging for testing, production for live
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://developer.world.org/api/v4/verify'
+      : 'https://developer.worldcoin.org/api/v4/verify';
+    
     const response = await fetch(
-      `https://developer.world.org/api/v4/verify/${rp_id}`,
+      `${baseUrl}/${rp_id}`,
       {
         method: 'POST',
         headers: {
@@ -34,6 +39,14 @@ export async function POST(request) {
         body: JSON.stringify(idkitResponse),
       }
     );
+
+    console.log('World ID verification request:', {
+      url: `${baseUrl}/${rp_id}`,
+      status: response.status,
+      ok: response.ok,
+      rp_id,
+      appId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID
+    });
 
     const text = await response.text();
     let payload;
